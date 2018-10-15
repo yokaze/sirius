@@ -1,24 +1,48 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-const cols = [];
+const content = [];
+const addressStyle = {
+    display: "inline-block",
+    fontFamily: "Monaco, monospace",
+    fontSize: "16px",
+    height: "24px",
+    lineHeight: "24px",
+    textAlign: "right",
+    width: "128px"
+};
+const style = {
+    display: "inline-block",
+    fontFamily: "Monaco, monospace",
+    fontSize: "16px",
+    height: "24px",
+    lineHeight: "24px",
+    textAlign: "center",
+    width: "32px"
+};
+
+content.push(<span key="address" style={addressStyle}>Address</span>);
 for (let i = 0; i < 16; ++i)
 {
-    const style = {
-        display: "inline-block",
-        fontFamily: "Monaco, monospace",
-        fontSize: "16px",
-        height: "24px",
-        lineHeight: "24px",
-        textAlign: "center",
-        width: "32px"
-    };
     const title = '+' + i.toString(16).toUpperCase();
-    cols.push(<span key={i} style={style}>{title}</span>);
+    content.push(<span key={i} style={style}>{title}</span>);
 }
-const content = <div>{cols}</div>;
+content.push(<br key={"br"} />);
+for (let j = 0; j < 20; ++j)
+{
+    const address = j * 16;
+    const title = ('00000000' + address.toString(16)).slice(-8).toUpperCase();
+    content.push(<span key={"address" + j} style={addressStyle}>{title}</span>);
+    for (let i = 0; i < 16; ++i)
+    {
+        const value = (i + j * 16) % 256;
+        const title = ('00' + value.toString(16)).slice(-2).toUpperCase();
+        content.push(<span key={(j + 1) * 100 + i} style={style}>{title}</span>);
+    }
+    content.push(<br key={"br" + j} />);
+}
 
 ReactDOM.render(
-    content,
+    <div>{content}</div>,
     document.getElementById('root')
 );
