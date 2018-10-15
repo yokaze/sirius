@@ -1,7 +1,7 @@
 import React from 'react';
 import ReactDOM from 'react-dom';
 
-const content = React.createElement('p', null, 'Binary Editor');
+const content = <p>Binary Editor</p>
 
 ReactDOM.render(
     content,
