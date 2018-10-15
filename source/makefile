@@ -1,0 +1,5 @@
+link:
+	npm link babel-preset-es2015
+	npm link babel-register
+	npm link react
+	npm link react-dom

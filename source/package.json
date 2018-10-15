@@ -1,3 +1,6 @@
 {
-    "main": "main.js"
+    "main": "main.js",
+    "babel": {
+        "presets": [ "es2015" ]
+    }
 }

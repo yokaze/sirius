@@ -12,4 +12,5 @@ app.on('ready', function() {
         slashes: true
     });
     browserWindow.loadURL(indexUrl);
+    browserWindow.webContents.openDevTools();
 });
