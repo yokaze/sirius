@@ -21,6 +21,11 @@ const style = {
     width: "32px"
 };
 
+function handleKeyDown(e)
+{
+    console.log(e);
+}
+
 content.push(<span key="address" style={addressStyle}>Address</span>);
 for (let i = 0; i < 16; ++i)
 {
@@ -35,14 +40,15 @@ for (let j = 0; j < 20; ++j)
     content.push(<span key={"address" + j} style={addressStyle}>{title}</span>);
     for (let i = 0; i < 16; ++i)
     {
+        const address = i + j * 16;
         const value = (i + j * 16) % 256;
         const title = ('00' + value.toString(16)).slice(-2).toUpperCase();
-        content.push(<span key={(j + 1) * 100 + i} style={style}>{title}</span>);
+        content.push(<span key={(j + 1) * 100 + i} style={style} tabIndex={address} onKeyDown={handleKeyDown}>{title}</span>);
     }
     content.push(<br key={"br" + j} />);
 }
 
 ReactDOM.render(
-    <div>{content}</div>,
+    <div className="binary-table">{content}</div>,
     document.getElementById('root')
 );
