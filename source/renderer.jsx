@@ -1,4 +1,4 @@
-import React from 'react';
+import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 
 const content = [];
@@ -21,9 +21,19 @@ const style = {
     width: "32px"
 };
 
-function handleKeyDown(e)
-{
-    console.log(e);
+class BinaryTableCell extends Component {
+    constructor(props, context, updater) {
+        super(props, context, updater);
+        this.address = props.address;
+        this.value = props.value;
+    }
+    render() {
+        const text = ('00' + this.value.toString(16)).slice(-2).toUpperCase();
+        return <span key={this.address} style={style} tabIndex={this.address} onKeyDown={this.handleKeyDown}>{text}</span>;
+    }
+    handleKeyDown(e) {
+        console.log(e);
+    }
 }
 
 content.push(<span key="address" style={addressStyle}>Address</span>);
@@ -42,8 +52,7 @@ for (let j = 0; j < 20; ++j)
     {
         const address = i + j * 16;
         const value = (i + j * 16) % 256;
-        const title = ('00' + value.toString(16)).slice(-2).toUpperCase();
-        content.push(<span key={(j + 1) * 100 + i} style={style} tabIndex={address} onKeyDown={handleKeyDown}>{title}</span>);
+        content.push(<BinaryTableCell key={"btcell" + address} address={address} value={value} />);
     }
     content.push(<br key={"br" + j} />);
 }
