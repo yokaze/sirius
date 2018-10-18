@@ -60,16 +60,19 @@ class BinaryTable extends Component {
     constructor(props) {
         super(props);
         this.state = {
-            startAddress: 0
+            startAddress: 0,
+            columnCount: 16
         };
         this.handleKeyDown = this.handleKeyDown.bind(this);
     }
     render() {
+        const columnCount = this.state.columnCount;
         const items = [];
         items.push(<span key="address" style={addressStyle}>Address</span>);
-        for (let i = 0; i < 16; ++i)
+        for (let i = 0; i < columnCount; ++i)
         {
-            const title = '+' + i.toString(16).toUpperCase();
+            let title = i.toString(16).toUpperCase();
+            title = (i < 16) ? ('+' + title) : title;
             items.push(<span key={i} style={style}>{title}</span>);
         }
         items.push(<br key="br-head" />);
@@ -77,10 +80,10 @@ class BinaryTable extends Component {
         const fileSize = fileData.getFileSize();
         for (let j = 0; j < 20; ++j)
         {
-            const rowAddress = this.state.startAddress + j * 16;
+            const rowAddress = this.state.startAddress + j * columnCount;
             const row = <BinaryTableRow key={"BinaryTableRow:" + rowAddress} address={rowAddress} />;
             items.push(row);
-            for (let i = 0; i < 16; ++i)
+            for (let i = 0; i < columnCount; ++i)
             {
                 const cellAddress = rowAddress + i;
                 const value = (cellAddress < fileSize) ? fileData.getValueAt(cellAddress) : '--';
@@ -98,18 +101,19 @@ class BinaryTable extends Component {
         switch (e.keyCode)
         {
             case keyCodeUp:
-                delta = -0x10;
+                delta = -1;
                 break;
             case keyCodeDown:
-                delta = +0x10;
+                delta = +1;
                 break;
         }
         if (delta != 0)
         {
             const updateStartAddress = function(state, props) {
+                const columnCount = state.columnCount;
                 const fileSize = props.fileData.getFileSize();
-                const maxAddress = Math.floor((fileSize - 1) / 16) * 16;
-                const nextAddress = Math.min(Math.max(0, state.startAddress + delta), maxAddress);
+                const maxAddress = Math.floor((fileSize - 1) / columnCount) * columnCount;
+                const nextAddress = Math.min(Math.max(0, state.startAddress + delta * columnCount), maxAddress);
                 return { startAddress: nextAddress };
             };
             this.setState(updateStartAddress);
