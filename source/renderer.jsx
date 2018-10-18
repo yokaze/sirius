@@ -25,6 +25,9 @@ class BinaryFileData {
     getValueAt(address) {
         return (address * 11) % 256;
     }
+    getFileSize() {
+        return 0x288;
+    }
 };
 
 class BinaryTableRow extends Component {
@@ -70,6 +73,8 @@ class BinaryTable extends Component {
             items.push(<span key={i} style={style}>{title}</span>);
         }
         items.push(<br key="br-head" />);
+        const fileData = this.props.fileData;
+        const fileSize = fileData.getFileSize();
         for (let j = 0; j < 20; ++j)
         {
             const rowAddress = this.state.startAddress + j * 16;
@@ -78,7 +83,7 @@ class BinaryTable extends Component {
             for (let i = 0; i < 16; ++i)
             {
                 const cellAddress = rowAddress + i;
-                const value = this.props.fileData.getValueAt(cellAddress);
+                const value = (cellAddress < fileSize) ? fileData.getValueAt(cellAddress) : '--';
                 const cell = <BinaryTableCell key={"BinaryTableCell:" + cellAddress} address={cellAddress} value={value} handleKeyDown={this.handleKeyDown} />;
                 items.push(cell);
             }
@@ -102,7 +107,10 @@ class BinaryTable extends Component {
         if (delta != 0)
         {
             const updateStartAddress = function(state, props) {
-                return { startAddress: Math.max(0, state.startAddress + delta) };
+                const fileSize = props.fileData.getFileSize();
+                const maxAddress = Math.floor((fileSize - 1) / 16) * 16;
+                const nextAddress = Math.min(Math.max(0, state.startAddress + delta), maxAddress);
+                return { startAddress: nextAddress };
             };
             this.setState(updateStartAddress);
         }
