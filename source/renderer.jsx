@@ -21,6 +21,12 @@ const style = {
     width: "32px"
 };
 
+class BinaryFileData {
+    getValueAt(address) {
+        return (address * 11) % 256;
+    }
+};
+
 class BinaryTableRow extends Component {
     constructor(props) {
         super(props);
@@ -72,7 +78,7 @@ class BinaryTable extends Component {
             for (let i = 0; i < 16; ++i)
             {
                 const cellAddress = rowAddress + i;
-                const value = (cellAddress) % 256;
+                const value = this.props.fileData.getValueAt(cellAddress);
                 const cell = <BinaryTableCell key={"BinaryTableCell:" + cellAddress} address={cellAddress} value={value} handleKeyDown={this.handleKeyDown} />;
                 items.push(cell);
             }
@@ -103,6 +109,6 @@ class BinaryTable extends Component {
     }
 };
 
-ReactDOM.render(<BinaryTable />,
+ReactDOM.render(<BinaryTable fileData={new BinaryFileData} />,
     document.getElementById('root')
 );
