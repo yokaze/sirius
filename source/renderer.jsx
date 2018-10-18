@@ -24,14 +24,11 @@ const style = {
 class BinaryTableRow extends Component {
     constructor(props) {
         super(props);
-        this.state = {
-            address: props.address,
-        };
     }
     render() {
-        const address = this.state.address;
+        const address = this.props.address;
         const text = ('00000000' + address.toString(16)).slice(-8).toUpperCase();
-        return <span key={"address" + address} style={addressStyle}>{text}</span>;
+        return <span key={"BinaryTableRow:span:" + address} style={addressStyle}>{text}</span>;
     }
 };
 
@@ -41,8 +38,9 @@ class BinaryTableCell extends Component {
         this.handleKeyDown = this.handleKeyDown.bind(this);
     }
     render() {
+        const address = this.props.address;
         const text = ('00' + this.props.value.toString(16)).slice(-2).toUpperCase();
-        return <span key={this.props.address} style={style} tabIndex={this.props.address} onKeyDown={this.handleKeyDown}>{text}</span>;
+        return <span key={"BinaryTableCell:span:" + address} style={style} tabIndex={this.props.address} onKeyDown={this.handleKeyDown}>{text}</span>;
     }
     handleKeyDown(e) {
         this.props.handleKeyDown(e);
@@ -68,13 +66,14 @@ class BinaryTable extends Component {
         items.push(<br key="br-head" />);
         for (let j = 0; j < 20; ++j)
         {
-            const row = <BinaryTableRow key={"btrow" + j + this.state.startAddress} address={j * 16 + this.state.startAddress} />;
+            const rowAddress = this.state.startAddress + j * 16;
+            const row = <BinaryTableRow key={"BinaryTableRow:" + rowAddress} address={rowAddress} />;
             items.push(row);
             for (let i = 0; i < 16; ++i)
             {
-                const address = i + j * 16 + this.state.startAddress;
-                const value = (address) % 256;
-                const cell = <BinaryTableCell key={"btcell" + address} address={address} value={value} handleKeyDown={this.handleKeyDown} />;
+                const cellAddress = rowAddress + i;
+                const value = (cellAddress) % 256;
+                const cell = <BinaryTableCell key={"BinaryTableCell:" + cellAddress} address={cellAddress} value={value} handleKeyDown={this.handleKeyDown} />;
                 items.push(cell);
             }
             items.push(<br key={"br" + j} />);
