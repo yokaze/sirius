@@ -22,11 +22,20 @@ const style = {
 };
 
 class BinaryFileData {
+    constructor() {
+        this.fileSize = 0x288;
+    }
     getValueAt(address) {
         return (address * 11) % 256;
     }
+    setValueAt(address) {
+        if (this.fileSize <= address)
+        {
+            this.fileSize = address + 1;
+        }
+    }
     getFileSize() {
-        return 0x288;
+        return this.fileSize;
     }
 };
 
@@ -96,6 +105,7 @@ class BinaryTable extends Component {
     }
     handleKeyDown(e) {
         const keyCodeUp = 38;
+        const keyCodeRight = 39;
         const keyCodeDown = 40;
         let delta = 0;
         switch (e.keyCode)
@@ -105,6 +115,9 @@ class BinaryTable extends Component {
                 break;
             case keyCodeDown:
                 delta = +1;
+                break;
+            case keyCodeRight:
+                this.props.fileData.setValueAt(this.props.fileData.getFileSize());
                 break;
         }
         if (delta != 0)
