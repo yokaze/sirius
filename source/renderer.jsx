@@ -23,19 +23,24 @@ const style = {
 
 class BinaryFileData {
     constructor() {
-        this.fileSize = 0x288;
-    }
-    getValueAt(address) {
-        return (address * 11) % 256;
-    }
-    setValueAt(address) {
-        if (this.fileSize <= address)
+        this.fileData = [];
+        for (let i = 0; i < 0x288; ++i)
         {
-            this.fileSize = address + 1;
+            this.fileData.push((i * 11) % 256);
         }
     }
+    getValueAt(address) {
+        return this.fileData[address];
+    }
+    setValueAt(address, value) {
+        while (this.getFileSize() <= address)
+        {
+            this.fileData.push(0);
+        }
+        this.fileData[address] = value;
+    }
     getFileSize() {
-        return this.fileSize;
+        return this.fileData.length;
     }
 };
 
@@ -117,7 +122,7 @@ class BinaryTable extends Component {
                 delta = +1;
                 break;
             case keyCodeRight:
-                this.props.fileData.setValueAt(this.props.fileData.getFileSize());
+                this.props.fileData.setValueAt(this.props.fileData.getFileSize(), 0);
                 break;
         }
         if (delta != 0)
