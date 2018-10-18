@@ -82,7 +82,25 @@ class BinaryTable extends Component {
         return <div className="binary-table">{items}</div>;
     }
     handleKeyDown(e) {
-        this.setState((state, props) => ({ startAddress: state.startAddress + 0x10 }));
+        const keyCodeUp = 38;
+        const keyCodeDown = 40;
+        let delta = 0;
+        switch (e.keyCode)
+        {
+            case keyCodeUp:
+                delta = -0x10;
+                break;
+            case keyCodeDown:
+                delta = +0x10;
+                break;
+        }
+        if (delta != 0)
+        {
+            const updateStartAddress = function(state, props) {
+                return { startAddress: Math.max(0, state.startAddress + delta) };
+            };
+            this.setState(updateStartAddress);
+        }
     }
 };
 
