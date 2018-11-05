@@ -1,5 +1,6 @@
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import { sprintf } from 'sprintf-js';
 
 const content = [];
 const addressStyle = {
@@ -57,7 +58,7 @@ class BinaryTableRow extends Component {
     }
     render() {
         const address = this.props.address;
-        const text = ('00000000' + address.toString(16)).slice(-8).toUpperCase();
+        const text = sprintf('%08X', address);
         return <span key={"BinaryTableRow:span:" + address} style={addressStyle}>{text}</span>;
     }
 };
@@ -69,8 +70,8 @@ class BinaryTableCell extends Component {
     }
     render() {
         const address = this.props.address;
-        const text = ('00' + this.props.value.toString(16)).slice(-2).toUpperCase();
-        return <span ref={this.props.inputRef} key={"BinaryTableCell:span:" + address} style={style} tabIndex={this.props.address} onKeyDown={this.handleKeyDown}>{text}</span>;
+        const text = sprintf('%02X', this.props.value);
+        return <span ref={this.props.inputRef} key={'span'} style={style} tabIndex={this.props.address} onKeyDown={this.handleKeyDown}>{text}</span>;
     }
     handleKeyDown(e) {
         this.props.handleKeyDown(e);

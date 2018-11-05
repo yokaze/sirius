@@ -4,3 +4,4 @@ link:
 	npm link babel-register
 	npm link react
 	npm link react-dom
+	npm link sprintf-js
