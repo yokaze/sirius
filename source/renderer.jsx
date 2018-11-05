@@ -67,14 +67,18 @@ class BinaryTableCell extends Component {
     constructor(props) {
         super(props);
         this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.handleMouseDown = this.handleMouseDown.bind(this);
     }
     render() {
         const address = this.props.address;
-        const text = sprintf('%02X', this.props.value);
-        return <span ref={this.props.inputRef} key={'span'} style={style} tabIndex={this.props.address} onKeyDown={this.handleKeyDown}>{text}</span>;
+        const text = this.props.valid ? sprintf('%02X', this.props.value) : '--';
+        return <span ref={this.props.inputRef} key={'span'} style={style} tabIndex={this.props.address} onKeyDown={this.handleKeyDown} onMouseDown={this.handleMouseDown}>{text}</span>;
     }
     handleKeyDown(e) {
         this.props.handleKeyDown(e);
+    }
+    handleMouseDown(e) {
+        this.props.handleMouseDown(this, e);
     }
 }
 
@@ -88,6 +92,7 @@ class BinaryTable extends Component {
         };
         this.reference = React.createRef();
         this.handleKeyDown = this.handleKeyDown.bind(this);
+        this.handleMouseDown = this.handleMouseDown.bind(this);
     }
     componentDidUpdate() {
         this.reference.current.focus();
@@ -113,9 +118,11 @@ class BinaryTable extends Component {
             for (let i = 0; i < columnCount; ++i)
             {
                 const cellAddress = rowAddress + i;
-                const value = (cellAddress < fileSize) ? viewModel.getValueAt(cellAddress) : '--';
+                const valid = (cellAddress < fileSize);
+                const value = valid ? viewModel.getValueAt(cellAddress) : 0;
                 const reference = (cellAddress == viewModel.getFocusAddress()) ? this.reference : undefined;
-                const cell = <BinaryTableCell inputRef={reference} key={"BinaryTableCell:" + cellAddress} address={cellAddress} value={value} handleKeyDown={this.handleKeyDown} />;
+                const cell = <BinaryTableCell inputRef={reference} key={"BinaryTableCell:" + cellAddress} address={cellAddress} value={value} valid={valid}
+                  handleKeyDown={this.handleKeyDown} handleMouseDown={this.handleMouseDown}/>;
                 items.push(cell);
             }
             items.push(<br key={"br" + j} />);
@@ -151,6 +158,14 @@ class BinaryTable extends Component {
             };
             this.setState(updateStartAddress);
         }
+    }
+    handleMouseDown(sender, e)
+    {
+        const handler = function(state, props) {
+            this.props.viewModel.setFocusAddress(sender.props.address);
+            return { };
+        };
+        this.setState(handler);
     }
 };
 
