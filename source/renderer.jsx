@@ -21,7 +21,7 @@ const style = {
     width: "32px"
 };
 
-class BinaryFileData {
+class BinaryTableViewModel {
     constructor() {
         this.fileData = [];
         for (let i = 0; i < 0x288; ++i)
@@ -41,6 +41,9 @@ class BinaryFileData {
     }
     getFileSize() {
         return this.fileData.length;
+    }
+    getFocusAddress() {
+        return 64;
     }
 };
 
@@ -63,7 +66,7 @@ class BinaryTableCell extends Component {
     render() {
         const address = this.props.address;
         const text = ('00' + this.props.value.toString(16)).slice(-2).toUpperCase();
-        return <span key={"BinaryTableCell:span:" + address} style={style} tabIndex={this.props.address} onKeyDown={this.handleKeyDown}>{text}</span>;
+        return <span ref={this.props.spanRef} key={"BinaryTableCell:span:" + address} style={style} tabIndex={this.props.address} onKeyDown={this.handleKeyDown}>{text}</span>;
     }
     handleKeyDown(e) {
         this.props.handleKeyDown(e);
@@ -75,9 +78,14 @@ class BinaryTable extends Component {
         super(props);
         this.state = {
             startAddress: 0,
+            focusAddress: 64,
             columnCount: 16
         };
+        this.reference = React.createRef();
         this.handleKeyDown = this.handleKeyDown.bind(this);
+    }
+    componentDidUpdate() {
+        this.reference.current.focus();
     }
     render() {
         const columnCount = this.state.columnCount;
@@ -101,7 +109,8 @@ class BinaryTable extends Component {
             {
                 const cellAddress = rowAddress + i;
                 const value = (cellAddress < fileSize) ? fileData.getValueAt(cellAddress) : '--';
-                const cell = <BinaryTableCell key={"BinaryTableCell:" + cellAddress} address={cellAddress} value={value} handleKeyDown={this.handleKeyDown} />;
+                const reference = (cellAddress == fileData.getFocusAddress()) ? this.reference : undefined;
+                const cell = <BinaryTableCell spanRef={reference} key={"BinaryTableCell:" + cellAddress} address={cellAddress} value={value} handleKeyDown={this.handleKeyDown} />;
                 items.push(cell);
             }
             items.push(<br key={"br" + j} />);
@@ -139,6 +148,6 @@ class BinaryTable extends Component {
     }
 };
 
-ReactDOM.render(<BinaryTable fileData={new BinaryFileData} />,
+ReactDOM.render(<BinaryTable fileData={new BinaryTableViewModel} />,
     document.getElementById('root')
 );
