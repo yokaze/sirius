@@ -47,6 +47,9 @@ class BinaryTableViewModel {
         }
         this.fileData[address] = value;
     }
+    insertValueAt(address, value) {
+        this.fileData.splice(address, 0, value);
+    }
     getFileSize() {
         return this.fileData.length;
     }
@@ -145,9 +148,31 @@ class BinaryTable extends Component {
     handleKeyDown(e) {
         const keyCode = e.keyCode;
         const handler = function(state, props) {
+            const viewModel = this.props.viewModel;
+            const handleTypeHex = function(value) {
+                if (viewModel.getWriteMode() == WriteMode.Overwrite)
+                {
+                    viewModel.setValueAt(viewModel.getFocusAddress(), value);
+                }
+                else
+                {
+                    viewModel.insertValueAt(viewModel.getFocusAddress(), value);
+                }
+            };
+
             const columnCount = state.columnCount;
             let addressMove = 0;
             let rowMove = 0;
+            if ((48 <= keyCode) && (keyCode <= 57))
+            {
+                handleTypeHex(keyCode - 48);
+                addressMove = 1;
+            }
+            else if ((65 <= keyCode) && (keyCode <= 70))
+            {
+                handleTypeHex(keyCode - 55);
+                addressMove = 1;
+            }
             switch (keyCode)
             {
                 case 37:  //  Left
@@ -165,14 +190,14 @@ class BinaryTable extends Component {
                     rowMove = 1;
                     break;
                 case 73:  //  i
-                    this.props.viewModel.setWriteMode(1 - this.props.viewModel.getWriteMode());
+                    viewModel.setWriteMode(1 - viewModel.getWriteMode());
                     break;
                 default:
                     console.log(keyCode);
                     break;
             }
-            this.props.viewModel.setFocusAddress(this.props.viewModel.getFocusAddress() + addressMove);
-            const fileSize = props.viewModel.getFileSize();
+            viewModel.setFocusAddress(viewModel.getFocusAddress() + addressMove);
+            const fileSize = viewModel.getFileSize();
             const maxAddress = Math.floor((fileSize - 1) / columnCount) * columnCount;
             const nextAddress = Math.min(Math.max(0, state.startAddress + rowMove * columnCount), maxAddress);
             return { startAddress: nextAddress };
