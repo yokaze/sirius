@@ -24,6 +24,7 @@ const style = {
 class BinaryTableViewModel {
     constructor() {
         this.fileData = [];
+        this.focusAddress = 64;
         for (let i = 0; i < 0x288; ++i)
         {
             this.fileData.push((i * 11) % 256);
@@ -43,7 +44,10 @@ class BinaryTableViewModel {
         return this.fileData.length;
     }
     getFocusAddress() {
-        return 64;
+        return this.focusAddress;
+    }
+    setFocusAddress(address) {
+        this.focusAddress = address;
     }
 };
 
@@ -66,7 +70,7 @@ class BinaryTableCell extends Component {
     render() {
         const address = this.props.address;
         const text = ('00' + this.props.value.toString(16)).slice(-2).toUpperCase();
-        return <span ref={this.props.spanRef} key={"BinaryTableCell:span:" + address} style={style} tabIndex={this.props.address} onKeyDown={this.handleKeyDown}>{text}</span>;
+        return <span ref={this.props.inputRef} key={"BinaryTableCell:span:" + address} style={style} tabIndex={this.props.address} onKeyDown={this.handleKeyDown}>{text}</span>;
     }
     handleKeyDown(e) {
         this.props.handleKeyDown(e);
@@ -110,7 +114,7 @@ class BinaryTable extends Component {
                 const cellAddress = rowAddress + i;
                 const value = (cellAddress < fileSize) ? fileData.getValueAt(cellAddress) : '--';
                 const reference = (cellAddress == fileData.getFocusAddress()) ? this.reference : undefined;
-                const cell = <BinaryTableCell spanRef={reference} key={"BinaryTableCell:" + cellAddress} address={cellAddress} value={value} handleKeyDown={this.handleKeyDown} />;
+                const cell = <BinaryTableCell inputRef={reference} key={"BinaryTableCell:" + cellAddress} address={cellAddress} value={value} handleKeyDown={this.handleKeyDown} />;
                 items.push(cell);
             }
             items.push(<br key={"br" + j} />);
@@ -136,6 +140,7 @@ class BinaryTable extends Component {
         }
         if (delta != 0)
         {
+            this.props.fileData.setFocusAddress(this.props.fileData.getFocusAddress() + delta * 16);
             const updateStartAddress = function(state, props) {
                 const columnCount = state.columnCount;
                 const fileSize = props.fileData.getFileSize();
