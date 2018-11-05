@@ -130,34 +130,32 @@ class BinaryTable extends Component {
         return <div className="binary-table">{items}</div>;
     }
     handleKeyDown(e) {
-        const keyCodeUp = 38;
-        const keyCodeRight = 39;
-        const keyCodeDown = 40;
-        let delta = 0;
-        switch (e.keyCode)
-        {
-            case keyCodeUp:
-                delta = -1;
-                break;
-            case keyCodeDown:
-                delta = +1;
-                break;
-            case keyCodeRight:
-                this.props.viewModel.setValueAt(this.props.viewModel.getFileSize(), 0);
-                break;
-        }
-        if (delta != 0)
-        {
+        const keyCode = e.keyCode;
+        const handler = function(state, props) {
+            const keyCodeUp = 38;
+            const keyCodeRight = 39;
+            const keyCodeDown = 40;
+            let delta = 0;
+            switch (keyCode)
+            {
+                case keyCodeUp:
+                    delta = -1;
+                    break;
+                case keyCodeDown:
+                    delta = +1;
+                    break;
+                case keyCodeRight:
+                    this.props.viewModel.setValueAt(this.props.viewModel.getFileSize(), 0);
+                    break;
+            }
             this.props.viewModel.setFocusAddress(this.props.viewModel.getFocusAddress() + delta * 16);
-            const updateStartAddress = function(state, props) {
-                const columnCount = state.columnCount;
-                const fileSize = props.viewModel.getFileSize();
-                const maxAddress = Math.floor((fileSize - 1) / columnCount) * columnCount;
-                const nextAddress = Math.min(Math.max(0, state.startAddress + delta * columnCount), maxAddress);
-                return { startAddress: nextAddress };
-            };
-            this.setState(updateStartAddress);
-        }
+            const columnCount = state.columnCount;
+            const fileSize = props.viewModel.getFileSize();
+            const maxAddress = Math.floor((fileSize - 1) / columnCount) * columnCount;
+            const nextAddress = Math.min(Math.max(0, state.startAddress + delta * columnCount), maxAddress);
+            return { startAddress: nextAddress };
+        };
+        this.setState(handler);
     }
     handleMouseDown(sender, e)
     {
