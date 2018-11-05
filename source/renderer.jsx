@@ -2,6 +2,11 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { sprintf } from 'sprintf-js';
 
+const WriteMode = {
+  Overwrite: 0,
+  Insert: 1
+};
+
 const content = [];
 const addressStyle = {
     display: "inline-block",
@@ -26,6 +31,7 @@ class BinaryTableViewModel {
     constructor() {
         this.fileData = [];
         this.focusAddress = 64;
+        this.writeMode = WriteMode.Overwrite;
         for (let i = 0; i < 0x288; ++i)
         {
             this.fileData.push((i * 11) % 256);
@@ -49,6 +55,12 @@ class BinaryTableViewModel {
     }
     setFocusAddress(address) {
         this.focusAddress = address;
+    }
+    getWriteMode() {
+        return this.writeMode;
+    }
+    setWriteMode(writeMode) {
+        this.writeMode = writeMode;
     }
 };
 
@@ -127,6 +139,7 @@ class BinaryTable extends Component {
             }
             items.push(<br key={"br" + j} />);
         }
+        items.push(<div key={"write-mode"}>{(this.props.viewModel.getWriteMode() == WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>);
         return <div className="binary-table">{items}</div>;
     }
     handleKeyDown(e) {
@@ -150,6 +163,12 @@ class BinaryTable extends Component {
                 case 40:  //  Down
                     addressMove = columnCount;
                     rowMove = 1;
+                    break;
+                case 73:  //  i
+                    this.props.viewModel.setWriteMode(1 - this.props.viewModel.getWriteMode());
+                    break;
+                default:
+                    console.log(keyCode);
                     break;
             }
             this.props.viewModel.setFocusAddress(this.props.viewModel.getFocusAddress() + addressMove);
