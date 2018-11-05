@@ -196,10 +196,19 @@ class BinaryTable extends Component {
                     console.log(keyCode);
                     break;
             }
-            viewModel.setFocusAddress(viewModel.getFocusAddress() + addressMove);
             const fileSize = viewModel.getFileSize();
             const maxAddress = Math.floor((fileSize - 1) / columnCount) * columnCount;
-            const nextAddress = Math.min(Math.max(0, state.startAddress + rowMove * columnCount), maxAddress);
+            const nextFocusAddress = Math.max(0, viewModel.getFocusAddress() + addressMove);
+            viewModel.setFocusAddress(nextFocusAddress);
+            let nextAddress = state.startAddress;
+            if (nextFocusAddress < nextAddress)
+            {
+                nextAddress -= Math.ceil((nextAddress - nextFocusAddress) / columnCount) * columnCount;
+            }
+            else if ((nextAddress + 20 * columnCount) <= nextFocusAddress)
+            {
+                nextAddress += (Math.floor((nextFocusAddress - nextAddress) / columnCount) - 19) * columnCount;
+            }
             return { startAddress: nextAddress };
         };
         this.setState(handler);
