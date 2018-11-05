@@ -102,8 +102,8 @@ class BinaryTable extends Component {
             items.push(<span key={i} style={style}>{title}</span>);
         }
         items.push(<br key="br-head" />);
-        const fileData = this.props.fileData;
-        const fileSize = fileData.getFileSize();
+        const viewModel = this.props.viewModel;
+        const fileSize = viewModel.getFileSize();
         for (let j = 0; j < 20; ++j)
         {
             const rowAddress = this.state.startAddress + j * columnCount;
@@ -112,8 +112,8 @@ class BinaryTable extends Component {
             for (let i = 0; i < columnCount; ++i)
             {
                 const cellAddress = rowAddress + i;
-                const value = (cellAddress < fileSize) ? fileData.getValueAt(cellAddress) : '--';
-                const reference = (cellAddress == fileData.getFocusAddress()) ? this.reference : undefined;
+                const value = (cellAddress < fileSize) ? viewModel.getValueAt(cellAddress) : '--';
+                const reference = (cellAddress == viewModel.getFocusAddress()) ? this.reference : undefined;
                 const cell = <BinaryTableCell inputRef={reference} key={"BinaryTableCell:" + cellAddress} address={cellAddress} value={value} handleKeyDown={this.handleKeyDown} />;
                 items.push(cell);
             }
@@ -135,15 +135,15 @@ class BinaryTable extends Component {
                 delta = +1;
                 break;
             case keyCodeRight:
-                this.props.fileData.setValueAt(this.props.fileData.getFileSize(), 0);
+                this.props.viewModel.setValueAt(this.props.viewModel.getFileSize(), 0);
                 break;
         }
         if (delta != 0)
         {
-            this.props.fileData.setFocusAddress(this.props.fileData.getFocusAddress() + delta * 16);
+            this.props.viewModel.setFocusAddress(this.props.viewModel.getFocusAddress() + delta * 16);
             const updateStartAddress = function(state, props) {
                 const columnCount = state.columnCount;
-                const fileSize = props.fileData.getFileSize();
+                const fileSize = props.viewModel.getFileSize();
                 const maxAddress = Math.floor((fileSize - 1) / columnCount) * columnCount;
                 const nextAddress = Math.min(Math.max(0, state.startAddress + delta * columnCount), maxAddress);
                 return { startAddress: nextAddress };
@@ -153,6 +153,6 @@ class BinaryTable extends Component {
     }
 };
 
-ReactDOM.render(<BinaryTable fileData={new BinaryTableViewModel} />,
+ReactDOM.render(<BinaryTable viewModel={new BinaryTableViewModel} />,
     document.getElementById('root')
 );
