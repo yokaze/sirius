@@ -1,3 +1,6 @@
+body {
+    margin: 0;
+}
 .binary-table span:focus {
     background-color: silver;
     outline: 0;

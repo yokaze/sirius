@@ -50,6 +50,9 @@ class BinaryTableViewModel {
     insertValueAt(address, value) {
         this.fileData.splice(address, 0, value);
     }
+    removeValueAt(address) {
+        this.fileData.splice(address, 1);
+    }
     getFileSize() {
         return this.fileData.length;
     }
@@ -162,7 +165,6 @@ class BinaryTable extends Component {
 
             const columnCount = state.columnCount;
             let addressMove = 0;
-            let rowMove = 0;
             if ((48 <= keyCode) && (keyCode <= 57))
             {
                 handleTypeHex(keyCode - 48);
@@ -175,19 +177,27 @@ class BinaryTable extends Component {
             }
             switch (keyCode)
             {
+                case 8:   //  Delete
+                {
+                    const focusAddress = viewModel.getFocusAddress();
+                    if (1 <= focusAddress)
+                    {
+                        viewModel.removeValueAt(focusAddress - 1);
+                        addressMove = -1;
+                    }
+                    break;
+                }
                 case 37:  //  Left
                     addressMove = -1;
                     break;
                 case 38:  //  Up
                     addressMove = -columnCount;
-                    rowMove = -1;
                     break;
                 case 39:  //  Right
                     addressMove = 1;
                     break;
                 case 40:  //  Down
                     addressMove = columnCount;
-                    rowMove = 1;
                     break;
                 case 73:  //  i
                     viewModel.setWriteMode(1 - viewModel.getWriteMode());
