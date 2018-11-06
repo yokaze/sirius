@@ -1,3 +1,5 @@
+import { dialog } from 'electron';
+
 export default class {
   constructor() {
   }
@@ -7,7 +9,13 @@ export default class {
   }
 
   open() {
-    console.log('Open');
+    const fileNames = dialog.showOpenDialog(null, {
+      properties: ['openFile']
+    });
+    if (fileNames != undefined) {
+      const fileName = fileNames[0];
+      console.log(fileName);
+    }
   }
 
   save() {
