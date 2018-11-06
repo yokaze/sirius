@@ -1,5 +1,4 @@
-
-export class SiriusModel {
+export default class {
   constructor() {
   }
 

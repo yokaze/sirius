@@ -1,13 +1,10 @@
-require('babel-register');
-const electron = require('electron');
-const app = electron.app;
-const BrowserWindow = electron.BrowserWindow;
-const Menu = electron.Menu;
-const path = require('path');
-const url = require('url');
-const SiriusModel = require('./SiriusModel');
+import electron from 'electron';
+import { app, BrowserWindow, Menu } from 'electron';
+import path from 'path';
+import url from 'url';
+import SiriusModel from './SiriusModel';
 
-const model = new SiriusModel.SiriusModel;
+const model = new SiriusModel;
 
 const menuTemplate = [
   {
