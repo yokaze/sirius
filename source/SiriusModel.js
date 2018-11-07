@@ -3,8 +3,15 @@ import fs from 'fs';
 import path from 'path';
 import url from 'url';
 
+class SiriusWindowModel {
+  constructor() {
+
+  }
+};
+
 export default class {
   constructor() {
+    this.windowModels = {};
   }
 
   createNew() {
@@ -16,6 +23,7 @@ export default class {
     });
     browserWindow.loadURL(indexUrl);
     browserWindow.webContents.openDevTools();
+    console.log(browserWindow.id);
   }
 
   open() {

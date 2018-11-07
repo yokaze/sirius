@@ -1,6 +1,9 @@
+import { remote } from 'electron';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { sprintf } from 'sprintf-js';
+
+const applicationModel = remote.require('./app').Model;
 
 const WriteMode = {
   Overwrite: 0,
