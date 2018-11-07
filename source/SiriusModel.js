@@ -1,11 +1,21 @@
-import { dialog } from 'electron';
+import { BrowserWindow, dialog } from 'electron';
+import fs from 'fs';
+import path from 'path';
+import url from 'url';
 
 export default class {
   constructor() {
   }
 
   createNew() {
-    console.log('Create New');
+    const browserWindow = new BrowserWindow({ width: 1600, height: 1024 });
+    const indexUrl = url.format({
+        pathname: path.join(__dirname, 'index.html'),
+        protocol: 'file:',
+        slashes: true
+    });
+    browserWindow.loadURL(indexUrl);
+    browserWindow.webContents.openDevTools();
   }
 
   open() {
@@ -14,7 +24,8 @@ export default class {
     });
     if (fileNames != undefined) {
       const fileName = fileNames[0];
-      console.log(fileName);
+      const buffer = fs.readFileSync(fileName);
+      console.log([...buffer]);
     }
   }
 

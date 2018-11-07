@@ -1,7 +1,5 @@
 import electron from 'electron';
-import { app, BrowserWindow, Menu } from 'electron';
-import path from 'path';
-import url from 'url';
+import { app, Menu } from 'electron';
 import SiriusModel from './SiriusModel';
 
 const model = new SiriusModel;
@@ -32,15 +30,7 @@ const menuTemplate = [
 ];
 
 app.on('ready', function() {
-    const browserWindow = new BrowserWindow({ width: 1600, height: 1024 });
-    const indexUrl = url.format({
-        pathname: path.join(__dirname, 'index.html'),
-        protocol: 'file:',
-        slashes: true
-    });
-    browserWindow.loadURL(indexUrl);
-    browserWindow.webContents.openDevTools();
-
     const menu = Menu.buildFromTemplate(menuTemplate);
     Menu.setApplicationMenu(menu);
+    model.createNew();
 });
