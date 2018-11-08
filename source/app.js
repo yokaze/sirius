@@ -14,10 +14,10 @@ const menuTemplate = [
   {
     label: 'File',
     submenu: [
-      { label: 'New', click: Model.createNew, accelerator:'CmdOrCtrl+N' },
-      { label: 'Open', click: Model.open, accelerator:'CmdOrCtrl+O' },
-      { label: 'Save', click: Model.save, accelerator:'CmdOrCtrl+S' },
-      { label: 'Save As', click: Model.saveAs, accelerator:'CmdOrCtrl+Shift+S' }
+      { label: 'New', click: () => { Model.createNew(); }, accelerator:'CmdOrCtrl+N' },
+      { label: 'Open', click: () => { Model.open(); }, accelerator:'CmdOrCtrl+O' },
+      { label: 'Save', click: () => { Model.save(); }, accelerator:'CmdOrCtrl+S' },
+      { label: 'Save As', click: () => { Model.saveAs(); }, accelerator:'CmdOrCtrl+Shift+S' }
     ]
   },
   {

@@ -1,4 +1,4 @@
-import { remote } from 'electron';
+import { ipcRenderer, remote } from 'electron';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import { sprintf } from 'sprintf-js';
@@ -33,12 +33,11 @@ const style = {
 class BinaryTableViewModel {
     constructor() {
         this.fileData = [];
-        this.focusAddress = 64;
+        this.focusAddress = 0;
         this.writeMode = WriteMode.Overwrite;
-        for (let i = 0; i < 0x288; ++i)
-        {
-            this.fileData.push((i * 11) % 256);
-        }
+    }
+    setListener(listener) {
+      this.listener = listener;
     }
     getValueAt(address) {
         return this.fileData[address];
@@ -70,6 +69,10 @@ class BinaryTableViewModel {
     }
     setWriteMode(writeMode) {
         this.writeMode = writeMode;
+    }
+    setFileData(fileData) {
+      this.fileData = fileData;
+      this.listener.onViewModelReloaded();
     }
 };
 
@@ -106,6 +109,7 @@ class BinaryTableCell extends Component {
 class BinaryTable extends Component {
     constructor(props) {
         super(props);
+        this.props.viewModel.setListener(this);
         this.state = {
             startAddress: 0,
             focusAddress: 64,
@@ -234,8 +238,19 @@ class BinaryTable extends Component {
         };
         this.setState(handler);
     }
+
+    onViewModelReloaded() {
+      this.forceUpdate();
+    }
 };
 
-ReactDOM.render(<BinaryTable viewModel={new BinaryTableViewModel} />,
+const tableViewModel = new BinaryTableViewModel;
+
+ipcRenderer.on('file-data', (e, data) => {
+  tableViewModel.setFileData([...data]);
+})
+ipcRenderer.send('editor-initialized');
+
+ReactDOM.render(<BinaryTable viewModel={tableViewModel} />,
     document.getElementById('root')
 );
