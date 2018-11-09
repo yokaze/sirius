@@ -15,14 +15,14 @@ class SiriusWindowModel {
   getFileData() {
     return this.fileData;
   }
-};
+}
 
 export default class {
   constructor() {
     this.windowModels = {};
     ipcMain.on('editor-initialized', (e) => {
       const windowId = e.sender.getOwnerBrowserWindow().id;
-      if (this.windowModels[windowId] != undefined) {
+      if (this.windowModels[windowId] !== undefined) {
         const fileData = this.windowModels[windowId].getFileData();
         e.sender.send('file-data', fileData);
       }
@@ -38,14 +38,14 @@ export default class {
 
   open() {
     const fileNames = dialog.showOpenDialog(null, {
-      properties: ['openFile']
+      properties: ['openFile'],
     });
-    if (fileNames != undefined) {
+    if (fileNames !== undefined) {
       const fileName = fileNames[0];
       fs.readFile(fileName, (err, data) => {
         console.log([...data]);
         const windowId = this.openEditor();
-        const windowModel = new SiriusWindowModel;
+        const windowModel = new SiriusWindowModel();
         windowModel.setFileData(data);
         this.windowModels[windowId] = windowModel;
       });
@@ -70,9 +70,9 @@ export default class {
 
   getIndexUrl() {
     return url.format({
-        pathname: path.join(__dirname, 'index.html'),
-        protocol: 'file:',
-        slashes: true
+      pathname: path.join(__dirname, 'index.html'),
+      protocol: 'file:',
+      slashes: true,
     });
   }
 }
