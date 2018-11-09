@@ -1,6 +1,7 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
+import SiriusIpcCommand from './ipc/SiriusIpcCommand';
 import url from 'url';
 
 class SiriusWindowModel {
@@ -24,7 +25,7 @@ export default class {
       const windowId = e.sender.getOwnerBrowserWindow().id;
       if (this.windowModels[windowId] !== undefined) {
         const fileData = this.windowModels[windowId].getFileData();
-        e.sender.send('file-data', fileData);
+        e.sender.send(SiriusIpcCommand.onRendererReceivedRenewalBinary, fileData);
       }
     });
   }

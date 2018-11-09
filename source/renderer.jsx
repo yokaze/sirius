@@ -1,7 +1,10 @@
 import { ipcRenderer, remote } from 'electron';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import SiriusIpcClient from './ipc/SiriusIpcClient';
 import { sprintf } from 'sprintf-js';
+
+const ipcClient = new SiriusIpcClient();
 
 const applicationModel = remote.require('./app').Model;
 
@@ -70,8 +73,9 @@ class BinaryTableViewModel {
     setWriteMode(writeMode) {
         this.writeMode = writeMode;
     }
-    setFileData(fileData) {
-      this.fileData = fileData;
+
+    onReceivedRenewalBinary(sender, renewalBinary) {
+      this.fileData = [...renewalBinary];
       this.listener.onViewModelReloaded();
     }
 };
@@ -245,10 +249,7 @@ class BinaryTable extends Component {
 };
 
 const tableViewModel = new BinaryTableViewModel;
-
-ipcRenderer.on('file-data', (e, data) => {
-  tableViewModel.setFileData([...data]);
-})
+ipcClient.setListener(tableViewModel);
 ipcRenderer.send('editor-initialized');
 
 ReactDOM.render(<BinaryTable viewModel={tableViewModel} />,
