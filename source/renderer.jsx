@@ -74,6 +74,10 @@ class BinaryTableViewModel {
         this.writeMode = writeMode;
     }
 
+    setIpcClient(ipcClient) {
+      this.ipcClient = ipcClient;
+    }
+
     onReceivedRenewalBinary(sender, renewalBinary) {
       this.fileData = [...renewalBinary];
       this.listener.onViewModelReloaded();
@@ -249,6 +253,7 @@ class BinaryTable extends Component {
 };
 
 const tableViewModel = new BinaryTableViewModel;
+tableViewModel.setIpcClient(ipcClient);
 ipcClient.setListener(tableViewModel);
 ipcRenderer.send('editor-initialized');
 

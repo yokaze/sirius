@@ -1,8 +1,9 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
-import SiriusIpcCommand from './ipc/SiriusIpcCommand';
 import url from 'url';
+
+import SiriusIpcCommand from './ipc/SiriusIpcCommand';
 
 class SiriusWindowModel {
   constructor() {
@@ -47,6 +48,7 @@ export default class {
         console.log([...data]);
         const windowId = this.openEditor();
         const windowModel = new SiriusWindowModel();
+        BrowserWindow.fromId(windowId).setTitle(fileName);
         windowModel.setFileData(data);
         this.windowModels[windowId] = windowModel;
       });
