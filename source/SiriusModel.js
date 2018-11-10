@@ -45,7 +45,6 @@ export default class {
     if (fileNames !== undefined) {
       const fileName = fileNames[0];
       fs.readFile(fileName, (err, data) => {
-        console.log([...data]);
         const windowId = this.openEditor();
         const windowModel = new SiriusWindowModel();
         BrowserWindow.fromId(windowId).setTitle(fileName);
@@ -64,7 +63,6 @@ export default class {
   }
 
   openEditor() {
-    console.log('Open Editor');
     const browserWindow = new BrowserWindow({ width: 1600, height: 1024 });
     browserWindow.loadURL(this.getIndexUrl());
     browserWindow.webContents.openDevTools();

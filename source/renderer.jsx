@@ -33,6 +33,11 @@ const style = {
     width: "32px"
 };
 
+const containerStyle = {
+  height: "100%",
+  width: "100%"
+};
+
 class BinaryTableViewModel {
     constructor() {
         this.fileData = [];
@@ -123,45 +128,57 @@ class BinaryTable extends Component {
             focusAddress: 64,
             columnCount: 16
         };
+        this.containerReference = React.createRef();
         this.reference = React.createRef();
         this.handleKeyDown = this.handleKeyDown.bind(this);
         this.handleMouseDown = this.handleMouseDown.bind(this);
+    }
+    componentDidMount() {
+      this.setState((state, props) => {
+        return {
+          containerWidth: this.containerReference.current.offsetWidth,
+          containerHeight: this.containerReference.current.offsetHeight,
+        };
+      });
     }
     componentDidUpdate() {
         this.reference.current.focus();
     }
     render() {
-        const columnCount = this.state.columnCount;
         const items = [];
-        items.push(<span key="address" style={addressStyle}>Address</span>);
-        for (let i = 0; i < columnCount; ++i)
+        if (this.state.containerWidth !== undefined)
         {
-            let title = i.toString(16).toUpperCase();
-            title = (i < 16) ? ('+' + title) : title;
-            items.push(<span key={i} style={style}>{title}</span>);
+          const columnCount = this.state.columnCount;
+          items.push(<span key="address" style={addressStyle}>Address</span>);
+          for (let i = 0; i < columnCount; ++i)
+          {
+              let title = i.toString(16).toUpperCase();
+              title = (i < 16) ? ('+' + title) : title;
+              items.push(<span key={i} style={style}>{title}</span>);
+          }
+          items.push(<br key="br-head" />);
+          const viewModel = this.props.viewModel;
+          const fileSize = viewModel.getFileSize();
+          for (let j = 0; j < 20; ++j)
+          {
+              const rowAddress = this.state.startAddress + j * columnCount;
+              const row = <BinaryTableRow key={"BinaryTableRow:" + rowAddress} address={rowAddress} />;
+              items.push(row);
+              for (let i = 0; i < columnCount; ++i)
+              {
+                  const cellAddress = rowAddress + i;
+                  const valid = (cellAddress < fileSize);
+                  const value = valid ? viewModel.getValueAt(cellAddress) : 0;
+                  const reference = (cellAddress == viewModel.getFocusAddress()) ? this.reference : undefined;
+                  const cell = <BinaryTableCell inputRef={reference} key={"BinaryTableCell:" + cellAddress} address={cellAddress} value={value} valid={valid}
+                    handleKeyDown={this.handleKeyDown} handleMouseDown={this.handleMouseDown}/>;
+                  items.push(cell);
+              }
+              items.push(<br key={"br" + j} />);
+          }
+          items.push(<div key={"write-mode"}>{(this.props.viewModel.getWriteMode() == WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>);
         }
-        items.push(<br key="br-head" />);
-        const viewModel = this.props.viewModel;
-        const fileSize = viewModel.getFileSize();
-        for (let j = 0; j < 20; ++j)
-        {
-            const rowAddress = this.state.startAddress + j * columnCount;
-            const row = <BinaryTableRow key={"BinaryTableRow:" + rowAddress} address={rowAddress} />;
-            items.push(row);
-            for (let i = 0; i < columnCount; ++i)
-            {
-                const cellAddress = rowAddress + i;
-                const valid = (cellAddress < fileSize);
-                const value = valid ? viewModel.getValueAt(cellAddress) : 0;
-                const reference = (cellAddress == viewModel.getFocusAddress()) ? this.reference : undefined;
-                const cell = <BinaryTableCell inputRef={reference} key={"BinaryTableCell:" + cellAddress} address={cellAddress} value={value} valid={valid}
-                  handleKeyDown={this.handleKeyDown} handleMouseDown={this.handleMouseDown}/>;
-                items.push(cell);
-            }
-            items.push(<br key={"br" + j} />);
-        }
-        items.push(<div key={"write-mode"}>{(this.props.viewModel.getWriteMode() == WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>);
-        return <div className="binary-table">{items}</div>;
+        return <div className="binary-table" ref={this.containerReference}>{items}</div>;
     }
     handleKeyDown(e) {
         const keyCode = e.keyCode;
