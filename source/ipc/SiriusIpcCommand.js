@@ -1,3 +1,3 @@
 export default {
-  onRendererReceivedRenewalBinary: 'onRendererReceivedRenewalBinary'
+  onRendererReceivedRenewalBinary: 'onRendererReceivedRenewalBinary',
 };

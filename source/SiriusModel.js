@@ -33,6 +33,7 @@ export default class {
 
   createNew() {
     const browserWindow = new BrowserWindow({ width: 1600, height: 1024 });
+    browserWindow.setTitle('Sirius');
     browserWindow.loadURL(this.getIndexUrl());
     browserWindow.webContents.openDevTools();
     console.log(browserWindow.id);
@@ -64,6 +65,7 @@ export default class {
 
   openEditor() {
     const browserWindow = new BrowserWindow({ width: 1600, height: 1024 });
+    browserWindow.setTitle('Sirius');
     browserWindow.loadURL(this.getIndexUrl());
     browserWindow.webContents.openDevTools();
     return browserWindow.id;
