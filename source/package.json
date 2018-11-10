@@ -1,6 +1,7 @@
 {
-    "main": "main.js",
     "babel": {
         "presets": [ "es2015", "react" ]
-    }
+    },
+    "main": "main.js",
+    "name": "Sirius"
 }

@@ -35,8 +35,6 @@ export default class {
     const browserWindow = new BrowserWindow({ width: 1600, height: 1024 });
     browserWindow.setTitle('Sirius');
     browserWindow.loadURL(this.getIndexUrl());
-    browserWindow.webContents.openDevTools();
-    console.log(browserWindow.id);
   }
 
   open() {
@@ -56,24 +54,31 @@ export default class {
   }
 
   save() {
-    console.log('Save');
   }
 
   saveAs() {
-    console.log('Save As');
   }
 
   openEditor() {
     const browserWindow = new BrowserWindow({ width: 1600, height: 1024 });
     browserWindow.setTitle('Sirius');
     browserWindow.loadURL(this.getIndexUrl());
-    browserWindow.webContents.openDevTools();
     return browserWindow.id;
   }
 
+  openAbout() {
+    const browserWindow = new BrowserWindow({ width: 400, height: 256, resizable: false });
+    browserWindow.setTitle('Sirius');
+    browserWindow.loadURL(this.getUrlForFileName('renderer/about.html'));
+  }
+
   getIndexUrl() {
+    return this.getUrlForFileName('index.html');
+  }
+
+  getUrlForFileName(fileName) {
     return url.format({
-      pathname: path.join(__dirname, 'index.html'),
+      pathname: path.join(__dirname, fileName),
       protocol: 'file:',
       slashes: true,
     });

@@ -11,6 +11,7 @@ const menuTemplate = [
   {
     label: app.getName(),
     submenu: [
+      { label: 'About', click: () => { model.openAbout(); } },
       { role: 'quit' },
     ],
   },
@@ -23,13 +24,14 @@ const menuTemplate = [
       { label: 'Save As', click: () => { model.saveAs(); }, accelerator: 'CmdOrCtrl+Shift+S' },
     ],
   },
+  /*
   {
     label: 'Edit',
     submenu: [
       { role: 'undo' },
       { role: 'redo' },
     ],
-  },
+  },*/
 ];
 
 app.on('ready', () => {
