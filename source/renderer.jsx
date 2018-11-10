@@ -159,7 +159,7 @@ class BinaryTable extends Component {
           items.push(<br key="br-head" />);
           const viewModel = this.props.viewModel;
           const fileSize = viewModel.getFileSize();
-          for (let j = 0; j < 20; ++j)
+          for (let j = 0; j < (this.state.containerHeight / 24 - 2); ++j)
           {
               const rowAddress = this.state.startAddress + j * columnCount;
               const row = <BinaryTableRow key={"BinaryTableRow:" + rowAddress} address={rowAddress} />;
@@ -178,7 +178,7 @@ class BinaryTable extends Component {
           }
           items.push(<div key={"write-mode"}>{(this.props.viewModel.getWriteMode() == WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>);
         }
-        return <div className="binary-table" ref={this.containerReference}>{items}</div>;
+        return <div className="binary-table" ref={this.containerReference} style={containerStyle}>{items}</div>;
     }
     handleKeyDown(e) {
         const keyCode = e.keyCode;
