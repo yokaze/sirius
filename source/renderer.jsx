@@ -1,6 +1,7 @@
 import { ipcRenderer, remote } from 'electron';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
+import Measure from 'react-measure';
 import { sprintf } from 'sprintf-js';
 
 import SiriusIpcClient from './ipc/SiriusIpcClient';
@@ -143,22 +144,15 @@ class BinaryTable extends Component {
     this.handleMouseDown = this.handleMouseDown.bind(this);
   }
 
-  componentDidMount() {
-    this.setState(() => {
-      return {
-        containerWidth: this.containerReference.current.offsetWidth,
-        containerHeight: this.containerReference.current.offsetHeight,
-      };
-    });
-  }
-
   componentDidUpdate() {
-    this.reference.current.focus();
+    if (this.reference.current !== null) {
+      this.reference.current.focus();
+    }
   }
 
   render() {
     const items = [];
-    if (this.state.containerWidth !== undefined) {
+    if (this.state.bounds !== undefined) {
       const columnCount = this.state.columnCount;
       items.push(<span key="address" style={addressStyle}>Address</span>);
       for (let i = 0; i < columnCount; i += 1) {
@@ -169,7 +163,7 @@ class BinaryTable extends Component {
       items.push(<br key="br-head" />);
       const viewModel = this.props.viewModel;
       const fileSize = viewModel.getFileSize();
-      for (let j = 0; j < ((this.state.containerHeight / 24) - 2); j += 1) {
+      for (let j = 0; j < ((this.state.bounds.height / 24) - 3); j += 1) {
         const rowAddress = this.state.startAddress + (j * columnCount);
         const row = <BinaryTableRow key={'BinaryTableRow:' + rowAddress} address={rowAddress} />;
         items.push(row);
@@ -192,7 +186,11 @@ class BinaryTable extends Component {
       }
       items.push(<div key={'write-mode'}>{(this.props.viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>);
     }
-    return <div className="binary-table" ref={this.containerReference} style={containerStyle}>{items}</div>;
+    return <Measure onResize={(contentRect) => { this.setState({ bounds: contentRect.entry }); }}>
+      {({ measureRef }) =>
+        <div ref={measureRef} className="binary-table" style={containerStyle}>{items}</div>
+      }
+    </Measure>;
   }
 
   handleKeyDown(e) {
@@ -278,6 +276,7 @@ tableViewModel.setIpcClient(ipcClient);
 ipcClient.setListener(tableViewModel);
 ipcRenderer.send('editor-initialized');
 
-ReactDOM.render(<BinaryTable viewModel={tableViewModel} />,
+ReactDOM.render(
+  <BinaryTable viewModel={tableViewModel} />,
   document.getElementById('root'),
 );

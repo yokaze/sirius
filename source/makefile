@@ -5,6 +5,7 @@ link:
 	npm link electron
 	npm link react
 	npm link react-dom
+	npm link react-measure
 	npm link sprintf-js
 
 lint:
