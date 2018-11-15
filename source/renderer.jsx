@@ -33,6 +33,25 @@ const style = {
   textAlign: 'center',
   width: '32px',
 };
+const whiteStyle = {
+  display: 'inline-block',
+  fontFamily: 'Monaco, monospace',
+  fontSize: '16px',
+  height: '24px',
+  lineHeight: '24px',
+  textAlign: 'center',
+  width: '24px',
+};
+const textStyle = {
+  display: 'inline-block',
+  fontFamily: 'Monaco, monospace',
+  fontSize: '16px',
+  height: '24px',
+  lineHeight: '24px',
+  textAlign: 'center',
+  width: '12px',
+};
+
 
 const containerStyle = {
   height: '100%',
@@ -129,6 +148,17 @@ class BinaryTableCell extends Component {
   }
 }
 
+class BinaryTableExpressionCell extends Component {
+  render() {
+    const text = this.props.valid ? this.props.value : '-';
+    if (this.props.whitespace) {
+      return <span key={'span'} style={textStyle}>&nbsp;</span>;
+    } else {
+      return <span key={'span'} style={textStyle}>{text}</span>;
+    }
+  }
+}
+
 class BinaryTable extends Component {
   constructor(props) {
     super(props);
@@ -181,6 +211,22 @@ class BinaryTable extends Component {
             handleKeyDown={this.handleKeyDown}
             handleMouseDown={this.handleMouseDown} />;
           items.push(cell);
+        }
+        items.push(<span style={whiteStyle}>&ensp;</span>);
+        for (let i = 0; i < columnCount; i += 1) {
+          const cellAddress = rowAddress + i;
+          const valid = (cellAddress < fileSize);
+          const value = valid ? viewModel.getValueAt(cellAddress) : 0;
+          let text = '';
+          let whitespace = false;
+          if ((32 < value) && (value < 127)) {
+            text = String.fromCharCode(value);
+          } else if (value === 32) {
+            whitespace = true;
+          } else {
+            text = '.';
+          }
+          items.push(<BinaryTableExpressionCell value={text} valid={valid} whitespace={whitespace} />);
         }
         items.push(<br key={'br' + j} />);
       }
