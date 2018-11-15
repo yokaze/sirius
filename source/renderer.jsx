@@ -250,8 +250,8 @@ class BinaryTable extends Component {
       let nextAddress = state.startAddress;
       if (nextFocusAddress < nextAddress) {
         nextAddress -= Math.ceil((nextAddress - nextFocusAddress) / columnCount) * columnCount;
-      } else if ((nextAddress + (20 * columnCount)) <= nextFocusAddress) {
-        nextAddress += (Math.floor((nextFocusAddress - nextAddress) / columnCount) - 19) * columnCount;
+      } else if ((nextAddress + (this.state.rowCount * columnCount)) <= nextFocusAddress) {
+        nextAddress += (Math.floor((nextFocusAddress - nextAddress) / columnCount) - (this.state.rowCount - 1)) * columnCount;
       }
       return { startAddress: nextAddress };
     };
