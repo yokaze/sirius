@@ -152,7 +152,7 @@ class BinaryTable extends Component {
 
   render() {
     const items = [];
-    if (this.state.bounds !== undefined) {
+    if (this.state.rowCount !== undefined) {
       const columnCount = this.state.columnCount;
       items.push(<span key="address" style={addressStyle}>Address</span>);
       for (let i = 0; i < columnCount; i += 1) {
@@ -163,7 +163,7 @@ class BinaryTable extends Component {
       items.push(<br key="br-head" />);
       const viewModel = this.props.viewModel;
       const fileSize = viewModel.getFileSize();
-      for (let j = 0; j < ((this.state.bounds.height / 24) - 3); j += 1) {
+      for (let j = 0; j < this.state.rowCount; j += 1) {
         const rowAddress = this.state.startAddress + (j * columnCount);
         const row = <BinaryTableRow key={'BinaryTableRow:' + rowAddress} address={rowAddress} />;
         items.push(row);
@@ -186,7 +186,7 @@ class BinaryTable extends Component {
       }
       items.push(<div key={'write-mode'}>{(this.props.viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>);
     }
-    return <Measure onResize={(contentRect) => { this.setState({ bounds: contentRect.entry }); }}>
+    return <Measure onResize={contentRect => { this.onResized(contentRect); }}>
       {({ measureRef }) =>
         <div ref={measureRef} className="binary-table" style={containerStyle}>{items}</div>
       }
@@ -264,6 +264,13 @@ class BinaryTable extends Component {
       return { };
     };
     this.setState(handler);
+  }
+
+  onResized(contentRect) {
+    const rowCount = Math.floor(contentRect.entry.height / 24 - 3);
+    if (this.state.rowCount !== rowCount) {
+      this.setState({ rowCount });
+    }
   }
 
   onViewModelReloaded() {
