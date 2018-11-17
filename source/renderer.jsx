@@ -15,24 +15,6 @@ const WriteMode = {
   Insert: 1,
 };
 
-const addressStyle = {
-  display: 'inline-block',
-  fontFamily: 'Monaco, monospace',
-  fontSize: '16px',
-  height: '24px',
-  lineHeight: '24px',
-  textAlign: 'right',
-  width: '128px',
-};
-const style = {
-  display: 'inline-block',
-  fontFamily: 'Monaco, monospace',
-  fontSize: '16px',
-  height: '24px',
-  lineHeight: '24px',
-  textAlign: 'center',
-  width: '32px',
-};
 const whiteStyle = {
   display: 'inline-block',
   fontFamily: 'Monaco, monospace',
@@ -42,16 +24,6 @@ const whiteStyle = {
   textAlign: 'center',
   width: '24px',
 };
-const textStyle = {
-  display: 'inline-block',
-  fontFamily: 'Monaco, monospace',
-  fontSize: '16px',
-  height: '24px',
-  lineHeight: '24px',
-  textAlign: 'center',
-  width: '12px',
-};
-
 
 const containerStyle = {
   height: '100%',
@@ -122,7 +94,7 @@ class BinaryTableRow extends Component {
   render() {
     const address = this.props.address;
     const text = sprintf('%08X', address);
-    return <span key={'BinaryTableRow:span:' + address} style={addressStyle}>{text}</span>;
+    return <span key={'BinaryTableRow:span:' + address} className='binary-table-address'>{text}</span>;
   }
 }
 
@@ -136,7 +108,7 @@ class BinaryTableCell extends Component {
   render() {
     const address = this.props.address;
     const text = this.props.valid ? sprintf('%02X', this.props.value) : '--';
-    return <span ref={this.props.inputRef} key={'span'} style={style} tabIndex={this.props.address} onKeyDown={this.handleKeyDown} onMouseDown={this.handleMouseDown}>{text}</span>;
+    return <span ref={this.props.inputRef} key={'span'} className='binary-table-cell' tabIndex={this.props.address} onKeyDown={this.handleKeyDown} onMouseDown={this.handleMouseDown}>{text}</span>;
   }
 
   handleKeyDown(e) {
@@ -152,9 +124,9 @@ class BinaryTableExpressionCell extends Component {
   render() {
     const text = this.props.valid ? this.props.value : '-';
     if (this.props.whitespace) {
-      return <span key={'span'} style={textStyle}>&nbsp;</span>;
+      return <span key={'span'} className='binary-table-expression'>&nbsp;</span>;
     } else {
-      return <span key={'span'} style={textStyle}>{text}</span>;
+      return <span key={'span'} className='binary-table-expression'>{text}</span>;
     }
   }
 }
@@ -184,11 +156,11 @@ class BinaryTable extends Component {
     const items = [];
     if (this.state.rowCount !== undefined) {
       const columnCount = this.state.columnCount;
-      items.push(<span key="address" style={addressStyle}>Address</span>);
+      items.push(<span key="address" className='binary-table-address'>Address</span>);
       for (let i = 0; i < columnCount; i += 1) {
         let title = i.toString(16).toUpperCase();
         title = (i < 16) ? ('+' + title) : title;
-        items.push(<span key={i} style={style}>{title}</span>);
+        items.push(<span key={i} className='binary-table-cell'>{title}</span>);
       }
       items.push(<br key="br-head" />);
       const viewModel = this.props.viewModel;

@@ -1,7 +1,38 @@
 body {
     margin: 0;
 }
+
 .binary-table span:focus {
     background-color: silver;
     outline: 0;
+}
+
+.binary-table-address {
+  display: inline-block;
+  font-family: Monaco, monospace;
+  font-size: 16px;
+  height: 24px;
+  line-height: 24px;
+  text-align: right;
+  width: 128px;
+}
+
+.binary-table-cell {
+  display: inline-block;
+  font-family: Monaco, monospace;
+  font-size: 16px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  width: 32px;
+}
+
+.binary-table-expression {
+  display: inline-block;
+  font-family: Monaco, monospace;
+  font-size: 16px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  width: 12px;
 }
