@@ -184,7 +184,7 @@ class BinaryTable extends Component {
             handleMouseDown={this.handleMouseDown} />;
           items.push(cell);
         }
-        items.push(<span style={whiteStyle}>&ensp;</span>);
+        items.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
         for (let i = 0; i < columnCount; i += 1) {
           const cellAddress = rowAddress + i;
           const valid = (cellAddress < fileSize);
@@ -198,7 +198,7 @@ class BinaryTable extends Component {
           } else {
             text = '.';
           }
-          items.push(<BinaryTableExpressionCell value={text} valid={valid} whitespace={whitespace} />);
+          items.push(<BinaryTableExpressionCell key={'expression:' + cellAddress} value={text} valid={valid} whitespace={whitespace} />);
         }
         items.push(<br key={'br' + j} />);
       }
