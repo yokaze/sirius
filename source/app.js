@@ -31,7 +31,7 @@ const menuTemplate = [
       { role: 'undo' },
       { role: 'redo' },
     ],
-  },*/
+  }, */
 ];
 
 app.on('ready', () => {

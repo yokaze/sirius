@@ -123,11 +123,7 @@ class BinaryTableCell extends Component {
 class BinaryTableExpressionCell extends Component {
   render() {
     const text = this.props.valid ? this.props.value : '-';
-    if (this.props.whitespace) {
-      return <span key={'span'} className='binary-table-expression'>&nbsp;</span>;
-    } else {
-      return <span key={'span'} className='binary-table-expression'>{text}</span>;
-    }
+    return <span key={'span'} className='binary-table-expression'>{text}</span>;
   }
 }
 
@@ -194,11 +190,11 @@ class BinaryTable extends Component {
           if ((32 < value) && (value < 127)) {
             text = String.fromCharCode(value);
           } else if (value === 32) {
-            whitespace = true;
+            text = '\u00A0';
           } else {
             text = '.';
           }
-          items.push(<BinaryTableExpressionCell key={'expression:' + cellAddress} value={text} valid={valid} whitespace={whitespace} />);
+          items.push(<BinaryTableExpressionCell key={'expression:' + cellAddress} value={text} valid={valid} />);
         }
         items.push(<br key={'br' + j} />);
       }
