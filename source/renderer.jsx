@@ -1,4 +1,5 @@
 import { ipcRenderer, remote } from 'electron';
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
@@ -126,9 +127,43 @@ class BinaryTableExpressionCell extends Component {
   }
 
   render() {
-    return <span key={'span'} className="binary-table-expression">{this.props.value}</span>;
+    return <span key="span" className="binary-table-expression">{this.props.value}</span>;
   }
 }
+
+BinaryTableExpressionCell.propTypes = {
+  value: PropTypes.string.isRequired,
+};
+
+class BinaryTableExpressionRow extends Component {
+  shouldComponentUpdate(nextProps) {
+    return nextProps.values.toString() !== this.props.values.toString();
+  }
+
+  render() {
+    const children = [];
+    const length = this.props.values.length;
+    for (let i = 0; i < length; i += 1) {
+      const value = this.props.values[i];
+      let text = '';
+      if (value === undefined) {
+        text = '-';
+      } else if (value === 32) {
+        text = '\u00A0';
+      } else if ((value > 32) && (value < 127)) {
+        text = String.fromCharCode(value);
+      } else {
+        text = '.';
+      }
+      children.push(<BinaryTableExpressionCell key={i.toString()} value={text} />);
+    }
+    return <span key="span">{children}</span>;
+  }
+}
+
+BinaryTableExpressionRow.propTypes = {
+  values: PropTypes.arrayOf(PropTypes.number).isRequired,
+};
 
 class BinaryTable extends Component {
   constructor(props) {
@@ -184,20 +219,15 @@ class BinaryTable extends Component {
           items.push(cell);
         }
         items.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
-        for (let i = 0; i < columnCount; i += 1) {
-          const cellAddress = rowAddress + i;
-          const valid = (cellAddress < fileSize);
-          const value = valid ? viewModel.getValueAt(cellAddress) : 0;
-          let text = '';
-          let whitespace = false;
-          if ((32 < value) && (value < 127)) {
-            text = String.fromCharCode(value);
-          } else if (value === 32) {
-            text = '\u00A0';
-          } else {
-            text = '.';
+        {
+          const values = [];
+          for (let i = 0; i < columnCount; i+= 1) {
+            const cellAddress = rowAddress + i;
+            const valid = (cellAddress < fileSize);
+            const value = valid ? viewModel.getValueAt(cellAddress) : undefined;
+            values.push(value);
           }
-          items.push(<BinaryTableExpressionCell key={'expression:' + cellAddress} value={text} valid={valid} />);
+          items.push(<BinaryTableExpressionRow key={'row:' + rowAddress} values={values} />);
         }
         items.push(<br key={'br' + j} />);
       }
