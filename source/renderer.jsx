@@ -121,9 +121,12 @@ class BinaryTableCell extends Component {
 }
 
 class BinaryTableExpressionCell extends Component {
+  shouldComponentUpdate(nextProps) {
+    return nextProps.value !== this.props.value;
+  }
+
   render() {
-    const text = this.props.valid ? this.props.value : '-';
-    return <span key={'span'} className='binary-table-expression'>{text}</span>;
+    return <span key={'span'} className="binary-table-expression">{this.props.value}</span>;
   }
 }
 
