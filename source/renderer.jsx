@@ -1,3 +1,4 @@
+import assert from 'assert';
 import { ipcRenderer, remote } from 'electron';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
@@ -123,28 +124,38 @@ class BinaryTableCell extends Component {
 
 class BinaryTableExpressionCell extends Component {
   shouldComponentUpdate(nextProps) {
-    return nextProps.value !== this.props.value;
+    let changed = (this.props.selected !== nextProps.selected);
+    changed = changed || (this.props.value !== nextProps.value);
+    return changed;
   }
 
   render() {
-    return <span key="span" className="binary-table-expression">{this.props.value}</span>;
+    const className = this.props.selected ? 'binary-table-expression-selected' : 'binary-table-expression';
+    return <span key="span" className={className}>{this.props.value}</span>;
   }
 }
 
 BinaryTableExpressionCell.propTypes = {
+  selected: PropTypes.bool.isRequired,
   value: PropTypes.string.isRequired,
 };
 
 class BinaryTableExpressionRow extends Component {
   shouldComponentUpdate(nextProps) {
-    return nextProps.values.toString() !== this.props.values.toString();
+    let changed = (this.props.selectedIndex !== nextProps.selectedIndex);
+    changed = changed || nextProps.values.toString() !== this.props.values.toString();
+    return changed;
   }
 
   render() {
+    const selectedIndex = this.props.selectedIndex;
+    const values = this.props.values;
+    const length = values.length;
+    assert((selectedIndex >= -1) && (selectedIndex < length));
+
     const children = [];
-    const length = this.props.values.length;
     for (let i = 0; i < length; i += 1) {
-      const value = this.props.values[i];
+      const value = values[i];
       let text = '';
       if (value === undefined) {
         text = '-';
@@ -155,13 +166,19 @@ class BinaryTableExpressionRow extends Component {
       } else {
         text = '.';
       }
-      children.push(<BinaryTableExpressionCell key={i.toString()} value={text} />);
+      const selected = (i === selectedIndex);
+      children.push(<BinaryTableExpressionCell
+        key={i.toString()}
+        value={text}
+        selected={selected}
+      />);
     }
     return <span key="span">{children}</span>;
   }
 }
 
 BinaryTableExpressionRow.propTypes = {
+  selectedIndex: PropTypes.number.isRequired,
   values: PropTypes.arrayOf(PropTypes.number).isRequired,
 };
 
@@ -199,6 +216,7 @@ class BinaryTable extends Component {
       items.push(<br key="br-head" />);
       const viewModel = this.props.viewModel;
       const fileSize = viewModel.getFileSize();
+      const focusedAddress = viewModel.getFocusAddress();
       for (let j = 0; j < this.state.rowCount; j += 1) {
         const rowAddress = this.state.startAddress + (j * columnCount);
         const row = <BinaryTableRow key={'BinaryTableRow:' + rowAddress} address={rowAddress} />;
@@ -207,7 +225,7 @@ class BinaryTable extends Component {
           const cellAddress = rowAddress + i;
           const valid = (cellAddress < fileSize);
           const value = valid ? viewModel.getValueAt(cellAddress) : 0;
-          const reference = (cellAddress === viewModel.getFocusAddress()) ? this.reference : undefined;
+          const reference = (cellAddress === focusedAddress) ? this.reference : undefined;
           const cell = <BinaryTableCell
             inputRef={reference}
             key={'BinaryTableCell:' + cellAddress}
@@ -227,7 +245,13 @@ class BinaryTable extends Component {
             const value = valid ? viewModel.getValueAt(cellAddress) : undefined;
             values.push(value);
           }
-          items.push(<BinaryTableExpressionRow key={'row:' + rowAddress} values={values} />);
+          let selectedIndex = (focusedAddress - rowAddress);
+          if (selectedIndex < 0) {
+            selectedIndex = -1;
+          } else if (selectedIndex >= columnCount) {
+            selectedIndex = -1;
+          }
+          items.push(<BinaryTableExpressionRow key={'row:' + rowAddress} values={values} selectedIndex={selectedIndex} />);
         }
         items.push(<br key={'br' + j} />);
       }

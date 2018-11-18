@@ -37,3 +37,14 @@ body {
   text-align: center;
   width: 12px;
 }
+
+.binary-table-expression-selected {
+  background-color: silver;
+  display: inline-block;
+  font-family: Monaco, monospace;
+  font-size: 16px;
+  height: 24px;
+  line-height: 24px;
+  text-align: center;
+  width: 12px;
+}
