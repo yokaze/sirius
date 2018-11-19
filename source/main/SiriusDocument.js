@@ -10,6 +10,9 @@ export default class SiriusDocument {
     if (command.type === SiriusDocumentCommand.Insert.getType()) {
       assert(command.address <= this.fileData.length);
       this.fileData.splice(command.address, 0, command.data[0]);
+    } else if (command.type === SiriusDocumentCommand.Overwrite.getType()) {
+      assert(command.address <= this.fileData.length);
+      this.fileData.splice(command.address, command.data.length, ...command.data);
     } else if (command.type === SiriusDocumentCommand.Remove.getType()) {
       this.fileData.splice(command.address, command.length);
     }
@@ -20,6 +23,7 @@ export default class SiriusDocument {
   }
 
   setFileData(fileData) {
+    assert(Array.isArray(fileData));
     this.fileData = fileData;
   }
 }

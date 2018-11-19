@@ -46,7 +46,7 @@ export default class SiriusModel {
         const windowId = this.openEditor();
         const doc = new SiriusDocument();
         BrowserWindow.fromId(windowId).setTitle(fileName);
-        doc.setFileData(data);
+        doc.setFileData([...data]);
         const handle = uuid();
         this.handles[windowId] = handle;
         this.documents[handle] = doc;

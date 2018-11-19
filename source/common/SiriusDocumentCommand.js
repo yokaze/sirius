@@ -10,6 +10,18 @@ class Insert {
   }
 }
 
+class Overwrite {
+  constructor(address, data) {
+    this.type = Overwrite.getType();
+    this.address = address;
+    this.data = data;
+  }
+
+  static getType() {
+    return 'Overwrite';
+  }
+}
+
 class Remove {
   constructor(address, length) {
     this.type = Remove.getType();
@@ -24,5 +36,6 @@ class Remove {
 
 export default {
   Insert,
+  Overwrite,
   Remove,
 };

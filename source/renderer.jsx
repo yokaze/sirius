@@ -53,6 +53,7 @@ class BinaryTableViewModel {
       this.fileData.push(0);
     }
     this.fileData[address] = value;
+    ipcClient.sendDocumentCommand(new SiriusDocumentCommand.Overwrite(address, [value]));
   }
 
   insertValueAt(address, value) {
