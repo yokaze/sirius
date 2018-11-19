@@ -62,6 +62,7 @@ class BinaryTableViewModel {
 
   removeValueAt(address) {
     this.fileData.splice(address, 1);
+    ipcClient.sendDocumentCommand(new SiriusDocumentCommand.Remove(address, 1));
   }
 
   getFileSize() {

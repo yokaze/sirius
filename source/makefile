@@ -1,2 +1,2 @@
 lint:
-	eslint .
+	eslint *.js; eslint *.jsx; eslint */*.js
