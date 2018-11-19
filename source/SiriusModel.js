@@ -4,45 +4,36 @@ import path from 'path';
 import url from 'url';
 import uuid from 'uuid/v4';
 
+import SiriusDocument from './main/SiriusDocument';
 import SiriusIpcCommand from './ipc/SiriusIpcCommand';
-
-class SiriusFileModel {
-  constructor() {
-    this.fileData = [];
-  }
-
-  getFileData() {
-    return this.fileData;
-  }
-
-  setFileData(fileData) {
-    this.fileData = fileData;
-  }
-}
 
 export default class SiriusModel {
   constructor() {
     //  Window ID -> Data UUID
     this.handles = {};
 
-    //  Data UUID -> SiriusFileModel
-    this.fileModels = {};
+    //  Data UUID -> SiriusDocument
+    this.documents = {};
 
     ipcMain.on('editor-initialized', (e) => {
       const windowId = e.sender.getOwnerBrowserWindow().id;
       if (this.handles[windowId] !== undefined) {
         const handle = this.handles[windowId];
-        const fileData = this.fileModels[handle].getFileData();
-        e.sender.send(SiriusIpcCommand.onRendererReceivedRenewalBinary, fileData);
+        const doc = this.documents[handle].getFileData();
+        e.sender.send(SiriusIpcCommand.onRendererReceivedRenewalBinary, doc);
       }
     });
+
+    ipcMain.on(SiriusIpcCommand.onDocumentCommand, (e, command) => {
+      this.onDocumentCommandReceived(e, command);
+    })
   }
 
   createNew() {
     const windowId = this.openEditor();
     const handle = uuid();
     this.handles[windowId] = handle;
-    this.fileModels[handle] = new SiriusFileModel();
+    this.documents[handle] = new SiriusDocument();
   }
 
   open() {
@@ -53,12 +44,12 @@ export default class SiriusModel {
       const fileName = fileNames[0];
       fs.readFile(fileName, (err, data) => {
         const windowId = this.openEditor();
-        const fileModel = new SiriusFileModel();
+        const doc = new SiriusDocument();
         BrowserWindow.fromId(windowId).setTitle(fileName);
-        fileModel.setFileData(data);
+        doc.setFileData(data);
         const handle = uuid();
         this.handles[windowId] = handle;
-        this.fileModels[handle] = fileModel;
+        this.documents[handle] = doc;
       });
     }
   }
@@ -99,5 +90,21 @@ export default class SiriusModel {
       protocol: 'file:',
       slashes: true,
     });
+  }
+
+  onDocumentCommandReceived(e, command) {
+    const senderWindowId = e.sender.getOwnerBrowserWindow().id;
+    const senderHandle = this.handles[senderWindowId];
+
+    for (const key in this.handles) {
+      const windowId = parseInt(key);
+      const handle = this.handles[windowId];
+
+      if ((senderWindowId !== windowId) && (senderHandle === handle)) {
+        const doc = this.documents[handle].getFileData();
+        const window = BrowserWindow.fromId(windowId);
+        window.webContents.send(SiriusIpcCommand.onRendererReceivedRenewalBinary, doc);
+      }
+    }
   }
 }

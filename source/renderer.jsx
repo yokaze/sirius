@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
 import { sprintf } from 'sprintf-js';
 
+import SiriusDocumentCommand from './common/SiriusDocumentCommand';
 import SiriusIpcClient from './ipc/SiriusIpcClient';
 
 const ipcClient = new SiriusIpcClient();
@@ -56,6 +57,7 @@ class BinaryTableViewModel {
 
   insertValueAt(address, value) {
     this.fileData.splice(address, 0, value);
+    ipcClient.sendDocumentCommand(new SiriusDocumentCommand.Insert(address, [value]));
   }
 
   removeValueAt(address) {

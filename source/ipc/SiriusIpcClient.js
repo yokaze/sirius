@@ -11,4 +11,8 @@ export default class {
   setListener(listener) {
     this.listener = listener;
   }
+
+  sendDocumentCommand(command) {
+    ipcRenderer.send(SiriusIpcCommand.onDocumentCommand, command);
+  }
 }
