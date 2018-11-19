@@ -32,6 +32,12 @@ const menuTemplate = [
       { role: 'redo' },
     ],
   }, */
+  {
+    label: 'View',
+    submenu: [
+      { label: 'Open in New Window', click: (e) => { model.duplicateActiveEditor(); } }
+    ],
+  }
 ];
 
 app.on('ready', () => {

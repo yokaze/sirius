@@ -2,39 +2,47 @@ import { BrowserWindow, dialog, ipcMain } from 'electron';
 import fs from 'fs';
 import path from 'path';
 import url from 'url';
+import uuid from 'uuid/v4';
 
 import SiriusIpcCommand from './ipc/SiriusIpcCommand';
 
-class SiriusWindowModel {
+class SiriusFileModel {
   constructor() {
-    this.fileData = undefined;
-  }
-
-  setFileData(fileData) {
-    this.fileData = fileData;
+    this.fileData = [];
   }
 
   getFileData() {
     return this.fileData;
   }
+
+  setFileData(fileData) {
+    this.fileData = fileData;
+  }
 }
 
-export default class {
+export default class SiriusModel {
   constructor() {
-    this.windowModels = {};
+    //  Window ID -> Data UUID
+    this.handles = {};
+
+    //  Data UUID -> SiriusFileModel
+    this.fileModels = {};
+
     ipcMain.on('editor-initialized', (e) => {
       const windowId = e.sender.getOwnerBrowserWindow().id;
-      if (this.windowModels[windowId] !== undefined) {
-        const fileData = this.windowModels[windowId].getFileData();
+      if (this.handles[windowId] !== undefined) {
+        const handle = this.handles[windowId];
+        const fileData = this.fileModels[handle].getFileData();
         e.sender.send(SiriusIpcCommand.onRendererReceivedRenewalBinary, fileData);
       }
     });
   }
 
   createNew() {
-    const browserWindow = new BrowserWindow({ width: 1600, height: 1024 });
-    browserWindow.setTitle('Sirius');
-    browserWindow.loadURL(this.getIndexUrl());
+    const windowId = this.openEditor();
+    const handle = uuid();
+    this.handles[windowId] = handle;
+    this.fileModels[handle] = new SiriusFileModel();
   }
 
   open() {
@@ -45,10 +53,12 @@ export default class {
       const fileName = fileNames[0];
       fs.readFile(fileName, (err, data) => {
         const windowId = this.openEditor();
-        const windowModel = new SiriusWindowModel();
+        const fileModel = new SiriusFileModel();
         BrowserWindow.fromId(windowId).setTitle(fileName);
-        windowModel.setFileData(data);
-        this.windowModels[windowId] = windowModel;
+        fileModel.setFileData(data);
+        const handle = uuid();
+        this.handles[windowId] = handle;
+        this.fileModels[handle] = fileModel;
       });
     }
   }
@@ -63,7 +73,14 @@ export default class {
     const browserWindow = new BrowserWindow({ width: 1600, height: 1024 });
     browserWindow.setTitle('Sirius');
     browserWindow.loadURL(this.getIndexUrl());
+    browserWindow.openDevTools();
     return browserWindow.id;
+  }
+
+  duplicateActiveEditor() {
+    const currentWindow = BrowserWindow.getFocusedWindow();
+    const nextWindowId = this.openEditor();
+    this.handles[nextWindowId] = this.handles[currentWindow.id];
   }
 
   openAbout() {
