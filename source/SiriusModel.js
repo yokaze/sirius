@@ -95,6 +95,7 @@ export default class SiriusModel {
   onDocumentCommandReceived(e, command) {
     const senderWindowId = e.sender.getOwnerBrowserWindow().id;
     const senderHandle = this.handles[senderWindowId];
+    this.documents[senderHandle].applyCommand(command);
 
     for (const key in this.handles) {
       const windowId = parseInt(key);

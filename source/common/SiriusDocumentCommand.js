@@ -1,15 +1,12 @@
 class Insert {
   constructor(address, data) {
+    this.type = Insert.getType();
     this.address = address;
     this.data = data;
   }
 
-  getAddress() {
-    return this.address;
-  }
-
-  getData() {
-    return this.data;
+  static getType() {
+    return 'Insert';
   }
 }
 
