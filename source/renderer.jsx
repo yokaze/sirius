@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
 import { sprintf } from 'sprintf-js';
 
+import SiriusDocument from './common/SiriusDocument';
 import SiriusDocumentCommand from './common/SiriusDocumentCommand';
 import SiriusIpcClient from './ipc/SiriusIpcClient';
 
@@ -35,7 +36,7 @@ const containerStyle = {
 
 class BinaryTableViewModel {
   constructor() {
-    this.fileData = [];
+    this.document = new SiriusDocument();
     this.focusAddress = 0;
     this.writeMode = WriteMode.Overwrite;
   }
@@ -45,32 +46,32 @@ class BinaryTableViewModel {
   }
 
   getValueAt(address) {
-    return this.fileData[address];
+    return this.document.getFileData()[address];
   }
 
   setValueAt(address, value) {
-    while (this.getFileSize() <= address) {
-      this.fileData.push(0);
-    }
-    this.fileData[address] = value;
-    ipcClient.sendDocumentCommand(new SiriusDocumentCommand.Overwrite(address, [value]));
+    const command = new SiriusDocumentCommand.Overwrite(address, [value]);
+    this.document.applyCommand(command);
+    ipcClient.sendDocumentCommand(command);
   }
 
   insertValueAt(address, value) {
-    this.fileData.splice(address, 0, value);
-    ipcClient.sendDocumentCommand(new SiriusDocumentCommand.Insert(address, [value]));
+    const command = new SiriusDocumentCommand.Insert(address, [value]);
+    this.document.applyCommand(command);
+    ipcClient.sendDocumentCommand(command);
   }
 
   removeValueAt(address, length) {
-    const executable = ((address + length) <= this.fileData.length);
+    const executable = ((address + length) <= this.document.getFileData().length);
     if (executable) {
-      this.fileData.splice(address, 1);
-      ipcClient.sendDocumentCommand(new SiriusDocumentCommand.Remove(address, 1));
+      const command = new SiriusDocumentCommand.Remove(address, 1);
+      this.document.applyCommand(command);
+      ipcClient.sendDocumentCommand(command);
     }
   }
 
   getFileSize() {
-    return this.fileData.length;
+    return this.document.getFileData().length;
   }
 
   getFocusAddress() {
@@ -94,7 +95,7 @@ class BinaryTableViewModel {
   }
 
   onReceivedRenewalBinary(sender, renewalBinary) {
-    this.fileData = [...renewalBinary];
+    this.document.setFileData([...renewalBinary]);
     this.listener.onViewModelReloaded();
   }
 }

@@ -4,7 +4,7 @@ import path from 'path';
 import url from 'url';
 import uuid from 'uuid/v4';
 
-import SiriusDocument from './main/SiriusDocument';
+import SiriusDocument from './common/SiriusDocument';
 import SiriusIpcCommand from './ipc/SiriusIpcCommand';
 
 export default class SiriusModel {
