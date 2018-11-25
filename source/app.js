@@ -29,6 +29,11 @@ const menuTemplate = [
     submenu: [
       { label: 'Undo', click: () => { model.undo(); }, accelerator: 'CmdOrCtrl+Z' },
       { label: 'Redo', click: () => { model.redo(); }, accelerator: 'CmdOrCtrl+Shift+Z' },
+      { type: 'separator' },
+      { label: 'Cut', click: () => { }, accelerator: 'CmdOrCtrl+X' },
+      { label: 'Copy', click: () => { }, accelerator: 'CmdOrCtrl+C' },
+      { label: 'Paste', click: () => { }, accelerator: 'CmdOrCtrl+V' },
+      { label: 'Select All', click: () => { }, accelerator: 'CmdOrCtrl+A' },
     ],
   },
   {
