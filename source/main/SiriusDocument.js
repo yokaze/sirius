@@ -42,10 +42,16 @@ export default class SiriusDocument {
 
   _runCommand(command) {
     if (command.type === SiriusDocumentCommand.Insert.getType()) {
-      assert(command.address <= this.fileData.length);
-      this.fileData.splice(command.address, 0, command.data[0]);
-      const undoCommand = new SiriusDocumentCommand.Remove(command.address, 1);
-      return undoCommand;
+      if (command.address <= this.fileData.length) {
+        this.fileData.splice(command.address, 0, ...command.data);
+        const undoCommand = new SiriusDocumentCommand.Remove(command.address, command.data.length);
+        return undoCommand;
+      }
+      const fillData = Array(command.address - this.fileData.length).fill(0);
+      const fillCommand = new SiriusDocumentCommand.Insert(this.fileData.length, fillData);
+      const undo1 = this._runCommand(fillCommand);
+      const undo2 = this._runCommand(command);
+      return new SiriusDocumentCommand.Composite([undo2, undo1]);
     } else if (command.type === SiriusDocumentCommand.Overwrite.getType()) {
       assert(command.address <= this.fileData.length);
       this.fileData.splice(command.address, command.data.length, ...command.data);
@@ -56,6 +62,9 @@ export default class SiriusDocument {
       const undoCommand = new SiriusDocumentCommand.Insert(command.address, backup);
       this.fileData.splice(command.address, command.length);
       return undoCommand;
+    } else if (command.type === SiriusDocumentCommand.Composite.getType()) {
+      command.items.forEach((item) => { this._runCommand(item); });
+      return undefined;
     }
     return undefined;
   }

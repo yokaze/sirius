@@ -34,8 +34,20 @@ class Remove {
   }
 }
 
+class Composite {
+  constructor(items) {
+    this.type = Composite.getType();
+    this.items = items;
+  }
+
+  static getType() {
+    return 'Composite';
+  }
+}
+
 export default {
   Insert,
   Overwrite,
   Remove,
+  Composite,
 };
