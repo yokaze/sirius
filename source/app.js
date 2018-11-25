@@ -24,20 +24,19 @@ const menuTemplate = [
       { label: 'Save As', click: () => { model.saveAs(); }, accelerator: 'CmdOrCtrl+Shift+S' },
     ],
   },
-  /*
   {
     label: 'Edit',
     submenu: [
-      { role: 'undo' },
-      { role: 'redo' },
+      { label: 'Undo', click: () => { model.undo(); }, accelerator: 'CmdOrCtrl+Z' },
+      { label: 'Redo', click: () => { model.redo(); }, accelerator: 'CmdOrCtrl+Shift+Z' },
     ],
-  }, */
+  },
   {
     label: 'View',
     submenu: [
-      { label: 'Open in New Window', click: (e) => { model.duplicateActiveEditor(); } }
+      { label: 'Open in New Window', click: () => { model.duplicateActiveEditor(); } },
     ],
-  }
+  },
 ];
 
 app.on('ready', () => {

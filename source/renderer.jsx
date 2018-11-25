@@ -61,9 +61,12 @@ class BinaryTableViewModel {
     ipcClient.sendDocumentCommand(new SiriusDocumentCommand.Insert(address, [value]));
   }
 
-  removeValueAt(address) {
-    this.fileData.splice(address, 1);
-    ipcClient.sendDocumentCommand(new SiriusDocumentCommand.Remove(address, 1));
+  removeValueAt(address, length) {
+    const executable = ((address + length) <= this.fileData.length);
+    if (executable) {
+      this.fileData.splice(address, 1);
+      ipcClient.sendDocumentCommand(new SiriusDocumentCommand.Remove(address, 1));
+    }
   }
 
   getFileSize() {
@@ -100,7 +103,7 @@ class BinaryTableRow extends Component {
   render() {
     const address = this.props.address;
     const text = sprintf('%08X', address);
-    return <span key={'BinaryTableRow:span:' + address} className='binary-table-address'>{text}</span>;
+    return <span key={'BinaryTableRow:span:' + address} className="binary-table-address">{text}</span>;
   }
 }
 
@@ -211,11 +214,11 @@ class BinaryTable extends Component {
     const items = [];
     if (this.state.rowCount !== undefined) {
       const columnCount = this.state.columnCount;
-      items.push(<span key="address" className='binary-table-address'>Address</span>);
+      items.push(<span key="address" className="binary-table-address">Address</span>);
       for (let i = 0; i < columnCount; i += 1) {
         let title = i.toString(16).toUpperCase();
         title = (i < 16) ? ('+' + title) : title;
-        items.push(<span key={i} className='binary-table-cell'>{title}</span>);
+        items.push(<span key={i} className="binary-table-cell">{title}</span>);
       }
       items.push(<br key="br-head" />);
       const viewModel = this.props.viewModel;
@@ -230,20 +233,22 @@ class BinaryTable extends Component {
           const valid = (cellAddress < fileSize);
           const value = valid ? viewModel.getValueAt(cellAddress) : 0;
           const reference = (cellAddress === focusedAddress) ? this.reference : undefined;
-          const cell = <BinaryTableCell
-            inputRef={reference}
-            key={'BinaryTableCell:' + cellAddress}
-            address={cellAddress}
-            value={value}
-            valid={valid}
-            handleKeyDown={this.handleKeyDown}
-            handleMouseDown={this.handleMouseDown} />;
+          const cell = (
+            <BinaryTableCell
+              inputRef={reference}
+              key={'BinaryTableCell:' + cellAddress}
+              address={cellAddress}
+              value={value}
+              valid={valid}
+              handleKeyDown={this.handleKeyDown}
+              handleMouseDown={this.handleMouseDown} />
+          );
           items.push(cell);
         }
         items.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
         {
           const values = [];
-          for (let i = 0; i < columnCount; i+= 1) {
+          for (let i = 0; i < columnCount; i += 1) {
             const cellAddress = rowAddress + i;
             const valid = (cellAddress < fileSize);
             const value = valid ? viewModel.getValueAt(cellAddress) : undefined;
@@ -294,7 +299,7 @@ class BinaryTable extends Component {
         {
           const focusAddress = viewModel.getFocusAddress();
           if (focusAddress >= 1) {
-            viewModel.removeValueAt(focusAddress - 1);
+            viewModel.removeValueAt(focusAddress - 1, 1);
             addressMove = -1;
           }
           break;
@@ -342,7 +347,7 @@ class BinaryTable extends Component {
   }
 
   onResized(contentRect) {
-    const rowCount = Math.floor(contentRect.entry.height / 24 - 3);
+    const rowCount = Math.floor((contentRect.entry.height / 24) - 3);
     if (this.state.rowCount !== rowCount) {
       this.setState({ rowCount });
     }

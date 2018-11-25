@@ -26,7 +26,7 @@ export default class SiriusModel {
 
     ipcMain.on(SiriusIpcCommand.onDocumentCommand, (e, command) => {
       this.onDocumentCommandReceived(e, command);
-    })
+    });
   }
 
   createNew() {
@@ -58,6 +58,40 @@ export default class SiriusModel {
   }
 
   saveAs() {
+  }
+
+  undo() {
+    const currentWindow = BrowserWindow.getFocusedWindow();
+    const handle = this.handles[currentWindow.id];
+    const doc = this.documents[handle];
+    doc.undo();
+
+    const fileData = doc.getFileData();
+    for (const key in this.handles) {
+      const windowId = parseInt(key, 10);
+      const windowHandle = this.handles[windowId];
+      if (handle === windowHandle) {
+        const window = BrowserWindow.fromId(windowId);
+        window.webContents.send(SiriusIpcCommand.onRendererReceivedRenewalBinary, fileData);
+      }
+    }
+  }
+
+  redo() {
+    const currentWindow = BrowserWindow.getFocusedWindow();
+    const handle = this.handles[currentWindow];
+    const doc = this.documents[handle];
+    doc.redo();
+
+    const fileData = doc.getFileData();
+    for (const key in this.handles) {
+      const windowId = parseInt(key, 10);
+      const windowHandle = this.handles[windowId];
+      if (handle === windowHandle) {
+        const window = BrowserWindow.fromId(windowId);
+        window.webContents.send(SiriusIpcCommand.onRendererReceivedRenewalBinary, fileData);
+      }
+    }
   }
 
   openEditor() {
@@ -98,7 +132,7 @@ export default class SiriusModel {
     this.documents[senderHandle].applyCommand(command);
 
     for (const key in this.handles) {
-      const windowId = parseInt(key);
+      const windowId = parseInt(key, 10);
       const handle = this.handles[windowId];
 
       if ((senderWindowId !== windowId) && (senderHandle === handle)) {
