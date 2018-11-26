@@ -1,4 +1,5 @@
 import { ipcRenderer, remote } from 'electron';
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
@@ -107,7 +108,7 @@ class BinaryTableRow extends Component {
   }
 }
 
-class BinaryTableCell extends Component {
+class BinaryTableDataCell extends Component {
   constructor(props) {
     super(props);
     this.handleKeyDown = this.handleKeyDown.bind(this);
@@ -115,19 +116,60 @@ class BinaryTableCell extends Component {
   }
 
   render() {
-    const address = this.props.address;
-    const text = this.props.valid ? sprintf('%02X', this.props.value) : '--';
+    const valid = (this.props.value !== undefined);
+    const text = valid ? sprintf('%02X', this.props.value) : '--';
     return <span ref={this.props.inputRef} key={'span'} className="binary-table-cell" tabIndex={this.props.address} onKeyDown={this.handleKeyDown} onMouseDown={this.handleMouseDown}>{text}</span>;
   }
 
   handleKeyDown(e) {
-    this.props.handleKeyDown(e);
+    this.props.onKeyDown(e);
   }
 
   handleMouseDown(e) {
-    this.props.handleMouseDown(this, e);
+    this.props.onMouseDown(this, e);
   }
 }
+
+BinaryTableDataCell.propTypes = {
+  address: PropTypes.number.isRequired,
+  value: PropTypes.number,
+  onKeyDown: PropTypes.func.isRequired,
+  onMouseDown: PropTypes.func.isRequired,
+};
+
+class BinaryTableDataRow extends Component {
+  render() {
+    const values = this.props.values;
+    const length = values.length;
+    const rowAddress = this.props.address;
+    const selectedIndex = this.props.selectedIndex;
+
+    const children = [];
+    for (let i = 0; i < length; i += 1) {
+      const cellAddress = rowAddress + i;
+      const value = values[i];
+      const reference = (i === selectedIndex) ? this.props.inputRef : undefined;
+      const cell = (<BinaryTableDataCell
+        inputRef={reference}
+        key={'BinaryTableCell:' + i}
+        address={cellAddress}
+        value={value}
+        onKeyDown={this.props.onKeyDown}
+        onMouseDown={this.props.onMouseDown}
+      />);
+      children.push(cell);
+    }
+    return <span key="span">{children}</span>;
+  }
+}
+
+BinaryTableDataRow.propTypes = {
+  address: PropTypes.number.isRequired,
+  values: PropTypes.arrayOf(PropTypes.number).isRequired,
+  selectedIndex: PropTypes.number.isRequired,
+  onKeyDown: PropTypes.func.isRequired,
+  onMouseDown: PropTypes.func.isRequired,
+};
 
 class BinaryTable extends Component {
   constructor(props) {
@@ -168,40 +210,31 @@ class BinaryTable extends Component {
         const rowAddress = this.state.startAddress + (j * columnCount);
         const row = <BinaryTableRow key={'BinaryTableRow:' + rowAddress} address={rowAddress} />;
         items.push(row);
+
+        const values = [];
         for (let i = 0; i < columnCount; i += 1) {
           const cellAddress = rowAddress + i;
           const valid = (cellAddress < fileSize);
-          const value = valid ? viewModel.getValueAt(cellAddress) : 0;
-          const reference = (cellAddress === focusedAddress) ? this.reference : undefined;
-          const cell = (
-            <BinaryTableCell
-              inputRef={reference}
-              key={'BinaryTableCell:' + cellAddress}
-              address={cellAddress}
-              value={value}
-              valid={valid}
-              handleKeyDown={this.handleKeyDown}
-              handleMouseDown={this.handleMouseDown} />
-          );
-          items.push(cell);
+          const value = valid ? viewModel.getValueAt(cellAddress) : undefined;
+          values.push(value);
         }
+        let selectedIndex = (focusedAddress - rowAddress);
+        if (selectedIndex < 0) {
+          selectedIndex = -1;
+        } else if (selectedIndex >= columnCount) {
+          selectedIndex = -1;
+        }
+        items.push(<BinaryTableDataRow
+          key={'DataRow:' + rowAddress}
+          inputRef={this.reference}
+          values={values}
+          address={rowAddress}
+          selectedIndex={selectedIndex}
+          onKeyDown={this.handleKeyDown}
+          onMouseDown={this.handleMouseDown}
+        />);
         items.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
-        {
-          const values = [];
-          for (let i = 0; i < columnCount; i += 1) {
-            const cellAddress = rowAddress + i;
-            const valid = (cellAddress < fileSize);
-            const value = valid ? viewModel.getValueAt(cellAddress) : undefined;
-            values.push(value);
-          }
-          let selectedIndex = (focusedAddress - rowAddress);
-          if (selectedIndex < 0) {
-            selectedIndex = -1;
-          } else if (selectedIndex >= columnCount) {
-            selectedIndex = -1;
-          }
-          items.push(<BinaryTableExpressionRow key={'row:' + rowAddress} values={values} selectedIndex={selectedIndex} />);
-        }
+        items.push(<BinaryTableExpressionRow key={'ExpressionRow:' + rowAddress} values={values} selectedIndex={selectedIndex} />);
         items.push(<br key={'br' + j} />);
       }
       items.push(<div key={'write-mode'}>{(this.props.viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>);

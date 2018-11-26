@@ -12,9 +12,9 @@ export default class BinaryTableExpressionRow extends Component {
   }
 
   render() {
-    const selectedIndex = this.props.selectedIndex;
     const values = this.props.values;
     const length = values.length;
+    const selectedIndex = this.props.selectedIndex;
     assert((selectedIndex >= -1) && (selectedIndex < length));
 
     const children = [];
