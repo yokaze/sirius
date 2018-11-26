@@ -1,11 +1,10 @@
-import assert from 'assert';
 import { ipcRenderer, remote } from 'electron';
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
 import { sprintf } from 'sprintf-js';
 
+import BinaryTableExpressionRow from './renderer/components/BinaryTableExpressionRow';
 import SiriusDocument from './common/SiriusDocument';
 import SiriusDocumentCommand from './common/SiriusDocumentCommand';
 import SiriusIpcClient from './ipc/SiriusIpcClient';
@@ -118,7 +117,7 @@ class BinaryTableCell extends Component {
   render() {
     const address = this.props.address;
     const text = this.props.valid ? sprintf('%02X', this.props.value) : '--';
-    return <span ref={this.props.inputRef} key={'span'} className='binary-table-cell' tabIndex={this.props.address} onKeyDown={this.handleKeyDown} onMouseDown={this.handleMouseDown}>{text}</span>;
+    return <span ref={this.props.inputRef} key={'span'} className="binary-table-cell" tabIndex={this.props.address} onKeyDown={this.handleKeyDown} onMouseDown={this.handleMouseDown}>{text}</span>;
   }
 
   handleKeyDown(e) {
@@ -129,66 +128,6 @@ class BinaryTableCell extends Component {
     this.props.handleMouseDown(this, e);
   }
 }
-
-class BinaryTableExpressionCell extends Component {
-  shouldComponentUpdate(nextProps) {
-    let changed = (this.props.selected !== nextProps.selected);
-    changed = changed || (this.props.value !== nextProps.value);
-    return changed;
-  }
-
-  render() {
-    const className = this.props.selected ? 'binary-table-expression-selected' : 'binary-table-expression';
-    return <span key="span" className={className}>{this.props.value}</span>;
-  }
-}
-
-BinaryTableExpressionCell.propTypes = {
-  selected: PropTypes.bool.isRequired,
-  value: PropTypes.string.isRequired,
-};
-
-class BinaryTableExpressionRow extends Component {
-  shouldComponentUpdate(nextProps) {
-    let changed = (this.props.selectedIndex !== nextProps.selectedIndex);
-    changed = changed || nextProps.values.toString() !== this.props.values.toString();
-    return changed;
-  }
-
-  render() {
-    const selectedIndex = this.props.selectedIndex;
-    const values = this.props.values;
-    const length = values.length;
-    assert((selectedIndex >= -1) && (selectedIndex < length));
-
-    const children = [];
-    for (let i = 0; i < length; i += 1) {
-      const value = values[i];
-      let text = '';
-      if (value === undefined) {
-        text = '-';
-      } else if (value === 32) {
-        text = '\u00A0';
-      } else if ((value > 32) && (value < 127)) {
-        text = String.fromCharCode(value);
-      } else {
-        text = '.';
-      }
-      const selected = (i === selectedIndex);
-      children.push(<BinaryTableExpressionCell
-        key={i.toString()}
-        value={text}
-        selected={selected}
-      />);
-    }
-    return <span key="span">{children}</span>;
-  }
-}
-
-BinaryTableExpressionRow.propTypes = {
-  selectedIndex: PropTypes.number.isRequired,
-  values: PropTypes.arrayOf(PropTypes.number).isRequired,
-};
 
 class BinaryTable extends Component {
   constructor(props) {
