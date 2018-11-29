@@ -45,8 +45,8 @@ class BinaryTableViewModel {
     this.listener = listener;
   }
 
-  getValueAt(address) {
-    return this.document.getFileData()[address];
+  getBuffer(address, length) {
+    return this.document.getBuffer(address, length);
   }
 
   setValueAt(address, value) {
@@ -212,13 +212,7 @@ class BinaryTable extends Component {
         const row = <BinaryTableRow key={'BinaryTableRow:' + rowAddress} address={rowAddress} />;
         items.push(row);
 
-        const values = [];
-        for (let i = 0; i < columnCount; i += 1) {
-          const cellAddress = rowAddress + i;
-          const valid = (cellAddress < fileSize);
-          const value = valid ? viewModel.getValueAt(cellAddress) : undefined;
-          values.push(value);
-        }
+        const values = viewModel.getBuffer(rowAddress, columnCount);
         let selectedIndex = (focusedAddress - rowAddress);
         if (selectedIndex < 0) {
           selectedIndex = -1;

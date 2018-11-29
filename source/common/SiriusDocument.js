@@ -31,6 +31,14 @@ export default class SiriusDocument {
     }
   }
 
+  getBuffer(address, length) {
+    let ret = this.fileData.slice(address, address + length);
+    if (ret.length < length) {
+      ret = ret.concat(Array(length - ret.length).fill(undefined));
+    }
+    return ret;
+  }
+
   getFileData() {
     return this.fileData;
   }
