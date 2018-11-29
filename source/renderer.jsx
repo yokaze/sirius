@@ -184,6 +184,7 @@ class BinaryTable extends Component {
     this.reference = React.createRef();
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleWheel = this.handleWheel.bind(this);
   }
 
   componentDidUpdate() {
@@ -241,7 +242,7 @@ class BinaryTable extends Component {
     }
     return <Measure onResize={contentRect => { this.onResized(contentRect); }}>
       {({ measureRef }) =>
-        <div ref={measureRef} className="binary-table" style={containerStyle}>{items}</div>
+        <div ref={measureRef} className="binary-table" style={containerStyle} onWheel={this.handleWheel}>{items}</div>
       }
     </Measure>;
   }
@@ -317,6 +318,13 @@ class BinaryTable extends Component {
       return { };
     };
     this.setState(handler);
+  }
+
+  handleWheel(e) {
+    const deltaY = Math.floor(e.deltaY / 24) ;
+    this.setState((state, props) => {
+      return { startAddress: Math.max(0, state.startAddress + 16 * deltaY) };
+    });
   }
 
   onResized(contentRect) {
