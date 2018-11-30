@@ -101,6 +101,10 @@ class BinaryTableViewModel {
 }
 
 class BinaryTableRow extends Component {
+  shouldComponentUpdate(nextProps) {
+    return this.props.address !== nextProps.address;
+  }
+
   render() {
     const address = this.props.address;
     const text = sprintf('%08X', address);
@@ -113,6 +117,13 @@ class BinaryTableDataCell extends Component {
     super(props);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
+  }
+
+  shouldComponentUpdate(nextProps) {
+    let changed = (this.props.address !== nextProps.address);
+    changed = changed || (this.props.value !== nextProps.value);
+    changed = changed || (this.props.inputRef !== nextProps.inputRef);
+    return changed;
   }
 
   render() {
@@ -138,6 +149,18 @@ BinaryTableDataCell.propTypes = {
 };
 
 class BinaryTableDataRow extends Component {
+  shouldComponentUpdate(nextProps) {
+    if (this.props.values.length !== nextProps.values.length) {
+      return true;
+    }
+    let changed = (this.props.address !== nextProps.address);
+    changed = changed || (this.props.selectedIndex !== nextProps.selectedIndex);
+    for (let i = 0; i < this.props.values.length; i += 1) {
+      changed = changed || (this.props.values[i] !== nextProps.values[i]);
+    }
+    return changed;
+  }
+
   render() {
     const values = this.props.values;
     const length = values.length;
