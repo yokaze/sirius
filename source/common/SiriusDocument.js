@@ -61,9 +61,17 @@ export default class SiriusDocument {
       const undo2 = this._runCommand(command);
       return new SiriusDocumentCommand.Composite([undo2, undo1]);
     } else if (command.type === SiriusDocumentCommand.Overwrite.getType()) {
-      assert(command.address <= this.fileData.length);
-      this.fileData.splice(command.address, command.data.length, ...command.data);
-      return undefined;
+      if ((command.address + command.data.length) <= this.fileData.length) {
+        const backup = this.fileData.slice(command.address, command.address + command.data.length);
+        this.fileData.splice(command.address, command.data.length, ...command.data);
+        const undoCommand = new SiriusDocumentCommand.Overwrite(command.address, backup);
+        return undoCommand;
+      }
+      const fillData = Array(command.address + command.data.length - this.fileData.length).fill(0);
+      const fillCommand = new SiriusDocumentCommand.Insert(this.fileData.length, fillData);
+      const undo1 = this._runCommand(fillCommand);
+      const undo2 = this._runCommand(command);
+      return new SiriusDocumentCommand.Composite([undo2, undo1]);
     } else if (command.type === SiriusDocumentCommand.Remove.getType()) {
       assert((command.address + command.length) <= this.fileData.length);
       const backup = this.fileData.slice(command.address, command.address + command.length);
