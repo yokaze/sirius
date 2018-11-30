@@ -232,7 +232,8 @@ class BinaryTable extends Component {
       const focusedAddress = viewModel.getFocusAddress();
       for (let j = 0; j < this.state.rowCount; j += 1) {
         const rowAddress = this.state.startAddress + (j * columnCount);
-        const row = <BinaryTableRow key={'BinaryTableRow:' + rowAddress} address={rowAddress} />;
+        const rowIndex = Math.floor(rowAddress / columnCount);
+        const row = <BinaryTableRow key={'BinaryTableRow:' + (rowIndex % this.state.rowCount)} address={rowAddress} />;
         items.push(row);
 
         const values = viewModel.getBuffer(rowAddress, columnCount);
@@ -243,7 +244,7 @@ class BinaryTable extends Component {
           selectedIndex = -1;
         }
         items.push(<BinaryTableDataRow
-          key={'DataRow:' + rowAddress}
+          key={'DataRow:' + (rowIndex % this.state.rowCount)}
           inputRef={this.reference}
           values={values}
           address={rowAddress}
@@ -252,7 +253,7 @@ class BinaryTable extends Component {
           onMouseDown={this.handleMouseDown}
         />);
         items.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
-        items.push(<BinaryTableExpressionRow key={'ExpressionRow:' + rowAddress} values={values} selectedIndex={selectedIndex} />);
+        items.push(<BinaryTableExpressionRow key={'ExpressionRow:' + (rowIndex % this.state.rowCount)} values={values} selectedIndex={selectedIndex} />);
         items.push(<br key={'br' + j} />);
       }
       items.push(<div key={'write-mode'}>{(this.props.viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>);
