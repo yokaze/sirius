@@ -221,11 +221,13 @@ class BinaryTable extends Component {
     if (this.state.rowCount !== undefined) {
       const columnCount = this.state.columnCount;
       items.push(<span key="address" className="binary-table-address">Address</span>);
+      const headerCells = [];
       for (let i = 0; i < columnCount; i += 1) {
         let title = i.toString(16).toUpperCase();
         title = (i < 16) ? ('+' + title) : title;
-        items.push(<span key={i} className="binary-table-cell">{title}</span>);
+        headerCells.push(<li key={i}>{title}</li>);
       }
+      items.push(<span key="binary-table-header-cell-container" className="binary-table-header-cell-container">{headerCells}</span>);
       items.push(<br key="br-head" />);
       const viewModel = this.props.viewModel;
       const fileSize = viewModel.getFileSize();

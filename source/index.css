@@ -8,6 +8,21 @@ body {
     outline: 0;
 }
 
+.binary-table-header-cell-container {
+    display: inline-block;
+    height: 24px;
+}
+
+.binary-table-header-cell-container li {
+    display: inline-block;
+    font-family: Monaco, monospace;
+    font-size: 16px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    width: 32px;
+}
+
 .binary-table-address {
   display: inline-block;
   font-family: Monaco, monospace;
