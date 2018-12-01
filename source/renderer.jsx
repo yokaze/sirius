@@ -38,6 +38,7 @@ class BinaryTableViewModel {
   constructor() {
     this.document = new SiriusDocument();
     this.focusAddress = 0;
+    this.selectedRange = [0, 0];
     this.writeMode = WriteMode.Overwrite;
   }
 
@@ -80,6 +81,14 @@ class BinaryTableViewModel {
 
   setFocusAddress(address) {
     this.focusAddress = address;
+  }
+
+  getSelectedRange() {
+    return this.selectedRange;
+  }
+
+  setSelectedRange(selectedRange) {
+    this.selectedRange = selectedRange;
   }
 
   getWriteMode() {
@@ -133,12 +142,13 @@ class BinaryTableDataCell extends Component {
     super(props);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
-    this.handleDrag = this.handleDrag.bind(this);
+    this.handleMouseEnter = this.handleMouseEnter.bind(this);
   }
 
   shouldComponentUpdate(nextProps) {
     let changed = (this.props.address !== nextProps.address);
     changed = changed || (this.props.value !== nextProps.value);
+    changed = changed || (this.props.selected !== nextProps.selected);
     changed = changed || (this.props.inputRef !== nextProps.inputRef);
     return changed;
   }
@@ -149,11 +159,11 @@ class BinaryTableDataCell extends Component {
     return (<span
       ref={this.props.inputRef}
       key={'span'}
-      className="binary-table-cell"
+      className={this.props.selected ? "binary-table-data-cell-selected" : "binary-table-cell"}
       tabIndex={this.props.address}
       onKeyDown={this.handleKeyDown}
       onMouseDown={this.handleMouseDown}
-      onMouseEnter={this.handleDrag}
+      onMouseEnter={this.handleMouseEnter}
     >{text}</span>);
   }
 
@@ -165,8 +175,8 @@ class BinaryTableDataCell extends Component {
     this.props.onMouseDown(this, e);
   }
 
-  handleDrag(e) {
-    console.log(this.props.address);
+  handleMouseEnter(e) {
+    this.props.onMouseEnter(this, e);
   }
 }
 
@@ -184,6 +194,8 @@ class BinaryTableDataRow extends Component {
     }
     let changed = (this.props.address !== nextProps.address);
     changed = changed || (this.props.selectedIndex !== nextProps.selectedIndex);
+    changed = changed || (this.props.selectedRange[0] !== nextProps.selectedRange[0]);
+    changed = changed || (this.props.selectedRange[1] !== nextProps.selectedRange[1]);
     for (let i = 0; i < this.props.values.length; i += 1) {
       changed = changed || (this.props.values[i] !== nextProps.values[i]);
     }
@@ -200,14 +212,17 @@ class BinaryTableDataRow extends Component {
     for (let i = 0; i < length; i += 1) {
       const cellAddress = rowAddress + i;
       const value = values[i];
+      const selected = (this.props.selectedRange[0] <= i) && (i <= this.props.selectedRange[1]);
       const reference = (i === selectedIndex) ? this.props.inputRef : undefined;
       const cell = (<BinaryTableDataCell
         inputRef={reference}
         key={'BinaryTableCell:' + i}
         address={cellAddress}
         value={value}
+        selected={selected}
         onKeyDown={this.props.onKeyDown}
         onMouseDown={this.props.onMouseDown}
+        onMouseEnter={this.props.onMouseEnter}
       />);
       children.push(cell);
     }
@@ -236,6 +251,7 @@ class BinaryTable extends Component {
     this.reference = React.createRef();
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleMouseEnter = this.handleMouseEnter.bind(this);
     this.handleWheel = this.handleWheel.bind(this);
   }
 
@@ -256,6 +272,7 @@ class BinaryTable extends Component {
       items.push(<br key="br-head" />);
       const viewModel = this.props.viewModel;
       const focusedAddress = viewModel.getFocusAddress();
+      const selectedRange = viewModel.getSelectedRange();
       for (let j = 0; j < this.state.rowCount; j += 1) {
         const rowAddress = this.state.startAddress + (j * columnCount);
         const rowIndex = Math.floor(rowAddress / columnCount);
@@ -269,14 +286,17 @@ class BinaryTable extends Component {
         } else if (selectedIndex >= columnCount) {
           selectedIndex = -1;
         }
+        const rowSelectedRange = [ selectedRange[0] - rowAddress, selectedRange[1] - rowAddress];
         items.push(<BinaryTableDataRow
           key={'DataRow:' + (rowIndex % this.state.rowCount)}
           inputRef={this.reference}
           values={values}
           address={rowAddress}
           selectedIndex={selectedIndex}
+          selectedRange={rowSelectedRange}
           onKeyDown={this.handleKeyDown}
           onMouseDown={this.handleMouseDown}
+          onMouseEnter={this.handleMouseEnter}
         />);
         items.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
         items.push(<BinaryTableExpressionRow key={'ExpressionRow:' + (rowIndex % this.state.rowCount)} values={values} selectedIndex={selectedIndex} />);
@@ -358,7 +378,23 @@ class BinaryTable extends Component {
 
   handleMouseDown(sender, e) {
     const handler = () => {
-      this.props.viewModel.setFocusAddress(sender.props.address);
+      const address = sender.props.address;
+      this.props.viewModel.setFocusAddress(address);
+      this.props.viewModel.setSelectedRange([address, address]);
+      return { mouseDownAddress: address };
+    };
+    this.setState(handler);
+  }
+
+  handleMouseEnter(sender, e) {
+    const buttons = e.buttons;
+    const handler = () => {
+      if (buttons === 1) {
+        const mouseDownAddress = this.state.mouseDownAddress ? this.state.mouseDownAddress : 0;
+        const startAddress = Math.min(mouseDownAddress, sender.props.address);
+        const endAddress = Math.max(mouseDownAddress, sender.props.address);
+        this.props.viewModel.setSelectedRange([startAddress, endAddress]);
+      }
       return { };
     };
     this.setState(handler);

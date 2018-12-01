@@ -3,11 +3,6 @@ body {
     margin: 0;
 }
 
-.binary-table span:focus {
-    background-color: silver;
-    outline: 0;
-}
-
 .binary-table-header-row {
     background-color: powderblue;
     box-shadow: 0px 2px 2px rgba(0, 0, 0, 0.2);
@@ -49,6 +44,18 @@ body {
   line-height: 24px;
   text-align: center;
   width: 32px;
+}
+
+.binary-table-data-cell-selected {
+    background-color: silver;
+    display: inline-block;
+    font-family: Monaco, monospace;
+    font-size: 16px;
+    height: 24px;
+    line-height: 24px;
+    outline: 0;
+    text-align: center;
+    width: 32px;
 }
 
 .binary-table-expression {
