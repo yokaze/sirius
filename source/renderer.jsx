@@ -112,11 +112,28 @@ class BinaryTableRow extends Component {
   }
 }
 
+class BinaryTableDataHeaderRow extends Component {
+  shouldComponentUpdate(nextProps) {
+    return false;
+  }
+
+  render() {
+    const cells = [];
+    for (let i = 0; i < this.props.columnCount; i += 1) {
+      let title = i.toString(16).toUpperCase();
+      title = (i < 16) ? ('+' + title) : title;
+      cells.push(<li key={i}>{title}</li>);
+    }
+    return <span key="binary-table-data-header-row" className="binary-table-data-header-row">{cells}</span>;
+  }
+}
+
 class BinaryTableDataCell extends Component {
   constructor(props) {
     super(props);
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleDrag = this.handleDrag.bind(this);
   }
 
   shouldComponentUpdate(nextProps) {
@@ -129,7 +146,15 @@ class BinaryTableDataCell extends Component {
   render() {
     const valid = (this.props.value !== undefined);
     const text = valid ? sprintf('%02X', this.props.value) : '--';
-    return <span ref={this.props.inputRef} key={'span'} className="binary-table-cell" tabIndex={this.props.address} onKeyDown={this.handleKeyDown} onMouseDown={this.handleMouseDown}>{text}</span>;
+    return (<span
+      ref={this.props.inputRef}
+      key={'span'}
+      className="binary-table-cell"
+      tabIndex={this.props.address}
+      onKeyDown={this.handleKeyDown}
+      onMouseDown={this.handleMouseDown}
+      onMouseEnter={this.handleDrag}
+    >{text}</span>);
   }
 
   handleKeyDown(e) {
@@ -138,6 +163,10 @@ class BinaryTableDataCell extends Component {
 
   handleMouseDown(e) {
     this.props.onMouseDown(this, e);
+  }
+
+  handleDrag(e) {
+    console.log(this.props.address);
   }
 }
 
@@ -220,17 +249,12 @@ class BinaryTable extends Component {
     const items = [];
     if (this.state.rowCount !== undefined) {
       const columnCount = this.state.columnCount;
-      items.push(<span key="address" className="binary-table-address">Address</span>);
-      const headerCells = [];
-      for (let i = 0; i < columnCount; i += 1) {
-        let title = i.toString(16).toUpperCase();
-        title = (i < 16) ? ('+' + title) : title;
-        headerCells.push(<li key={i}>{title}</li>);
-      }
-      items.push(<span key="binary-table-header-cell-container" className="binary-table-header-cell-container">{headerCells}</span>);
+      items.push(<span key="binary-table-header-row" className="binary-table-header-row">
+        <span key="address" className="binary-table-address">Address</span>
+        <BinaryTableDataHeaderRow key="binary-table-data-header-row" columnCount={columnCount} />
+      </span>);
       items.push(<br key="br-head" />);
       const viewModel = this.props.viewModel;
-      const fileSize = viewModel.getFileSize();
       const focusedAddress = viewModel.getFocusAddress();
       for (let j = 0; j < this.state.rowCount; j += 1) {
         const rowAddress = this.state.startAddress + (j * columnCount);
@@ -256,15 +280,15 @@ class BinaryTable extends Component {
         />);
         items.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
         items.push(<BinaryTableExpressionRow key={'ExpressionRow:' + (rowIndex % this.state.rowCount)} values={values} selectedIndex={selectedIndex} />);
-        items.push(<br key={'br' + j} />);
+        items.push(<br key={'br' + rowAddress} />);
       }
       items.push(<div key={'write-mode'}>{(this.props.viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>);
     }
-    return <Measure onResize={contentRect => { this.onResized(contentRect); }}>
+    return (<Measure onResize={contentRect => { this.onResized(contentRect); }}>
       {({ measureRef }) =>
         <div ref={measureRef} className="binary-table" style={containerStyle} onWheel={this.handleWheel}>{items}</div>
       }
-    </Measure>;
+    </Measure>);
   }
 
   handleKeyDown(e) {
