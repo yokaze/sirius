@@ -65,7 +65,7 @@ class BinaryTableViewModel {
   removeValueAt(address, length) {
     const executable = ((address + length) <= this.document.getFileData().length);
     if (executable) {
-      const command = new SiriusDocumentCommand.Remove(address, 1);
+      const command = new SiriusDocumentCommand.Remove(address, length);
       this.document.applyCommand(command);
       ipcClient.sendDocumentCommand(command);
     }
@@ -335,10 +335,16 @@ class BinaryTable extends Component {
       switch (keyCode) {
         case 8: // Delete
         {
-          const focusAddress = viewModel.getFocusAddress();
-          if (focusAddress >= 1) {
-            viewModel.removeValueAt(focusAddress - 1, 1);
-            addressMove = -1;
+          const selectedRange = viewModel.getSelectedRange();
+          if (selectedRange[0] === selectedRange[1]) {
+            if (selectedRange[0] >= 1) {
+              viewModel.removeValueAt(selectedRange[0] - 1, 1);
+              addressMove = -1;
+            }
+          } else {
+            viewModel.removeValueAt(selectedRange[0], selectedRange[1] - selectedRange[0] + 1);
+            viewModel.setSelectedRange([selectedRange[0], selectedRange[0]]);
+            return { };
           }
           break;
         }
