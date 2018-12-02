@@ -292,7 +292,7 @@ class BinaryTable extends Component {
           onMouseEnter={this.handleMouseEnter}
         />);
         items.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
-        items.push(<BinaryTableExpressionRow key={'ExpressionRow:' + (rowIndex % this.state.rowCount)} values={values} selectedIndex={selectedIndex} />);
+        items.push(<BinaryTableExpressionRow key={'ExpressionRow:' + (rowIndex % this.state.rowCount)} values={values} selectedRange={rowSelectedRange} />);
         items.push(<br key={'br' + rowAddress} />);
       }
       items.push(<div key={'write-mode'}>{(this.props.viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>);

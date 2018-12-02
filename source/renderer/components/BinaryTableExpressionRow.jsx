@@ -6,7 +6,7 @@ import BinaryTableExpressionCell from './BinaryTableExpressionCell';
 
 export default class BinaryTableExpressionRow extends Component {
   shouldComponentUpdate(nextProps) {
-    let changed = (this.props.selectedIndex !== nextProps.selectedIndex);
+    let changed = (this.props.selectedRange.toString() !== nextProps.selectedRange.toString());
     changed = changed || nextProps.values.toString() !== this.props.values.toString();
     return changed;
   }
@@ -14,8 +14,7 @@ export default class BinaryTableExpressionRow extends Component {
   render() {
     const values = this.props.values;
     const length = values.length;
-    const selectedIndex = this.props.selectedIndex;
-    assert((selectedIndex >= -1) && (selectedIndex < length));
+    const selectedRange = this.props.selectedRange;
 
     const children = [];
     for (let i = 0; i < length; i += 1) {
@@ -30,7 +29,7 @@ export default class BinaryTableExpressionRow extends Component {
       } else {
         text = '.';
       }
-      const selected = (i === selectedIndex);
+      const selected = (selectedRange[0] <= i) && (i <= selectedRange[1]);
       children.push(<BinaryTableExpressionCell
         key={i.toString()}
         value={text}
@@ -42,6 +41,6 @@ export default class BinaryTableExpressionRow extends Component {
 }
 
 BinaryTableExpressionRow.propTypes = {
-  selectedIndex: PropTypes.number.isRequired,
+  selectedRange: PropTypes.arrayOf(PropTypes.number).isRequired,
   values: PropTypes.arrayOf(PropTypes.number).isRequired,
 };
