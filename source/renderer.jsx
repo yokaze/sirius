@@ -83,7 +83,6 @@ class BinaryTableViewModel {
       if (this.writeMode === WriteMode.Overwrite) {
         this.setValueAt(selected, b);
       } else {
-        viewModel.processCharacter(value);
         this.insertValueAt(selected, b);
       }
     }
