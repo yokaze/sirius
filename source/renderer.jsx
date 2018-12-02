@@ -37,7 +37,8 @@ const containerStyle = {
 class BinaryTableViewModel {
   constructor() {
     this.document = new SiriusDocument();
-    this.selectedRange = [0, 0];
+    this.selectionStartAddress = 0;
+    this.selectionEndAddress = 0;
     this.writeMode = WriteMode.Overwrite;
     this.isEditing = false;
     this.editValue = 0;
@@ -73,12 +74,13 @@ class BinaryTableViewModel {
   }
 
   processCharacter(value) {
-    const selected = this.selectedRange[0];
+    const selected = this.selectionStartAddress;
     if (this.isEditing) {
       const b = this.editValue + value;
       this.isEditing = false;
       this.editValue = 0;
-      this.selectedRange = [selected + 1, selected + 1];
+      this.selectionStartAddress = selected + 1;
+      this.selectionEndAddress = selected + 1;
 
       if (this.writeMode === WriteMode.Overwrite) {
         this.setValueAt(selected, b);
@@ -97,11 +99,17 @@ class BinaryTableViewModel {
   }
 
   getSelectedRange() {
-    return this.selectedRange;
+    const left = Math.min(this.selectionStartAddress, this.selectionEndAddress);
+    const right = Math.max(this.selectionStartAddress, this.selectionEndAddress);
+    return [left, right];
   }
 
-  setSelectedRange(selectedRange) {
-    this.selectedRange = selectedRange;
+  setSelectionStartAddress(address) {
+    this.selectionStartAddress = address;
+  }
+
+  setSelectionEndAddress(address) {
+    this.selectionEndAddress = address;
   }
 
   getWriteMode() {
@@ -358,11 +366,13 @@ class BinaryTable extends Component {
           if (selectedRange[0] === selectedRange[1]) {
             if (selectedRange[0] >= 1) {
               viewModel.removeValueAt(selectedRange[0] - 1, 1);
-              viewModel.setSelectedRange([selectedRange[0] - 1, selectedRange[0] - 1]);
+              viewModel.setSelectionStartAddress(selectedRange[0] - 1);
+              viewModel.setSelectionEndAddress(selectedRange[0] - 1);
             }
           } else {
             viewModel.removeValueAt(selectedRange[0], selectedRange[1] - selectedRange[0] + 1);
-            viewModel.setSelectedRange([selectedRange[0], selectedRange[0]]);
+            viewModel.setSelectionStartAddress(selectedRange[0]);
+            viewModel.setSelectionEndAddress(selectedRange[0]);
             return { };
           }
           break;
@@ -370,25 +380,29 @@ class BinaryTable extends Component {
         case 37: // Left
         {
           const address = selectedRange[0] - 1;
-          viewModel.setSelectedRange([address, address]);
+          viewModel.setSelectionStartAddress(address);
+          viewModel.setSelectionEndAddress(address);
           break;
         }
         case 38: // Up
         {
           const address = selectedRange[0] - columnCount;
-          viewModel.setSelectedRange([address, address]);
+          viewModel.setSelectionStartAddress(address);
+          viewModel.setSelectionEndAddress(address);
           break;
         }
         case 39: // Right
         {
           const address = selectedRange[1] + 1;
-          viewModel.setSelectedRange([address, address]);
+          viewModel.setSelectionStartAddress(address);
+          viewModel.setSelectionEndAddress(address);
           break;
         }
         case 40: // Down
         {
           const address = selectedRange[1] + columnCount;
-          viewModel.setSelectedRange([address, address]);
+          viewModel.setSelectionStartAddress(address);
+          viewModel.setSelectionEndAddress(address);
           break;
         }
         case 73: // i
@@ -401,7 +415,8 @@ class BinaryTable extends Component {
       const fileSize = viewModel.getFileSize();
       const maxAddress = Math.floor((fileSize - 1) / columnCount) * columnCount;
       const nextFocusAddress = Math.max(0, viewModel.getSelectedRange()[0] + addressMove);
-      viewModel.setSelectedRange([nextFocusAddress, nextFocusAddress]);
+      viewModel.setSelectionStartAddress(nextFocusAddress);
+      viewModel.setSelectionEndAddress(nextFocusAddress);
       let nextAddress = state.startAddress;
       if (nextFocusAddress < nextAddress) {
         nextAddress -= Math.ceil((nextAddress - nextFocusAddress) / columnCount) * columnCount;
@@ -416,7 +431,8 @@ class BinaryTable extends Component {
   handleMouseDown(sender, e) {
     const handler = () => {
       const address = sender.props.address;
-      this.props.viewModel.setSelectedRange([address, address]);
+      this.props.viewModel.setSelectionStartAddress(address);
+      this.props.viewModel.setSelectionEndAddress(address);
       return { mouseDownAddress: address };
     };
     this.setState(handler);
@@ -429,7 +445,8 @@ class BinaryTable extends Component {
         const mouseDownAddress = this.state.mouseDownAddress ? this.state.mouseDownAddress : 0;
         const startAddress = Math.min(mouseDownAddress, sender.props.address);
         const endAddress = Math.max(mouseDownAddress, sender.props.address);
-        this.props.viewModel.setSelectedRange([startAddress, endAddress]);
+        this.props.viewModel.setSelectionStartAddress(startAddress);
+        this.props.viewModel.setSelectionEndAddress(endAddress);
       }
       return { };
     };
