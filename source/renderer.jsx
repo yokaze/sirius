@@ -243,6 +243,8 @@ class BinaryTable extends Component {
     super(props);
     this.props.viewModel.setListener(this);
     this.state = {
+      row: 0,
+      floatRow: 0,
       startAddress: 0,
       focusAddress: 64,
       columnCount: 16,
@@ -274,7 +276,7 @@ class BinaryTable extends Component {
       const focusedAddress = viewModel.getFocusAddress();
       const selectedRange = viewModel.getSelectedRange();
       for (let j = 0; j < this.state.rowCount; j += 1) {
-        const rowAddress = this.state.startAddress + (j * columnCount);
+        const rowAddress = (j + this.state.row) * columnCount;
         const rowIndex = Math.floor(rowAddress / columnCount);
         const row = <BinaryTableRow key={'BinaryTableRow:' + (rowIndex % this.state.rowCount)} address={rowAddress} />;
         items.push(row);
@@ -324,6 +326,7 @@ class BinaryTable extends Component {
       };
 
       const columnCount = state.columnCount;
+      const displayAddress = 0;
       let addressMove = 0;
       if ((keyCode >= 48) && (keyCode <= 57)) {
         handleTypeHex(keyCode - 48);
@@ -407,9 +410,15 @@ class BinaryTable extends Component {
   }
 
   handleWheel(e) {
-    const deltaY = Math.floor(e.deltaY / 24) ;
+    const deltaRow = e.deltaY / 24;
     this.setState((state, props) => {
-      return { startAddress: Math.max(0, state.startAddress + 16 * deltaY) };
+      const maxRow = Math.max(0, Math.floor((props.viewModel.getFileSize() - 1) / 16));
+      let nextFloatRow = Math.max(0, state.floatRow + deltaRow);
+      nextFloatRow = Math.min(nextFloatRow, maxRow);
+      return {
+        floatRow: nextFloatRow,
+        row: Math.floor(state.floatRow),
+      };
     });
   }
 
