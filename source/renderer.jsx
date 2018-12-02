@@ -335,13 +335,14 @@ class BinaryTable extends Component {
         handleTypeHex(keyCode - 55);
         addressMove = 1;
       }
+      const selectedRange = viewModel.getSelectedRange();
       switch (keyCode) {
         case 8: // Delete
         {
-          const selectedRange = viewModel.getSelectedRange();
           if (selectedRange[0] === selectedRange[1]) {
             if (selectedRange[0] >= 1) {
               viewModel.removeValueAt(selectedRange[0] - 1, 1);
+              viewModel.setSelectedRange([selectedRange[0] - 1, selectedRange[0] - 1]);
               addressMove = -1;
             }
           } else {
@@ -352,17 +353,33 @@ class BinaryTable extends Component {
           break;
         }
         case 37: // Left
+        {
+          const address = selectedRange[0] - 1;
+          viewModel.setSelectedRange([address, address]);
           addressMove = -1;
           break;
+        }
         case 38: // Up
+        {
+          const address = selectedRange[0] - columnCount;
+          viewModel.setSelectedRange([address, address]);
           addressMove = -columnCount;
           break;
+        }
         case 39: // Right
+        {
+          const address = selectedRange[1] + 1;
+          viewModel.setSelectedRange([address, address]);
           addressMove = 1;
           break;
+        }
         case 40: // Down
+        {
+          const address = selectedRange[1] + columnCount;
+          viewModel.setSelectedRange([address, address]);
           addressMove = columnCount;
           break;
+        }
         case 73: // i
           viewModel.setWriteMode(1 - viewModel.getWriteMode());
           break;
@@ -412,9 +429,7 @@ class BinaryTable extends Component {
   handleWheel(e) {
     const deltaRow = e.deltaY / 24;
     this.setState((state, props) => {
-      const maxRow = Math.max(0, Math.floor((props.viewModel.getFileSize() - 1) / 16));
-      let nextFloatRow = Math.max(0, state.floatRow + deltaRow);
-      nextFloatRow = Math.min(nextFloatRow, maxRow);
+      let nextFloatRow = BinaryTable.limitRowNumber(state.floatRow + deltaRow, props.viewModel.getFileSize());
       return {
         floatRow: nextFloatRow,
         row: Math.floor(state.floatRow),
@@ -431,6 +446,12 @@ class BinaryTable extends Component {
 
   onViewModelReloaded() {
     this.forceUpdate();
+  }
+
+  static limitRowNumber(row, fileSize) {
+    const maxRow = Math.max(0, Math.floor(fileSize - 1) / 16);
+    row = Math.max(0, row);
+    return Math.min(row, maxRow);
   }
 }
 
