@@ -37,7 +37,6 @@ const containerStyle = {
 class BinaryTableViewModel {
   constructor() {
     this.document = new SiriusDocument();
-    this.focusAddress = 0;
     this.selectedRange = [0, 0];
     this.writeMode = WriteMode.Overwrite;
   }
@@ -73,14 +72,6 @@ class BinaryTableViewModel {
 
   getFileSize() {
     return this.document.getFileData().length;
-  }
-
-  getFocusAddress() {
-    return this.focusAddress;
-  }
-
-  setFocusAddress(address) {
-    this.focusAddress = address;
   }
 
   getSelectedRange() {
@@ -273,8 +264,8 @@ class BinaryTable extends Component {
       </span>);
       items.push(<br key="br-head" />);
       const viewModel = this.props.viewModel;
-      const focusedAddress = viewModel.getFocusAddress();
       const selectedRange = viewModel.getSelectedRange();
+      const focusedAddress = selectedRange[0];
       for (let j = 0; j < this.state.rowCount; j += 1) {
         const rowAddress = (j + this.state.row) * columnCount;
         const rowIndex = Math.floor(rowAddress / columnCount);
@@ -318,10 +309,11 @@ class BinaryTable extends Component {
     const handler = (state, props) => {
       const viewModel = this.props.viewModel;
       const handleTypeHex = (value) => {
+        const selectedRange = viewModel.getSelectedRange();
         if (viewModel.getWriteMode() === WriteMode.Overwrite) {
-          viewModel.setValueAt(viewModel.getFocusAddress(), value);
+          viewModel.setValueAt(selectedRange[0], value);
         } else {
-          viewModel.insertValueAt(viewModel.getFocusAddress(), value);
+          viewModel.insertValueAt(selectedRange[0], value);
         }
       };
 
@@ -356,28 +348,24 @@ class BinaryTable extends Component {
         {
           const address = selectedRange[0] - 1;
           viewModel.setSelectedRange([address, address]);
-          addressMove = -1;
           break;
         }
         case 38: // Up
         {
           const address = selectedRange[0] - columnCount;
           viewModel.setSelectedRange([address, address]);
-          addressMove = -columnCount;
           break;
         }
         case 39: // Right
         {
           const address = selectedRange[1] + 1;
           viewModel.setSelectedRange([address, address]);
-          addressMove = 1;
           break;
         }
         case 40: // Down
         {
           const address = selectedRange[1] + columnCount;
           viewModel.setSelectedRange([address, address]);
-          addressMove = columnCount;
           break;
         }
         case 73: // i
@@ -389,8 +377,8 @@ class BinaryTable extends Component {
       }
       const fileSize = viewModel.getFileSize();
       const maxAddress = Math.floor((fileSize - 1) / columnCount) * columnCount;
-      const nextFocusAddress = Math.max(0, viewModel.getFocusAddress() + addressMove);
-      viewModel.setFocusAddress(nextFocusAddress);
+      const nextFocusAddress = Math.max(0, viewModel.getSelectedRange()[0] + addressMove);
+      viewModel.setSelectedRange([nextFocusAddress, nextFocusAddress]);
       let nextAddress = state.startAddress;
       if (nextFocusAddress < nextAddress) {
         nextAddress -= Math.ceil((nextAddress - nextFocusAddress) / columnCount) * columnCount;
@@ -405,7 +393,6 @@ class BinaryTable extends Component {
   handleMouseDown(sender, e) {
     const handler = () => {
       const address = sender.props.address;
-      this.props.viewModel.setFocusAddress(address);
       this.props.viewModel.setSelectedRange([address, address]);
       return { mouseDownAddress: address };
     };
