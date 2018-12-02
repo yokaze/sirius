@@ -3,6 +3,18 @@ body {
     margin: 0;
 }
 
+br {
+    user-select: none;
+}
+
+div {
+    user-select: none;
+}
+
+span {
+    user-select: none;
+}
+
 .binary-table-header-row {
     background-color: powderblue;
     border-bottom: 1px;
@@ -34,8 +46,9 @@ body {
   font-size: 16px;
   height: 24px;
   line-height: 24px;
+  margin-left: 16px;
+  margin-right: 6px;
   text-align: right;
-  width: 128px;
 }
 
 .binary-table-cell {

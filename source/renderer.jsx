@@ -268,7 +268,7 @@ class BinaryTable extends Component {
     if (this.state.rowCount !== undefined) {
       const columnCount = this.state.columnCount;
       items.push(<span key="binary-table-header-row" className="binary-table-header-row">
-        <span key="address" className="binary-table-address">Address</span>
+        <span key="address" className="binary-table-address">&ensp;Address</span>
         <BinaryTableDataHeaderRow key="binary-table-data-header-row" columnCount={columnCount} />
       </span>);
       items.push(<br key="br-head" />);
