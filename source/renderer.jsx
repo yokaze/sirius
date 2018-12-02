@@ -39,6 +39,8 @@ class BinaryTableViewModel {
     this.document = new SiriusDocument();
     this.selectedRange = [0, 0];
     this.writeMode = WriteMode.Overwrite;
+    this.isEditing = false;
+    this.editValue = 0;
   }
 
   setListener(listener) {
@@ -70,6 +72,27 @@ class BinaryTableViewModel {
     }
   }
 
+  processCharacter(value) {
+    const selected = this.selectedRange[0];
+    if (this.isEditing) {
+      const b = this.editValue + value;
+      this.isEditing = false;
+      this.editValue = 0;
+      this.selectedRange = [selected + 1, selected + 1];
+
+      if (this.writeMode === WriteMode.Overwrite) {
+        this.setValueAt(selected, b);
+      } else {
+        viewModel.processCharacter(value);
+        this.insertValueAt(selected, b);
+      }
+    }
+    else {
+      this.isEditing = true;
+      this.editValue = value << 4;
+    }
+  }
+
   getFileSize() {
     return this.document.getFileData().length;
   }
@@ -88,6 +111,10 @@ class BinaryTableViewModel {
 
   setWriteMode(writeMode) {
     this.writeMode = writeMode;
+  }
+
+  isEditing() {
+    return this.isEditing;
   }
 
   setIpcClient(ipcClient) {
@@ -311,9 +338,9 @@ class BinaryTable extends Component {
       const handleTypeHex = (value) => {
         const selectedRange = viewModel.getSelectedRange();
         if (viewModel.getWriteMode() === WriteMode.Overwrite) {
-          viewModel.setValueAt(selectedRange[0], value);
+          viewModel.processCharacter(value);
         } else {
-          viewModel.insertValueAt(selectedRange[0], value);
+          viewModel.processCharacter(value);
         }
       };
 
@@ -322,10 +349,8 @@ class BinaryTable extends Component {
       let addressMove = 0;
       if ((keyCode >= 48) && (keyCode <= 57)) {
         handleTypeHex(keyCode - 48);
-        addressMove = 1;
       } else if ((keyCode >= 65) && (keyCode <= 70)) {
         handleTypeHex(keyCode - 55);
-        addressMove = 1;
       }
       const selectedRange = viewModel.getSelectedRange();
       switch (keyCode) {
@@ -335,7 +360,6 @@ class BinaryTable extends Component {
             if (selectedRange[0] >= 1) {
               viewModel.removeValueAt(selectedRange[0] - 1, 1);
               viewModel.setSelectedRange([selectedRange[0] - 1, selectedRange[0] - 1]);
-              addressMove = -1;
             }
           } else {
             viewModel.removeValueAt(selectedRange[0], selectedRange[1] - selectedRange[0] + 1);
