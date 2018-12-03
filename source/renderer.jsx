@@ -491,7 +491,7 @@ class BinaryTable extends Component {
   handleWheel(e) {
     const deltaRow = e.deltaY / 24;
     this.setState((state, props) => {
-      let nextFloatRow = BinaryTable.limitRowNumber(state.floatRow + deltaRow, props.viewModel.getFileSize());
+      let nextFloatRow = BinaryTable.limitRowNumber(state.floatRow + deltaRow, state.columnCount, props.viewModel.getFileSize());
       return {
         floatRow: nextFloatRow,
         row: Math.floor(state.floatRow),
@@ -510,8 +510,8 @@ class BinaryTable extends Component {
     this.forceUpdate();
   }
 
-  static limitRowNumber(row, fileSize) {
-    const maxRow = Math.max(0, Math.floor(fileSize - 1) / 16);
+  static limitRowNumber(row, columnCount, fileSize) {
+    const maxRow = Math.max(0, Math.floor(fileSize - 1) / columnCount);
     row = Math.max(0, row);
     return Math.min(row, maxRow);
   }
