@@ -104,8 +104,16 @@ class BinaryTableViewModel {
     return [left, right];
   }
 
+  getSelectionStartAddress(address) {
+    return this.selectionStartAddress;
+  }
+
   setSelectionStartAddress(address) {
     this.selectionStartAddress = address;
+  }
+
+  getSelectionEndAddress() {
+    return this.selectionEndAddress;
   }
 
   setSelectionEndAddress(address) {
@@ -340,6 +348,7 @@ class BinaryTable extends Component {
 
   handleKeyDown(e) {
     const keyCode = e.keyCode;
+    const shiftKey = e.shiftKey;
     const handler = (state, props) => {
       const viewModel = this.props.viewModel;
       const handleTypeHex = (value) => {
@@ -377,33 +386,57 @@ class BinaryTable extends Component {
           }
           break;
         }
+        case 16: // Shift
+        {
+          return { };
+        }
         case 37: // Left
         {
-          const address = selectedRange[0] - 1;
-          viewModel.setSelectionStartAddress(address);
-          viewModel.setSelectionEndAddress(address);
-          break;
+          if (shiftKey === false) {
+            const address = selectedRange[0] - 1;
+            viewModel.setSelectionStartAddress(address);
+            viewModel.setSelectionEndAddress(address);
+          } else {
+            const address = viewModel.getSelectionEndAddress() - 1;
+            viewModel.setSelectionEndAddress(address);
+          }
+          return { };
         }
         case 38: // Up
         {
-          const address = selectedRange[0] - columnCount;
-          viewModel.setSelectionStartAddress(address);
-          viewModel.setSelectionEndAddress(address);
-          break;
+          if (shiftKey === false) {
+            const address = selectedRange[0] - columnCount;
+            viewModel.setSelectionStartAddress(address);
+            viewModel.setSelectionEndAddress(address);
+          } else {
+            const address = viewModel.getSelectionEndAddress() - columnCount;
+            viewModel.setSelectionEndAddress(address);
+          }
+          return { };
         }
         case 39: // Right
         {
-          const address = selectedRange[1] + 1;
-          viewModel.setSelectionStartAddress(address);
-          viewModel.setSelectionEndAddress(address);
-          break;
+          if (shiftKey === false) {
+            const address = selectedRange[1] + 1;
+            viewModel.setSelectionStartAddress(address);
+            viewModel.setSelectionEndAddress(address);
+          } else {
+            const address = viewModel.getSelectionEndAddress() + 1;
+            viewModel.setSelectionEndAddress(address);
+          }
+          return { };
         }
         case 40: // Down
         {
-          const address = selectedRange[1] + columnCount;
-          viewModel.setSelectionStartAddress(address);
-          viewModel.setSelectionEndAddress(address);
-          break;
+          if (shiftKey === false) {
+            const address = selectedRange[1] + columnCount;
+            viewModel.setSelectionStartAddress(address);
+            viewModel.setSelectionEndAddress(address);
+          } else {
+            const address = viewModel.getSelectionEndAddress() + columnCount;
+            viewModel.setSelectionEndAddress(address);
+          }
+          return { };
         }
         case 73: // i
           viewModel.setWriteMode(1 - viewModel.getWriteMode());
@@ -429,24 +462,26 @@ class BinaryTable extends Component {
   }
 
   handleMouseDown(sender, e) {
+    const address = sender.props.address;
+    const shiftKey = e.shiftKey;
+
     const handler = () => {
-      const address = sender.props.address;
-      this.props.viewModel.setSelectionStartAddress(address);
+      if (shiftKey === false) {
+        this.props.viewModel.setSelectionStartAddress(address);
+      }
       this.props.viewModel.setSelectionEndAddress(address);
-      return { mouseDownAddress: address };
+      return { };
     };
     this.setState(handler);
   }
 
   handleMouseEnter(sender, e) {
+    const address = sender.props.address;
     const buttons = e.buttons;
+
     const handler = () => {
       if (buttons === 1) {
-        const mouseDownAddress = this.state.mouseDownAddress ? this.state.mouseDownAddress : 0;
-        const startAddress = Math.min(mouseDownAddress, sender.props.address);
-        const endAddress = Math.max(mouseDownAddress, sender.props.address);
-        this.props.viewModel.setSelectionStartAddress(startAddress);
-        this.props.viewModel.setSelectionEndAddress(endAddress);
+        this.props.viewModel.setSelectionEndAddress(address);
       }
       return { };
     };
