@@ -104,7 +104,7 @@ class BinaryTableViewModel {
     return [left, right];
   }
 
-  getSelectionStartAddress(address) {
+  getSelectionStartAddress() {
     return this.selectionStartAddress;
   }
 
