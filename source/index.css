@@ -25,6 +25,18 @@ span {
     width: 100%;
 }
 
+.binary-table-footer-row {
+    background-color: powderblue;
+    border-color: lightsteelblue;
+    border-top: 1px;
+    border-top-style: solid;
+    bottom: 0px;
+    display: inline-block;
+    height: 24px;
+    position: fixed;
+    width: 100%;
+}
+
 .binary-table-data-header-row {
     display: inline-block;
     height: 24px;

@@ -156,7 +156,7 @@ class BinaryTableRow extends Component {
 
 class BinaryTableDataHeaderRow extends Component {
   shouldComponentUpdate(nextProps) {
-    return false;
+    return this.props.columnCount !== nextProps.columnCount;
   }
 
   render() {
@@ -337,7 +337,10 @@ class BinaryTable extends Component {
         items.push(<BinaryTableExpressionRow key={'ExpressionRow:' + (rowIndex % this.state.rowCount)} values={values} selectedRange={rowSelectedRange} />);
         items.push(<br key={'br' + rowAddress} />);
       }
-      items.push(<div key={'write-mode'}>{(this.props.viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>);
+      items.push(<span key="binary-table-footer-row" className="binary-table-footer-row">
+        <span key="address" className="binary-table-address">&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;</span>
+        <div key={'write-mode'} className="binary-table-address">{(this.props.viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>
+      </span>);
     }
     return (<Measure onResize={contentRect => { this.onResized(contentRect); }}>
       {({ measureRef }) =>
@@ -500,7 +503,7 @@ class BinaryTable extends Component {
   }
 
   onResized(contentRect) {
-    const rowCount = Math.floor((contentRect.entry.height / 24) - 3);
+    const rowCount = Math.floor((contentRect.entry.height / 24) - 2);
     const columnCount = contentRect.entry.width >= 1550 ? 32 : 16;
     if ((this.state.columnCount !== columnCount) || (this.state.rowCount !== rowCount)) {
       this.setState({ columnCount, rowCount });
