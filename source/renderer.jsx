@@ -501,8 +501,9 @@ class BinaryTable extends Component {
 
   onResized(contentRect) {
     const rowCount = Math.floor((contentRect.entry.height / 24) - 3);
-    if (this.state.rowCount !== rowCount) {
-      this.setState({ rowCount });
+    const columnCount = contentRect.entry.width >= 1550 ? 32 : 16;
+    if ((this.state.columnCount !== columnCount) || (this.state.rowCount !== rowCount)) {
+      this.setState({ columnCount, rowCount });
     }
   }
 
