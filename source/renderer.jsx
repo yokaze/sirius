@@ -334,7 +334,7 @@ class BinaryTable extends Component {
           onMouseEnter={this.handleMouseEnter}
         />);
         items.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
-        items.push(<BinaryTableExpressionRow key={'ExpressionRow:' + (rowIndex % this.state.rowCount)} values={values} selectedRange={rowSelectedRange} />);
+        items.push(<BinaryTableExpressionRow key={'ExpressionRow:' + (rowIndex % this.state.rowCount)} listener={this} address={rowAddress} values={values} selectedRange={rowSelectedRange} />);
         items.push(<br key={'br' + rowAddress} />);
       }
       items.push(<span key="binary-table-footer-row" className="binary-table-footer-row">
@@ -512,6 +512,31 @@ class BinaryTable extends Component {
 
   onViewModelReloaded() {
     this.forceUpdate();
+  }
+
+  onExpressionCellMouseDown(address, e) {
+    const shiftKey = e.shiftKey;
+
+    const handler = () => {
+      if (shiftKey === false) {
+        this.props.viewModel.setSelectionStartAddress(address);
+      }
+      this.props.viewModel.setSelectionEndAddress(address);
+      return { };
+    };
+    this.setState(handler);
+  }
+
+  onExpressionCellMouseEnter(address, e) {
+    const buttons = e.buttons;
+
+    const handler = () => {
+      if (buttons === 1) {
+        this.props.viewModel.setSelectionEndAddress(address);
+      }
+      return { };
+    };
+    this.setState(handler);
   }
 
   static limitRowNumber(row, columnCount, fileSize) {

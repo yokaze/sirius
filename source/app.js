@@ -12,6 +12,8 @@ const menuTemplate = [
     label: app.getName(),
     submenu: [
       { label: 'About', click: () => { model.openAbout(); } },
+      { label: 'Option', click: () => { } },
+      { type: 'separator' },
       { role: 'quit' },
     ],
   },
