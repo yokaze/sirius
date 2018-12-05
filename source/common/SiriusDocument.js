@@ -67,7 +67,8 @@ export default class SiriusDocument {
         const undoCommand = new SiriusDocumentCommand.Overwrite(command.address, backup);
         return undoCommand;
       }
-      const fillData = Array(command.address + command.data.length - this.fileData.length).fill(0);
+      const desiredLength = command.address + command.data.length;
+      const fillData = Array(desiredLength - this.fileData.length).fill(0);
       const fillCommand = new SiriusDocumentCommand.Insert(this.fileData.length, fillData);
       const undo1 = this._runCommand(fillCommand);
       const undo2 = this._runCommand(command);
