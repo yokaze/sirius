@@ -53,24 +53,24 @@ span {
 }
 
 .binary-table-address {
-  display: inline-block;
-  font-family: Monaco, monospace;
-  font-size: 16px;
-  height: 24px;
-  line-height: 24px;
-  margin-left: 16px;
-  margin-right: 6px;
-  text-align: right;
+    display: inline-block;
+    font-family: Monaco, monospace;
+    font-size: 16px;
+    height: 24px;
+    line-height: 24px;
+    margin-left: 16px;
+    margin-right: 6px;
+    text-align: right;
 }
 
 .binary-table-cell {
-  display: inline-block;
-  font-family: Monaco, monospace;
-  font-size: 16px;
-  height: 24px;
-  line-height: 24px;
-  text-align: center;
-  width: 32px;
+    display: inline-block;
+    font-family: Monaco, monospace;
+    font-size: 16px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    width: 32px;
 }
 
 .binary-table-data-cell-selected {
@@ -86,22 +86,22 @@ span {
 }
 
 .binary-table-expression {
-  display: inline-block;
-  font-family: Monaco, monospace;
-  font-size: 16px;
-  height: 24px;
-  line-height: 24px;
-  text-align: center;
-  width: 12px;
+    display: inline-block;
+    font-family: Monaco, monospace;
+    font-size: 16px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    width: 14px;
 }
 
 .binary-table-expression-selected {
-  background-color: silver;
-  display: inline-block;
-  font-family: Monaco, monospace;
-  font-size: 16px;
-  height: 24px;
-  line-height: 24px;
-  text-align: center;
-  width: 12px;
+    background-color: silver;
+    display: inline-block;
+    font-family: Monaco, monospace;
+    font-size: 16px;
+    height: 24px;
+    line-height: 24px;
+    text-align: center;
+    width: 14px;
 }
