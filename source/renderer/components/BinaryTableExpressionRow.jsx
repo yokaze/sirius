@@ -5,8 +5,9 @@ import BinaryTableExpressionCell from './BinaryTableExpressionCell';
 
 export default class BinaryTableExpressionRow extends Component {
   shouldComponentUpdate(nextProps) {
-    let changed = (this.props.selectedRange.toString() !== nextProps.selectedRange.toString());
-    changed = changed || nextProps.values.toString() !== this.props.values.toString();
+    let changed = this.props.focusIndex !== nextProps.focusIndex;
+    changed = changed || (this.props.selectedRange !== nextProps.selectedRange);
+    changed = changed || (nextProps.values !== this.props.values);
     return changed;
   }
 
@@ -15,7 +16,8 @@ export default class BinaryTableExpressionRow extends Component {
     const address = this.props.address;
     const values = this.props.values;
     const length = values.length;
-    const selectedRange = this.props.selectedRange;
+    const focusIndex = 1;//this.props.focusIndex;
+    const selectedRange = [3, 5];//this.props.selectedRange;
 
     const children = [];
     for (let i = 0; i < length; i += 1) {
@@ -30,12 +32,14 @@ export default class BinaryTableExpressionRow extends Component {
       } else {
         text = '.';
       }
-      const selected = (selectedRange[0] <= i) && (i <= selectedRange[1]);
+      const focused = (i === focusIndex);
+      const selected = (selectedRange[0] <= i) && (i < selectedRange[1]);
       children.push(<BinaryTableExpressionCell
         key={i.toString()}
         listener={listener}
         address={address + i}
         value={text}
+        focused={focused}
         selected={selected}
       />);
     }
@@ -49,6 +53,11 @@ BinaryTableExpressionRow.propTypes = {
     onExpressionCellMouseEnter: PropTypes.function,
   }).isRequired,
   address: PropTypes.number.isRequired,
+  focusIndex: PropTypes.number,
   selectedRange: PropTypes.arrayOf(PropTypes.number).isRequired,
   values: PropTypes.arrayOf(PropTypes.number).isRequired,
+};
+
+BinaryTableExpressionRow.defaultProps = {
+  focusIndex: undefined,
 };

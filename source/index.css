@@ -73,6 +73,20 @@ span {
     width: 32px;
 }
 
+.binary-table-data-cell-focused {
+    border: 2px;
+    border-color: silver;
+    border-style: solid;
+    display: inline-block;
+    font-family: Monaco, monospace;
+    font-size: 16px;
+    height: 20px;
+    line-height: 20px;
+    outline: 0;
+    text-align: center;
+    width: 28px;
+}
+
 .binary-table-data-cell-selected {
     background-color: silver;
     display: inline-block;
@@ -93,6 +107,19 @@ span {
     line-height: 24px;
     text-align: center;
     width: 14px;
+}
+
+.binary-table-expression-focused {
+    border: 2px;
+    border-color: silver;
+    border-style: solid;
+    display: inline-block;
+    font-family: Monaco, monospace;
+    font-size: 16px;
+    height: 20px;
+    line-height: 20px;
+    text-align: center;
+    width: 10px;
 }
 
 .binary-table-expression-selected {

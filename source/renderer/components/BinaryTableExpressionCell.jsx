@@ -9,7 +9,8 @@ export default class BinaryTableExpressionCell extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    let changed = (this.props.selected !== nextProps.selected);
+    let changed = (this.props.focused !== nextProps.focused);
+    changed = changed || (this.props.selected !== nextProps.selected);
     changed = changed || (this.props.value !== nextProps.value);
     return changed;
   }
@@ -23,7 +24,12 @@ export default class BinaryTableExpressionCell extends Component {
   }
 
   render() {
-    const className = this.props.selected ? 'binary-table-expression-selected' : 'binary-table-expression';
+    let className = 'binary-table-expression';
+    if (this.props.selected) {
+      className = 'binary-table-expression-selected';
+    } else if (this.props.focused) {
+      className = 'binary-table-expression-focused';
+    }
     return (<span
       key="span"
       className={className}
@@ -39,6 +45,7 @@ BinaryTableExpressionCell.propTypes = {
     onExpressionCellMouseEnter: PropTypes.function,
   }).isRequired,
   address: PropTypes.number.isRequired,
+  focused: PropTypes.bool.isRequired,
   selected: PropTypes.bool.isRequired,
   value: PropTypes.string.isRequired,
 };
