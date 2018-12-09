@@ -16,8 +16,11 @@ export default class BinaryTableExpressionRow extends Component {
     const address = this.props.address;
     const values = this.props.values;
     const length = values.length;
-    const focusIndex = 1;//this.props.focusIndex;
-    const selectedRange = [3, 5];//this.props.selectedRange;
+    const focusIndex = this.props.focusIndex;
+    let selectedRange = this.props.selectedRange;
+    if (selectedRange === undefined) {
+      selectedRange = [0, 0];
+    }
 
     const children = [];
     for (let i = 0; i < length; i += 1) {
@@ -54,10 +57,11 @@ BinaryTableExpressionRow.propTypes = {
   }).isRequired,
   address: PropTypes.number.isRequired,
   focusIndex: PropTypes.number,
-  selectedRange: PropTypes.arrayOf(PropTypes.number).isRequired,
+  selectedRange: PropTypes.arrayOf(PropTypes.number),
   values: PropTypes.arrayOf(PropTypes.number).isRequired,
 };
 
 BinaryTableExpressionRow.defaultProps = {
   focusIndex: undefined,
+  selectedRange: undefined,
 };

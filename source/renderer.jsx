@@ -188,16 +188,23 @@ class BinaryTableDataCell extends Component {
   shouldComponentUpdate(nextProps) {
     let changed = (this.props.address !== nextProps.address);
     changed = changed || (this.props.value !== nextProps.value);
+    changed = changed || (this.props.focused !== nextProps.focused);
     changed = changed || (this.props.selected !== nextProps.selected);
     return changed;
   }
 
   render() {
+    let className = 'binary-table-cell';
+    if (this.props.selected) {
+      className = 'binary-table-data-cell-selected';
+    } else if (this.props.focused) {
+      className = 'binary-table-data-cell-focused';
+    }
     const valid = (this.props.value !== undefined);
     const text = valid ? sprintf('%02X', this.props.value) : '--';
     return (<span
       key={'span'}
-      className={this.props.selected ? 'binary-table-data-cell-selected' : 'binary-table-cell'}
+      className={className}
       onMouseDown={this.handleMouseDown}
       onMouseEnter={this.handleMouseEnter}
     >{text}</span>);
@@ -215,6 +222,7 @@ class BinaryTableDataCell extends Component {
 BinaryTableDataCell.propTypes = {
   address: PropTypes.number.isRequired,
   value: PropTypes.number.isRequired,
+  focused: PropTypes.bool.isRequired,
   selected: PropTypes.bool.isRequired,
   onMouseDown: PropTypes.func.isRequired,
   onMouseEnter: PropTypes.func.isRequired,
@@ -226,8 +234,8 @@ class BinaryTableDataRow extends Component {
       return true;
     }
     let changed = (this.props.address !== nextProps.address);
-    changed = changed || (this.props.selectedRange[0] !== nextProps.selectedRange[0]);
-    changed = changed || (this.props.selectedRange[1] !== nextProps.selectedRange[1]);
+    changed = changed || (this.props.focusIndex !== nextProps.focusIndex);
+    changed = changed || (this.props.selectedRange !== nextProps.selectedRange);
     for (let i = 0; i < this.props.values.length; i += 1) {
       changed = changed || (this.props.values[i] !== nextProps.values[i]);
     }
@@ -238,19 +246,25 @@ class BinaryTableDataRow extends Component {
     const values = this.props.values;
     const length = values.length;
     const rowAddress = this.props.address;
-    const selectedRange = this.props.selectedRange;
     const onMouseDown = this.props.onMouseDown;
     const onMouseEnter = this.props.onMouseEnter;
+    const focusIndex = this.props.focusIndex;
+    let selectedRange = this.props.selectedRange;
+    if (selectedRange === undefined) {
+      selectedRange = [0, 0];
+    }
 
     const children = [];
     for (let i = 0; i < length; i += 1) {
       const cellAddress = rowAddress + i;
       const value = values[i];
-      const selected = (selectedRange[0] <= i) && (i <= selectedRange[1]);
+      const focused = (i === focusIndex);
+      const selected = (selectedRange[0] <= i) && (i < selectedRange[1]);
       const cell = (<BinaryTableDataCell
         key={'BinaryTableCell:' + i}
         address={cellAddress}
         value={value}
+        focused={focused}
         selected={selected}
         onMouseDown={onMouseDown}
         onMouseEnter={onMouseEnter}
@@ -264,6 +278,7 @@ class BinaryTableDataRow extends Component {
 BinaryTableDataRow.propTypes = {
   address: PropTypes.number.isRequired,
   values: PropTypes.arrayOf(PropTypes.number).isRequired,
+  focusIndex: PropTypes.number,
   selectedRange: PropTypes.arrayOf(PropTypes.number).isRequired,
   onMouseDown: PropTypes.func.isRequired,
   onMouseEnter: PropTypes.func.isRequired,
@@ -280,6 +295,7 @@ class BinaryTable extends Component {
       focusAddress: 64,
       columnCount: 16,
     };
+    this.tableData = { };
     this.containerReference = React.createRef();
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
@@ -306,24 +322,51 @@ class BinaryTable extends Component {
         items.push(row);
 
         const values = viewModel.getBuffer(rowAddress, columnCount);
+        if (this.tableData[rowIndex] === undefined) {
+          this.tableData[rowIndex] = values;
+        } else if (this.tableData[rowIndex].length !== values.length) {
+          this.tableData[rowIndex] = values;
+        } else {
+          let changed = false;
+          for (let i = 0; i < columnCount; ++i) {
+            if (this.tableData[rowIndex][i] !== values[i]) {
+              changed = true;
+              break;
+            }
+          }
+          if (changed) {
+            this.tableData[rowIndex] = values;
+          }
+        }
+
         let selectedIndex = (focusedAddress - rowAddress);
         if (selectedIndex < 0) {
           selectedIndex = -1;
         } else if (selectedIndex >= columnCount) {
           selectedIndex = -1;
         }
-        const rowSelectedRange = [selectedRange[0] - rowAddress, selectedRange[1] - rowAddress];
+        let rowFocusIndex = focusedAddress - rowAddress;
+        if ((rowFocusIndex < 0) || (columnCount <= rowFocusIndex)) {
+          rowFocusIndex = undefined;
+        }
+        let rowSelectedRange = [selectedRange[0] - rowAddress, selectedRange[1] - rowAddress];
+        rowSelectedRange[0] = Math.min(Math.max(0, rowSelectedRange[0]), columnCount);
+        rowSelectedRange[1] = Math.min(Math.max(0, rowSelectedRange[1]), columnCount);
+        if (rowSelectedRange[0] === rowSelectedRange[1]) {
+          rowSelectedRange = undefined;
+        }
         items.push(<BinaryTableDataRow
           key={'DataRow:' + (rowIndex % this.state.rowCount)}
           values={values}
           address={rowAddress}
-          selectedIndex={selectedIndex}
+          focusIndex={rowFocusIndex}
           selectedRange={rowSelectedRange}
           onMouseDown={this.handleMouseDown}
           onMouseEnter={this.handleMouseEnter}
         />);
         items.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
-        items.push(<BinaryTableExpressionRow key={'ExpressionRow:' + (rowIndex % this.state.rowCount)} listener={this} address={rowAddress} values={values} selectedRange={rowSelectedRange} />);
+        items.push(<BinaryTableExpressionRow key={'ExpressionRow:' + (rowIndex % this.state.rowCount)} listener={this}
+        address={rowAddress} values={this.tableData[rowIndex]} focusIndex={rowFocusIndex} selectedRange={rowSelectedRange} />);
         items.push(<br key={'br' + rowAddress} />);
       }
       items.push(<span key="binary-table-footer-row" className="binary-table-footer-row">
@@ -377,7 +420,7 @@ class BinaryTable extends Component {
               viewModel.setSelectionEndAddress(selectedRange[0] - 1);
             }
           } else {
-            viewModel.removeValueAt(selectedRange[0], selectedRange[1] - selectedRange[0] + 1);
+            viewModel.removeValueAt(selectedRange[0], selectedRange[1] - selectedRange[0]);
             viewModel.setSelectionStartAddress(selectedRange[0]);
             viewModel.setSelectionEndAddress(selectedRange[0]);
             return { };
