@@ -1,4 +1,5 @@
 import { app, Menu } from 'electron';
+import installExtension, { REACT_DEVELOPER_TOOLS } from 'electron-devtools-installer';
 import SiriusModel from './SiriusModel';
 
 const model = new SiriusModel();
@@ -47,6 +48,7 @@ const menuTemplate = [
 ];
 
 app.on('ready', () => {
+  installExtension(REACT_DEVELOPER_TOOLS);
   const menu = Menu.buildFromTemplate(menuTemplate);
   Menu.setApplicationMenu(menu);
   model.createNew();
