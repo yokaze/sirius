@@ -402,14 +402,12 @@ class BinaryTable extends Component {
       };
 
       const columnCount = state.columnCount;
-      const displayAddress = 0;
-      const addressMove = 0;
       if ((keyCode >= 48) && (keyCode <= 57)) {
         handleTypeHex(keyCode - 48);
       } else if ((keyCode >= 65) && (keyCode <= 70)) {
         handleTypeHex(keyCode - 55);
       }
-      const selectedRange = viewModel.getSelectedRange();
+      let selectedRange = viewModel.getSelectedRange();
       switch (keyCode) {
         case 8: // Delete
         {
@@ -441,7 +439,7 @@ class BinaryTable extends Component {
             const address = viewModel.getSelectionEndAddress() - 1;
             viewModel.setSelectionEndAddress(address);
           }
-          return { };
+          break;
         }
         case 38: // Up
         {
@@ -453,7 +451,7 @@ class BinaryTable extends Component {
             const address = viewModel.getSelectionEndAddress() - columnCount;
             viewModel.setSelectionEndAddress(address);
           }
-          return { };
+          break;
         }
         case 39: // Right
         {
@@ -465,7 +463,7 @@ class BinaryTable extends Component {
             const address = viewModel.getSelectionEndAddress() + 1;
             viewModel.setSelectionEndAddress(address);
           }
-          return { };
+          break;
         }
         case 40: // Down
         {
@@ -477,7 +475,7 @@ class BinaryTable extends Component {
             const address = viewModel.getSelectionEndAddress() + columnCount;
             viewModel.setSelectionEndAddress(address);
           }
-          return { };
+          break;
         }
         case 73: // i
           viewModel.setWriteMode(1 - viewModel.getWriteMode());
@@ -486,18 +484,24 @@ class BinaryTable extends Component {
           console.log(keyCode);
           break;
       }
-      const fileSize = viewModel.getFileSize();
-      const maxAddress = Math.floor((fileSize - 1) / columnCount) * columnCount;
-      const nextFocusAddress = Math.max(0, viewModel.getSelectedRange()[0] + addressMove);
-      viewModel.setSelectionStartAddress(nextFocusAddress);
-      viewModel.setSelectionEndAddress(nextFocusAddress);
-      let nextAddress = state.startAddress;
-      if (nextFocusAddress < nextAddress) {
-        nextAddress -= Math.ceil((nextAddress - nextFocusAddress) / columnCount) * columnCount;
-      } else if ((nextAddress + (this.state.rowCount * columnCount)) <= nextFocusAddress) {
-        nextAddress += (Math.floor((nextFocusAddress - nextAddress) / columnCount) - (this.state.rowCount - 1)) * columnCount;
+
+      selectedRange = viewModel.getSelectedRange();
+      let displayAddress = viewModel.getSelectionStartAddress();
+      if (selectedRange[0] !== selectedRange[1]) {
+        if (viewModel.getSelectionStartAddress() < viewModel.getSelectionEndAddress()) {
+          displayAddress = selectedRange[1] - 1;
+        } else {
+          displayAddress = selectedRange[0];
+        }
       }
-      return { startAddress: nextAddress };
+      const displayRow = Math.floor(displayAddress / state.columnCount);
+      let row = state.row;
+      if (displayRow < row) {
+        row = displayRow;
+      } else if (displayRow >= (row + state.rowCount)) {
+        row = displayRow - state.rowCount + 1;
+      }
+      return { floatRow: row, row: row };
     };
     this.setState(handler);
   }
