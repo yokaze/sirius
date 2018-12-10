@@ -110,8 +110,12 @@ export default class SiriusModel {
 
   openAbout() {
     const browserWindow = new BrowserWindow({ width: 400, height: 256, resizable: false });
-    browserWindow.setTitle('Sirius');
     browserWindow.loadURL(this.getUrlForFileName('renderer/about.html'));
+  }
+
+  openPreferences() {
+    const browserWindow = new BrowserWindow({ width: 400, height: 256, resizable: false });
+    browserWindow.loadURL(this.getUrlForFileName('renderer/preferences.html'));
   }
 
   getIndexUrl() {

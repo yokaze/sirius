@@ -13,7 +13,7 @@ const menuTemplate = [
     label: app.getName(),
     submenu: [
       { label: 'About', click: () => { model.openAbout(); } },
-      { label: 'Option', click: () => { } },
+      { label: 'Preferences', click: () => { model.openPreferences(); } },
       { type: 'separator' },
       { role: 'quit' },
     ],
