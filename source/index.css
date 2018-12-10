@@ -1,3 +1,5 @@
+@import 'node_modules/typeface-roboto-mono/index.css';
+
 body {
     background-color: whitesmoke;
     margin: 0;
@@ -44,7 +46,7 @@ span {
 
 .binary-table-data-header-row li {
     display: inline-block;
-    font-family: Monaco, monospace;
+    font-family: Roboto Mono, monospace;
     font-size: 16px;
     height: 24px;
     line-height: 24px;
@@ -54,7 +56,7 @@ span {
 
 .binary-table-address {
     display: inline-block;
-    font-family: Monaco, monospace;
+    font-family: Roboto Mono, monospace;
     font-size: 16px;
     height: 24px;
     line-height: 24px;
@@ -65,7 +67,7 @@ span {
 
 .binary-table-cell {
     display: inline-block;
-    font-family: Monaco, monospace;
+    font-family: Roboto Mono, monospace;
     font-size: 16px;
     height: 24px;
     line-height: 24px;
@@ -78,7 +80,7 @@ span {
     border-color: silver;
     border-style: solid;
     display: inline-block;
-    font-family: Monaco, monospace;
+    font-family: Roboto Mono, monospace;
     font-size: 16px;
     height: 20px;
     line-height: 20px;
@@ -90,7 +92,7 @@ span {
 .binary-table-data-cell-selected {
     background-color: silver;
     display: inline-block;
-    font-family: Monaco, monospace;
+    font-family: Roboto Mono, monospace;
     font-size: 16px;
     height: 24px;
     line-height: 24px;

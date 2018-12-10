@@ -7,7 +7,7 @@ const jss = create(preset());
 const styles = {
   default: {
     display: 'inline-block',
-    fontFamily: 'Monaco, monospace',
+    fontFamily: 'Roboto Mono, monospace',
     height: '24px',
     lineHeight: '24px',
     textAlign: 'center',
@@ -18,7 +18,7 @@ const styles = {
     borderColor: 'silver',
     borderStyle: 'solid',
     display: 'inline-block',
-    fontFamily: 'Monaco, monospace',
+    fontFamily: 'Roboto Mono, monospace',
     height: '20px',
     lineHeight: '20px',
     textAlign: 'center',
@@ -27,7 +27,7 @@ const styles = {
   selected: {
     backgroundColor: 'silver',
     display: 'inline-block',
-    fontFamily: 'Monaco, monospace',
+    fontFamily: 'Roboto Mono, monospace',
     height: '24px',
     lineHeight: '24px',
     textAlign: 'center',
