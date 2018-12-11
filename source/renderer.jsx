@@ -140,6 +140,10 @@ class BinaryTableViewModel {
     this.document.setFileData([...renewalBinary]);
     this.listener.onViewModelReloaded();
   }
+
+  onAppUpdatePreference(sender, preference) {
+    console.log(preference);
+  }
 }
 
 class BinaryTableRow extends Component {

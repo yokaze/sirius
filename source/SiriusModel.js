@@ -27,9 +27,9 @@ export default class SiriusModel {
     ipcMain.on(SiriusIpcCommand.onDocumentCommand, (e, command) => {
       this.onDocumentCommandReceived(e, command);
     });
+
     ipcMain.on(SiriusIpcCommand.onPreferenceCommand, (e, command) => {
-      console.log(e);
-      console.log(command);
+      this.onPreferenceCommandReceived(e, command);
     })
   }
 
@@ -148,6 +148,14 @@ export default class SiriusModel {
         const window = BrowserWindow.fromId(windowId);
         window.webContents.send(SiriusIpcCommand.onRendererReceivedRenewalBinary, doc);
       }
+    }
+  }
+
+  onPreferenceCommandReceived(e, command) {
+    for (const key in this.handles) {
+      const windowId = parseInt(key, 10);
+      const window = BrowserWindow.fromId(windowId);
+      window.webContents.send(SiriusIpcCommand.onAppUpdatePreference, command);
     }
   }
 }
