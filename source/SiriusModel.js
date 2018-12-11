@@ -27,6 +27,10 @@ export default class SiriusModel {
     ipcMain.on(SiriusIpcCommand.onDocumentCommand, (e, command) => {
       this.onDocumentCommandReceived(e, command);
     });
+    ipcMain.on(SiriusIpcCommand.onPreferenceCommand, (e, command) => {
+      console.log(e);
+      console.log(command);
+    })
   }
 
   createNew() {

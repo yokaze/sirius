@@ -15,4 +15,8 @@ export default class {
   sendDocumentCommand(command) {
     ipcRenderer.send(SiriusIpcCommand.onDocumentCommand, command);
   }
+
+  sendPreferenceCommand(command) {
+    ipcRenderer.send(SiriusIpcCommand.onPreferenceCommand, command);
+  }
 }
