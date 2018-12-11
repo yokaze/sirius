@@ -15,6 +15,8 @@ export default class SiriusModel {
     //  Data UUID -> SiriusDocument
     this.documents = {};
 
+    this.preferencesWindow = undefined;
+
     ipcMain.on('editor-initialized', (e) => {
       const windowId = e.sender.getOwnerBrowserWindow().id;
       if (this.handles[windowId] !== undefined) {
@@ -118,8 +120,16 @@ export default class SiriusModel {
   }
 
   openPreferences() {
-    const browserWindow = new BrowserWindow({ width: 400, height: 256, resizable: false });
-    browserWindow.loadURL(this.getUrlForFileName('renderer/preferences.html'));
+    if (this.preferencesWindow === undefined) {
+      this.preferencesWindow = new BrowserWindow({ width: 400, height: 256, resizable: true });
+      this.preferencesWindow.loadURL(this.getUrlForFileName('renderer/preferences.html'));
+      this.preferencesWindow.openDevTools();
+      this.preferencesWindow.on('closed', () => {
+        this.preferencesWindow = undefined;
+      });
+    } else {
+      this.preferencesWindow.focus();
+    }
   }
 
   getIndexUrl() {
