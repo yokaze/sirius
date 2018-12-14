@@ -16,17 +16,17 @@ const ipcClient = new SiriusIpcClient();
 class PreferencesView extends Component {
   constructor(props) {
     super(props);
-    this.rowUnitGroupChanged = this.rowUnitGroupChanged.bind(this);
-    this.state = { rowUnit: 16 };
+    this.columnUnitGroupChanged = this.columnUnitGroupChanged.bind(this);
+    this.state = { columnUnit: 16 };
   }
 
-  rowUnitGroupChanged(e) {
+  columnUnitGroupChanged(e) {
     const value = e.target.value;
     this.setState(() => {
       ipcClient.sendPreferenceCommand({
-        rowUnit: value,
+        columnUnit: value,
       });
-      return { rowUnit: value };
+      return { columnUnit: value };
     });
   }
 
@@ -41,8 +41,8 @@ class PreferencesView extends Component {
         <Input placeholder="16" />
       </FormControl>
       <FormControl>
-        <FormLabel component="legend">Number of Rows in Unit</FormLabel>
-        <RadioGroup row value={this.state.rowUnit.toString(10)} onChange={this.rowUnitGroupChanged}>
+        <FormLabel component="legend">Column Unit</FormLabel>
+        <RadioGroup row value={this.state.columnUnit.toString(10)} onChange={this.columnUnitGroupChanged}>
           <FormControlLabel value="1" control={<Radio />} label="1" />
           <FormControlLabel value="2" control={<Radio />} label="2" />
           <FormControlLabel value="4" control={<Radio />} label="4" />

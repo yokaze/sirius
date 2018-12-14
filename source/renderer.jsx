@@ -142,7 +142,7 @@ class BinaryTableViewModel {
   }
 
   onAppUpdatePreference(sender, preference) {
-    console.log(preference);
+    this.listener.onViewModelUpdatePreference(this, preference);
   }
 }
 
@@ -556,13 +556,25 @@ class BinaryTable extends Component {
     });
   }
 
-  onResized(contentRect) {
-    const rowCount = Math.floor((contentRect.entry.height / 24) - 2);
-    let columnCount = Math.floor(Math.max(this.state.columnUnit, (contentRect.entry.width - this.state.addressWidth - 24 - 22 - 1) / 46));
-    columnCount = Math.floor(columnCount / this.state.columnUnit) * this.state.columnUnit;
-    if ((this.state.columnCount !== columnCount) || (this.state.rowCount !== rowCount)) {
-      this.setState({ columnCount, rowCount });
+  complementStateChange(state, diff) {
+    if (diff.addressWidth || diff.totalWidth || diff.tableHeight || diff.columnUnit) {
+      if ((diff.columnCount === undefined) || (diff.rowCount === undefined)) {
+        const nextState = Object.assign(state, diff);
+        if (nextState.addressWidth === undefined) {
+          return diff;
+        }
+        const rowCount = Math.floor((nextState.tableHeight / 24) - 2);
+        let columnCount = Math.floor(Math.max(nextState.columnUnit, (nextState.totalWidth - nextState.addressWidth - 24 - 22 - 1) / 46));
+        columnCount = Math.floor(columnCount / nextState.columnUnit) * nextState.columnUnit;
+        return Object.assign(diff, { rowCount, columnCount });
+      }
     }
+  }
+
+  onResized(contentRect) {
+    this.setState((state, props) => {
+      return this.complementStateChange(state, { totalWidth: contentRect.entry.width, tableHeight: contentRect.entry.height });
+    })
   }
 
   onAddressResized(contentRect) {
@@ -572,6 +584,13 @@ class BinaryTable extends Component {
 
   onViewModelReloaded() {
     this.forceUpdate();
+  }
+
+  onViewModelUpdatePreference(sender, preference) {
+    console.log(preference);
+    this.setState((state, props) => {
+      return this.complementStateChange(state, { columnUnit: preference.columnUnit });
+    });
   }
 
   onExpressionCellMouseDown(address, e) {
