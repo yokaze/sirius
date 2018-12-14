@@ -298,6 +298,7 @@ class BinaryTable extends Component {
       startAddress: 0,
       focusAddress: 64,
       columnCount: 16,
+      addressWidth: 0,
     };
     this.tableData = { };
     this.containerReference = React.createRef();
@@ -312,7 +313,13 @@ class BinaryTable extends Component {
     if (this.state.rowCount !== undefined) {
       const columnCount = this.state.columnCount;
       items.push(<span key="binary-table-header-row" className="binary-table-header-row">
-        <span key="address" className="binary-table-address">&ensp;Address</span>
+        <Measure onResize={contentRect => { this.onAddressResized(contentRect); }}>
+          {({ measureRef }) =>
+            (<span ref={measureRef} style={{ display: 'inline-block' }} key="addressBox">
+              <span key="address" className="binary-table-address">&ensp;Address</span>
+            </span>)
+          }
+        </Measure>
         <BinaryTableDataHeaderRow key="binary-table-data-header-row" columnCount={columnCount} />
       </span>);
       items.push(<br key="br-head" />);
@@ -550,10 +557,15 @@ class BinaryTable extends Component {
 
   onResized(contentRect) {
     const rowCount = Math.floor((contentRect.entry.height / 24) - 2);
-    const columnCount = contentRect.entry.width >= 1550 ? 32 : 16;
+    const columnCount = Math.floor(Math.max(1, (contentRect.entry.width - this.state.addressWidth - 24 - 22 - 1) / 46));
     if ((this.state.columnCount !== columnCount) || (this.state.rowCount !== rowCount)) {
       this.setState({ columnCount, rowCount });
     }
+  }
+
+  onAddressResized(contentRect) {
+    const addressWidth = contentRect.entry.width;
+    this.setState({ addressWidth });
   }
 
   onViewModelReloaded() {
