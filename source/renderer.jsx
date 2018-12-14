@@ -579,7 +579,9 @@ class BinaryTable extends Component {
 
   onAddressResized(contentRect) {
     const addressWidth = contentRect.entry.width;
-    this.setState({ addressWidth });
+    this.setState((state, props) => {
+      return this.complementStateChange(state, { addressWidth });
+    });
   }
 
   onViewModelReloaded() {
