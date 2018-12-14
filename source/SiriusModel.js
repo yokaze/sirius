@@ -20,9 +20,7 @@ export default class SiriusModel {
     ipcMain.on('editor-initialized', (e) => {
       const windowId = e.sender.getOwnerBrowserWindow().id;
       if (this.handles[windowId] !== undefined) {
-        const handle = this.handles[windowId];
-        const doc = this.documents[handle].getFileData();
-        e.sender.send(SiriusIpcCommand.onRendererReceivedRenewalBinary, doc);
+        this.updateWindowBinary(windowId);
       }
     });
 
@@ -49,13 +47,31 @@ export default class SiriusModel {
     if (fileNames !== undefined) {
       const fileName = fileNames[0];
       fs.readFile(fileName, (err, data) => {
-        const windowId = this.openEditor();
+        let windowId = undefined;
+        let initialized = false;
+        {
+          //  If a blank document window is focused, open document in it.
+          const currentWindow = BrowserWindow.getFocusedWindow();
+          const currentHandle = this.handles[currentWindow.id];
+          const doc = this.documents[currentHandle];
+          if (doc.isBlankDocument()) {
+            windowId = currentWindow.id;
+            initialized = true;
+          }
+        }
+        if (windowId === undefined) {
+          windowId = this.openEditor();
+        }
         const doc = new SiriusDocument();
         BrowserWindow.fromId(windowId).setTitle(fileName);
         doc.setFileData([...data]);
         const handle = uuid();
         this.handles[windowId] = handle;
         this.documents[handle] = doc;
+
+        if (initialized) {
+          this.updateWindowBinary(windowId);
+        }
       });
     }
   }
@@ -77,8 +93,7 @@ export default class SiriusModel {
       const windowId = parseInt(key, 10);
       const windowHandle = this.handles[windowId];
       if (handle === windowHandle) {
-        const window = BrowserWindow.fromId(windowId);
-        window.webContents.send(SiriusIpcCommand.onRendererReceivedRenewalBinary, fileData);
+        this.updateWindowBinary(windowId);
       }
     }
   }
@@ -94,8 +109,7 @@ export default class SiriusModel {
       const windowId = parseInt(key, 10);
       const windowHandle = this.handles[windowId];
       if (handle === windowHandle) {
-        const window = BrowserWindow.fromId(windowId);
-        window.webContents.send(SiriusIpcCommand.onRendererReceivedRenewalBinary, fileData);
+        this.updateWindowBinary(windowId);
       }
     }
   }
@@ -144,6 +158,13 @@ export default class SiriusModel {
     });
   }
 
+  updateWindowBinary(windowId) {
+    const handle = this.handles[windowId];
+    const doc = this.documents[handle].getFileData();
+    const window = BrowserWindow.fromId(windowId);
+    window.webContents.send(SiriusIpcCommand.onRendererReceivedRenewalBinary, doc);
+  }
+
   onDocumentCommandReceived(e, command) {
     const senderWindowId = e.sender.getOwnerBrowserWindow().id;
     const senderHandle = this.handles[senderWindowId];
@@ -152,11 +173,8 @@ export default class SiriusModel {
     for (const key in this.handles) {
       const windowId = parseInt(key, 10);
       const handle = this.handles[windowId];
-
       if ((senderWindowId !== windowId) && (senderHandle === handle)) {
-        const doc = this.documents[handle].getFileData();
-        const window = BrowserWindow.fromId(windowId);
-        window.webContents.send(SiriusIpcCommand.onRendererReceivedRenewalBinary, doc);
+        this.updateWindowBinary(windowId);
       }
     }
   }

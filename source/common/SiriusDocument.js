@@ -48,6 +48,14 @@ export default class SiriusDocument {
     this.fileData = fileData;
   }
 
+  isBlankDocument() {
+    let ret = true;
+    ret = ret && (this.fileData.length === 0);
+    ret = ret && (this.undoBuffer.length === 0);
+    ret = ret && (this.redoBuffer.length === 0);
+    return ret;
+  }
+
   _runCommand(command) {
     if (command.type === SiriusDocumentCommand.Insert.getType()) {
       if (command.address <= this.fileData.length) {
