@@ -7,5 +7,8 @@ run:
 lint:
 	cd source; eslint . --ext .js --ext .jsx
 
+setup:
+	cd source; npm install
+
 update:
 	cd source; npm update
