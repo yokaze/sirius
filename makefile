@@ -3,3 +3,9 @@ default:
 
 run:
 	npx electron ./source
+
+lint:
+	cd source; eslint . --ext .js --ext .jsx
+
+update:
+	cd source; npm update
