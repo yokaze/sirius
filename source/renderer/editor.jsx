@@ -53,13 +53,15 @@ class BinaryTableViewModel {
   }
 
   setValueAt(address, value) {
-    const command = new SiriusDocumentCommand.Overwrite(address, [value]);
+    const data = new Uint8Array([value]);
+    const command = new SiriusDocumentCommand.Overwrite(address, data);
     this.document.applyCommand(command);
     ipcClient.sendDocumentCommand(command);
   }
 
   insertValueAt(address, value) {
-    const command = new SiriusDocumentCommand.Insert(address, [value]);
+    const data = new Uint8Array([value]);
+    const command = new SiriusDocumentCommand.Insert(address, data);
     this.document.applyCommand(command);
     ipcClient.sendDocumentCommand(command);
   }
@@ -137,7 +139,7 @@ class BinaryTableViewModel {
   }
 
   onReceivedRenewalBinary(sender, renewalBinary) {
-    this.document.setFileData([...renewalBinary]);
+    this.document.setFileData(renewalBinary);
     this.listener.onViewModelReloaded();
   }
 

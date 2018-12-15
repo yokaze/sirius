@@ -3,6 +3,7 @@ import assert from 'assert';
 class Insert {
   constructor(address, data) {
     assert(address !== undefined);
+    assert(data instanceof Uint8Array);
     this.type = Insert.getType();
     this.address = address;
     this.data = data;
@@ -16,6 +17,7 @@ class Insert {
 class Overwrite {
   constructor(address, data) {
     assert(address !== undefined);
+    assert(data instanceof Uint8Array);
     this.type = Overwrite.getType();
     this.address = address;
     this.data = data;
