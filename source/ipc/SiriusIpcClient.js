@@ -9,9 +9,18 @@ export default class {
     ipcRenderer.on(SiriusIpcCommand.onAppUpdatePreference, (e, preference) => {
       this.listener.onAppUpdatePreference(this, preference);
     });
+    ipcRenderer.on(SiriusIpcCommand.onAppRequestCut, (e) => {
+      this.listener.onAppRequestCut(this);
+    });
+    ipcRenderer.on(SiriusIpcCommand.onAppRequestCopy, (e) => {
+      this.listener.onAppRequestCopy(this);
+    });
+    ipcRenderer.on(SiriusIpcCommand.onAppRequestPaste, (e) => {
+      this.listener.onAppRequestPaste(this);
+    });
     ipcRenderer.on(SiriusIpcCommand.onAppRequestSelectAll, (e) => {
       this.listener.onAppRequestSelectAll(this);
-    })
+    });
   }
 
   setListener(listener) {

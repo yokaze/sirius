@@ -115,15 +115,18 @@ export default class SiriusModel {
   }
 
   cut() {
-
+    const window = BrowserWindow.getFocusedWindow();
+    window.webContents.send(SiriusIpcCommand.onAppRequestCut);
   }
 
   copy() {
-
+    const window = BrowserWindow.getFocusedWindow();
+    window.webContents.send(SiriusIpcCommand.onAppRequestCopy);
   }
 
   paste() {
-
+    const window = BrowserWindow.getFocusedWindow();
+    window.webContents.send(SiriusIpcCommand.onAppRequestPaste);
   }
 
   selectAll() {

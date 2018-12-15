@@ -39,6 +39,44 @@ class Remove {
   }
 }
 
+class Cut {
+  constructor(address, length) {
+    assert(address !== undefined);
+    this.type = Cut.getType();
+    this.address = address;
+    this.length = length;
+  }
+
+  static getType() {
+    return 'Cut';
+  }
+}
+
+class Copy {
+  constructor(address, length) {
+    assert(address !== undefined);
+    this.type = Copy.getType();
+    this.address = address;
+    this.length = length;
+  }
+
+  static getType() {
+    return 'Copy';
+  }
+}
+
+class Paste {
+  constructor(address) {
+    assert(address !== undefined);
+    this.type = Paste.getType();
+    this.address = address;
+  }
+
+  static getType() {
+    return 'Paste';
+  }
+}
+
 class Composite {
   constructor(items) {
     this.type = Composite.getType();
@@ -54,5 +92,8 @@ export default {
   Insert,
   Overwrite,
   Remove,
+  Cut,
+  Copy,
+  Paste,
   Composite,
 };

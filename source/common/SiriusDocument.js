@@ -89,6 +89,12 @@ export default class SiriusDocument {
       const undoCommand = new SiriusDocumentCommand.Insert(command.address, backup);
       this.fileData.splice(command.address, command.length);
       return undoCommand;
+    } else if (command.type === SiriusDocumentCommand.Cut.getType()) {
+      console.log(command);
+    } else if (command.type === SiriusDocumentCommand.Copy.getType()) {
+      console.log(command);
+    } else if (command.type === SiriusDocumentCommand.Paste.getType()) {
+      console.log(command);
     } else if (command.type === SiriusDocumentCommand.Composite.getType()) {
       command.items.forEach((item) => { this._runCommand(item); });
       return undefined;

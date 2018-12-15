@@ -145,6 +145,26 @@ class BinaryTableViewModel {
     this.listener.onViewModelUpdatePreference(this, preference);
   }
 
+  onAppRequestCut() {
+    const range = this.getSelectedRange();
+    if (range === undefined) {
+      return;
+    }
+    const address = range[0];
+    const length = range[1] - range[0];
+    const command = new SiriusDocumentCommand.Cut(address, length);
+    this.document.applyCommand(command);
+    this.listener.onViewModelReloaded();
+  }
+
+  onAppRequestCopy() {
+
+  }
+
+  onAppRequestPaste() {
+
+  }
+
   onAppRequestSelectAll() {
     this.selectionStartAddress = 0;
     this.selectionEndAddress = this.getFileSize();
