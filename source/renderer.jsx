@@ -497,9 +497,6 @@ class BinaryTable extends Component {
         case 73: // i
           viewModel.setWriteMode(1 - viewModel.getWriteMode());
           break;
-        default:
-          console.log(keyCode);
-          break;
       }
 
       selectedRange = viewModel.getSelectedRange();
@@ -539,16 +536,14 @@ class BinaryTable extends Component {
   }
 
   handleMouseEnter(sender, e) {
-    const address = sender.props.address;
     const buttons = e.buttons;
-    if (buttons === 0) {
+    if (buttons !== 1) {
       return;
     }
 
+    let address = sender.props.address;
     const handler = () => {
-      if (buttons === 1) {
-        this.props.viewModel.setSelectionEndAddress(address);
-      }
+      this.props.viewModel.setSelectionEndAddress(address);
       return { };
     };
     this.setState(handler);
@@ -601,7 +596,6 @@ class BinaryTable extends Component {
   }
 
   onViewModelUpdatePreference(sender, preference) {
-    console.log(preference);
     this.setState((state, props) => {
       return this.complementStateChange(state, { columnUnit: preference.columnUnit });
     });
