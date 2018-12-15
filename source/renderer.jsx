@@ -238,6 +238,7 @@ class BinaryTableDataRow extends Component {
       return true;
     }
     let changed = (this.props.address !== nextProps.address);
+    changed = changed || (this.props.length !== nextProps.length);
     changed = changed || (this.props.focusIndex !== nextProps.focusIndex);
     changed = changed || (this.props.selectedRange !== nextProps.selectedRange);
     for (let i = 0; i < this.props.values.length; i += 1) {
@@ -248,7 +249,7 @@ class BinaryTableDataRow extends Component {
 
   render() {
     const values = this.props.values;
-    const length = values.length;
+    const length = this.props.length;
     const rowAddress = this.props.address;
     const onMouseDown = this.props.onMouseDown;
     const onMouseEnter = this.props.onMouseEnter;
@@ -281,7 +282,8 @@ class BinaryTableDataRow extends Component {
 
 BinaryTableDataRow.propTypes = {
   address: PropTypes.number.isRequired,
-  values: PropTypes.arrayOf(PropTypes.number).isRequired,
+  length: PropTypes.number.isRequired,
+  values: PropTypes.instanceOf(Uint8Array).isRequired,
   focusIndex: PropTypes.number,
   selectedRange: PropTypes.arrayOf(PropTypes.number).isRequired,
   onMouseDown: PropTypes.func.isRequired,
@@ -373,6 +375,7 @@ class BinaryTable extends Component {
           key={'DataRow:' + (rowIndex % this.state.rowCount)}
           values={values}
           address={rowAddress}
+          length={columnCount}
           focusIndex={rowFocusIndex}
           selectedRange={rowSelectedRange}
           onMouseDown={this.handleMouseDown}
@@ -380,7 +383,7 @@ class BinaryTable extends Component {
         />);
         items.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
         items.push(<BinaryTableExpressionRow key={'ExpressionRow:' + (rowIndex % this.state.rowCount)} listener={this}
-        address={rowAddress} values={this.tableData[rowIndex]} focusIndex={rowFocusIndex} selectedRange={rowSelectedRange} />);
+        address={rowAddress} length={columnCount} values={this.tableData[rowIndex]} focusIndex={rowFocusIndex} selectedRange={rowSelectedRange} />);
         items.push(<br key={'br' + rowAddress} />);
       }
       items.push(<span key="binary-table-footer-row" className="binary-table-footer-row">

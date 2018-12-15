@@ -32,11 +32,13 @@ export default class SiriusDocument {
   }
 
   getBuffer(address, length) {
-    let ret = this.fileData.slice(address, address + length);
-    if (ret.length < length) {
-      ret = ret.concat(Array(length - ret.length).fill(undefined));
+    length = Math.max(0, Math.min(length, this.fileData.length - address));
+    const buffer = new ArrayBuffer(length);
+    const view = new Uint8Array(buffer);
+    for (let i = 0; i < length; i += 1) {
+      view[i] = this.fileData[address + i];
     }
-    return ret;
+    return view;
   }
 
   getFileData() {
