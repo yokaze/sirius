@@ -32,9 +32,9 @@ export default class SiriusDocument {
   }
 
   getBuffer(address, length) {
-    length = Math.max(0, Math.min(length, this.fileData.length - address));
-    const view = new Uint8Array(length);
-    for (let i = 0; i < length; i += 1) {
+    const bufferLength = Math.max(0, Math.min(length, this.fileData.length - address));
+    const view = new Uint8Array(bufferLength);
+    for (let i = 0; i < bufferLength; i += 1) {
       view[i] = this.fileData[address + i];
     }
     return view;
@@ -101,10 +101,9 @@ export default class SiriusDocument {
       if (this.clipData === undefined) {
         console.log('clip board is empty');
         return undefined;
-      } else {
-        const insertCommand = new SiriusDocumentCommand.Insert(command.address, this.clipData);
-        return this._runCommand(insertCommand);
       }
+      const insertCommand = new SiriusDocumentCommand.Insert(command.address, this.clipData);
+      return this._runCommand(insertCommand);
     } else if (command.type === SiriusDocumentCommand.Composite.getType()) {
       command.items.forEach((item) => { this._runCommand(item); });
       return undefined;
