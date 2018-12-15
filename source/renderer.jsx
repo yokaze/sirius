@@ -225,7 +225,7 @@ class BinaryTableDataCell extends Component {
 
 BinaryTableDataCell.propTypes = {
   address: PropTypes.number.isRequired,
-  value: PropTypes.number.isRequired,
+  value: PropTypes.number,
   focused: PropTypes.bool.isRequired,
   selected: PropTypes.bool.isRequired,
   onMouseDown: PropTypes.func.isRequired,
@@ -285,7 +285,7 @@ BinaryTableDataRow.propTypes = {
   length: PropTypes.number.isRequired,
   values: PropTypes.instanceOf(Uint8Array).isRequired,
   focusIndex: PropTypes.number,
-  selectedRange: PropTypes.arrayOf(PropTypes.number).isRequired,
+  selectedRange: PropTypes.arrayOf(PropTypes.number),
   onMouseDown: PropTypes.func.isRequired,
   onMouseEnter: PropTypes.func.isRequired,
 };
