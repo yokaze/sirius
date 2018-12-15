@@ -55,23 +55,20 @@ class BinaryTableViewModel {
   setValueAt(address, value) {
     const data = new Uint8Array([value]);
     const command = new SiriusDocumentCommand.Overwrite(address, data);
-    this.document.applyCommand(command);
-    ipcClient.sendDocumentCommand(command);
+    this._applyCommand(command);
   }
 
   insertValueAt(address, value) {
     const data = new Uint8Array([value]);
     const command = new SiriusDocumentCommand.Insert(address, data);
-    this.document.applyCommand(command);
-    ipcClient.sendDocumentCommand(command);
+    this._applyCommand(command);
   }
 
   removeValueAt(address, length) {
     const executable = ((address + length) <= this.document.getFileData().length);
     if (executable) {
       const command = new SiriusDocumentCommand.Remove(address, length);
-      this.document.applyCommand(command);
-      ipcClient.sendDocumentCommand(command);
+      this._applyCommand(command);
     }
   }
 
@@ -155,8 +152,7 @@ class BinaryTableViewModel {
     const address = range[0];
     const length = range[1] - range[0];
     const command = new SiriusDocumentCommand.Cut(address, length);
-    this.document.applyCommand(command);
-    ipcClient.sendDocumentCommand(command);
+    this._applyCommand(command);
     this.selectionStartAddress = address;
     this.selectionEndAddress = address;
     this.listener.onViewModelReloaded();
@@ -170,8 +166,7 @@ class BinaryTableViewModel {
     const address = range[0];
     const length = range[1] - range[0];
     const command = new SiriusDocumentCommand.Copy(address, length);
-    this.document.applyCommand(command);
-    ipcClient.sendDocumentCommand(command);
+    this._applyCommand(command);
   }
 
   onAppRequestPaste() {
@@ -181,8 +176,7 @@ class BinaryTableViewModel {
     }
     const address = range[0];
     const command = new SiriusDocumentCommand.Paste(address);
-    this.document.applyCommand(command);
-    ipcClient.sendDocumentCommand(command);
+    this._applyCommand(command);
     this.listener.onViewModelReloaded();
   }
 
@@ -190,6 +184,11 @@ class BinaryTableViewModel {
     this.selectionStartAddress = 0;
     this.selectionEndAddress = this.getFileSize();
     this.listener.onViewModelReloaded();
+  }
+
+  _applyCommand(command) {
+    this.document.applyCommand(command);
+    ipcClient.sendDocumentCommand(command);
   }
 }
 
