@@ -20,8 +20,8 @@ span {
 .binary-table-header-row {
     background-color: powderblue;
     border-bottom: 1px;
+    border-bottom-color: lightsteelblue;
     border-bottom-style: solid;
-    border-color: lightsteelblue;
     display: inline-block;
     height: 24px;
     width: 100%;
@@ -29,8 +29,8 @@ span {
 
 .binary-table-footer-row {
     background-color: powderblue;
-    border-color: lightsteelblue;
     border-top: 1px;
+    border-top-color: lightsteelblue;
     border-top-style: solid;
     bottom: 0px;
     display: inline-block;
