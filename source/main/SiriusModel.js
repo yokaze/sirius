@@ -114,6 +114,23 @@ export default class SiriusModel {
     }
   }
 
+  cut() {
+
+  }
+
+  copy() {
+
+  }
+
+  paste() {
+
+  }
+
+  selectAll() {
+    const window = BrowserWindow.getFocusedWindow();
+    window.webContents.send(SiriusIpcCommand.onAppRequestSelectAll);
+  }
+
   openEditor() {
     const browserWindow = new BrowserWindow({ width: 1600, height: 1024 });
     browserWindow.setTitle('Sirius');

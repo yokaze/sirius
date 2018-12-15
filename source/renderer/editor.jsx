@@ -144,6 +144,12 @@ class BinaryTableViewModel {
   onAppUpdatePreference(sender, preference) {
     this.listener.onViewModelUpdatePreference(this, preference);
   }
+
+  onAppRequestSelectAll() {
+    this.selectionStartAddress = 0;
+    this.selectionEndAddress = this.getFileSize();
+    this.listener.onViewModelReloaded();
+  }
 }
 
 class BinaryTableRow extends Component {

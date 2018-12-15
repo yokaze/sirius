@@ -9,6 +9,9 @@ export default class {
     ipcRenderer.on(SiriusIpcCommand.onAppUpdatePreference, (e, preference) => {
       this.listener.onAppUpdatePreference(this, preference);
     });
+    ipcRenderer.on(SiriusIpcCommand.onAppRequestSelectAll, (e) => {
+      this.listener.onAppRequestSelectAll(this);
+    })
   }
 
   setListener(listener) {
