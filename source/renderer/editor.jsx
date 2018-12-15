@@ -90,7 +90,7 @@ class BinaryTableViewModel {
     }
     else {
       this.isEditing = true;
-      this.editValue = value << 4;
+      this.editValue = value * 16;
     }
   }
 
@@ -370,7 +370,7 @@ class BinaryTable extends Component {
           this.tableData[rowIndex] = values;
         } else {
           let changed = false;
-          for (let i = 0; i < columnCount; ++i) {
+          for (let i = 0; i < columnCount; i += 1) {
             if (this.tableData[rowIndex][i] !== values[i]) {
               changed = true;
               break;
@@ -408,8 +408,15 @@ class BinaryTable extends Component {
           onMouseEnter={this.handleMouseEnter}
         />);
         items.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
-        items.push(<BinaryTableExpressionRow key={'ExpressionRow:' + (rowIndex % this.state.rowCount)} listener={this}
-        address={rowAddress} length={columnCount} values={this.tableData[rowIndex]} focusIndex={rowFocusIndex} selectedRange={rowSelectedRange} />);
+        items.push(<BinaryTableExpressionRow
+          key={'ExpressionRow:' + (rowIndex % this.state.rowCount)}
+          listener={this}
+          address={rowAddress}
+          length={columnCount}
+          values={this.tableData[rowIndex]}
+          focusIndex={rowFocusIndex}
+          selectedRange={rowSelectedRange}
+        />);
         items.push(<br key={'br' + rowAddress} />);
       }
       items.push(<span key="binary-table-footer-row" className="binary-table-footer-row">
@@ -523,6 +530,8 @@ class BinaryTable extends Component {
         case 73: // i
           viewModel.setWriteMode(1 - viewModel.getWriteMode());
           break;
+        default:
+          break;
       }
 
       selectedRange = viewModel.getSelectedRange();
@@ -567,7 +576,7 @@ class BinaryTable extends Component {
       return;
     }
 
-    let address = sender.props.address;
+    const address = sender.props.address;
     const handler = () => {
       this.props.viewModel.setSelectionEndAddress(address);
       return { };
@@ -578,7 +587,7 @@ class BinaryTable extends Component {
   handleWheel(e) {
     const deltaRow = e.deltaY / 24;
     this.setState((state, props) => {
-      let nextFloatRow = BinaryTable.limitRowNumber(this.cache.floatRow + deltaRow, state.columnCount, props.viewModel.getFileSize());
+      const nextFloatRow = BinaryTable.limitRowNumber(this.cache.floatRow + deltaRow, state.columnCount, props.viewModel.getFileSize());
       this.cache.floatRow = nextFloatRow;
       const nextRow = Math.floor(nextFloatRow);
       if (nextRow !== state.row) {
@@ -602,19 +611,20 @@ class BinaryTable extends Component {
         return Object.assign(diff, { rowCount, columnCount });
       }
     }
+    return diff;
   }
 
   onResized(contentRect) {
-    this.setState((state, props) => {
-      return this.complementStateChange(state, { totalWidth: contentRect.entry.width, tableHeight: contentRect.entry.height });
-    })
+    this.setState(state =>
+      this.complementStateChange(state, { totalWidth: contentRect.entry.width, tableHeight: contentRect.entry.height }),
+    );
   }
 
   onAddressResized(contentRect) {
     const addressWidth = contentRect.entry.width;
-    this.setState((state, props) => {
-      return this.complementStateChange(state, { addressWidth });
-    });
+    this.setState(state =>
+      this.complementStateChange(state, { addressWidth }),
+    );
   }
 
   onViewModelReloaded() {
@@ -622,9 +632,9 @@ class BinaryTable extends Component {
   }
 
   onViewModelUpdatePreference(sender, preference) {
-    this.setState((state, props) => {
-      return this.complementStateChange(state, { columnUnit: preference.columnUnit });
-    });
+    this.setState(state =>
+      this.complementStateChange(state, { columnUnit: preference.columnUnit }),
+    );
   }
 
   onExpressionCellMouseDown(address, e) {

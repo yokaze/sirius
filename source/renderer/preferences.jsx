@@ -42,7 +42,11 @@ class PreferencesView extends Component {
       </FormControl>
       <FormControl>
         <FormLabel component="legend">Column Unit</FormLabel>
-        <RadioGroup row value={this.state.columnUnit.toString(10)} onChange={this.columnUnitGroupChanged}>
+        <RadioGroup
+          row
+          value={this.state.columnUnit.toString(10)}
+          onChange={this.columnUnitGroupChanged}
+        >
           <FormControlLabel value="1" control={<Radio />} label="1" />
           <FormControlLabel value="2" control={<Radio />} label="2" />
           <FormControlLabel value="4" control={<Radio />} label="4" />

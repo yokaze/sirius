@@ -30,7 +30,7 @@ export default class SiriusModel {
 
     ipcMain.on(SiriusIpcCommand.onPreferenceCommand, (e, command) => {
       this.onPreferenceCommandReceived(e, command);
-    })
+    });
   }
 
   createNew() {
@@ -47,7 +47,7 @@ export default class SiriusModel {
     if (fileNames !== undefined) {
       const fileName = fileNames[0];
       fs.readFile(fileName, (err, data) => {
-        let windowId = undefined;
+        let windowId;
         let initialized = false;
         {
           //  If a blank document window is focused, open document in it.

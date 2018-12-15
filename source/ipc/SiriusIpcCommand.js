@@ -4,7 +4,7 @@ export default {
   onAppRequestCut: 'onAppRequestCut',
   onAppRequestCopy: 'onAppRequestCopy',
   onAppRequestPaste: 'onAppRequestPaste',
-  onAppRequestSelectAll: 'onAppRequestSelectAll',  
+  onAppRequestSelectAll: 'onAppRequestSelectAll',
   onDocumentCommand: 'onDocumentCommand',
   onPreferenceCommand: 'onPreferenceCommand',
 };
