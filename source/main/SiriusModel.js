@@ -4,8 +4,8 @@ import path from 'path';
 import url from 'url';
 import uuid from 'uuid/v4';
 
-import SiriusDocument from './common/SiriusDocument';
-import SiriusIpcCommand from './ipc/SiriusIpcCommand';
+import SiriusDocument from '../common/SiriusDocument';
+import SiriusIpcCommand from '../ipc/SiriusIpcCommand';
 
 export default class SiriusModel {
   constructor() {
@@ -130,13 +130,13 @@ export default class SiriusModel {
 
   openAbout() {
     const browserWindow = new BrowserWindow({ width: 400, height: 256, resizable: false });
-    browserWindow.loadURL(this.getUrlForFileName('renderer/about.html'));
+    browserWindow.loadURL(this.getUrlForFileName('../renderer/about.html'));
   }
 
   openPreferences() {
     if (this.preferencesWindow === undefined) {
       this.preferencesWindow = new BrowserWindow({ width: 400, height: 256, resizable: true });
-      this.preferencesWindow.loadURL(this.getUrlForFileName('renderer/preferences.html'));
+      this.preferencesWindow.loadURL(this.getUrlForFileName('../renderer/preferences.html'));
       this.preferencesWindow.openDevTools();
       this.preferencesWindow.on('closed', () => {
         this.preferencesWindow = undefined;
@@ -147,7 +147,7 @@ export default class SiriusModel {
   }
 
   getIndexUrl() {
-    return this.getUrlForFileName('index.html');
+    return this.getUrlForFileName('../renderer/index.html');
   }
 
   getUrlForFileName(fileName) {

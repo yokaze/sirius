@@ -5,10 +5,10 @@ import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
 import { sprintf } from 'sprintf-js';
 
-import BinaryTableExpressionRow from './renderer/components/BinaryTableExpressionRow';
-import SiriusDocument from './common/SiriusDocument';
-import SiriusDocumentCommand from './common/SiriusDocumentCommand';
-import SiriusIpcClient from './ipc/SiriusIpcClient';
+import BinaryTableExpressionRow from './components/BinaryTableExpressionRow';
+import SiriusDocument from '../common/SiriusDocument';
+import SiriusDocumentCommand from '../common/SiriusDocumentCommand';
+import SiriusIpcClient from '../ipc/SiriusIpcClient';
 
 const ipcClient = new SiriusIpcClient();
 
