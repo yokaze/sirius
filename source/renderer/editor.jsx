@@ -149,22 +149,41 @@ class BinaryTableViewModel {
 
   onAppRequestCut() {
     const range = this.getSelectedRange();
-    if (range === undefined) {
+    if (range[0] === range[1]) {
       return;
     }
     const address = range[0];
     const length = range[1] - range[0];
     const command = new SiriusDocumentCommand.Cut(address, length);
     this.document.applyCommand(command);
+    ipcClient.sendDocumentCommand(command);
+    this.selectionStartAddress = address;
+    this.selectionEndAddress = address;
     this.listener.onViewModelReloaded();
   }
 
   onAppRequestCopy() {
-
+    const range = this.getSelectedRange();
+    if (range[0] === range[1]) {
+      return;
+    }
+    const address = range[0];
+    const length = range[1] - range[0];
+    const command = new SiriusDocumentCommand.Copy(address, length);
+    this.document.applyCommand(command);
+    ipcClient.sendDocumentCommand(command);
   }
 
   onAppRequestPaste() {
-
+    const range = this.getSelectedRange();
+    if (range[0] !== range[1]) {
+      console.log('remove data here');
+    }
+    const address = range[0];
+    const command = new SiriusDocumentCommand.Paste(address);
+    this.document.applyCommand(command);
+    ipcClient.sendDocumentCommand(command);
+    this.listener.onViewModelReloaded();
   }
 
   onAppRequestSelectAll() {

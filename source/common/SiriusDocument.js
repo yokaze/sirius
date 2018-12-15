@@ -91,11 +91,20 @@ export default class SiriusDocument {
       this.fileData.splice(command.address, command.length);
       return undoCommand;
     } else if (command.type === SiriusDocumentCommand.Cut.getType()) {
-      console.log(command);
+      const copyCommand = new SiriusDocumentCommand.Copy(command.address, command.length);
+      const removeCommand = new SiriusDocumentCommand.Remove(command.address, command.length);
+      this._runCommand(copyCommand);
+      return this._runCommand(removeCommand);
     } else if (command.type === SiriusDocumentCommand.Copy.getType()) {
-      console.log(command);
+      this.clipData = this.getBuffer(command.address, command.length);
     } else if (command.type === SiriusDocumentCommand.Paste.getType()) {
-      console.log(command);
+      if (this.clipData === undefined) {
+        console.log('clip board is empty');
+        return undefined;
+      } else {
+        const insertCommand = new SiriusDocumentCommand.Insert(command.address, this.clipData);
+        return this._runCommand(insertCommand);
+      }
     } else if (command.type === SiriusDocumentCommand.Composite.getType()) {
       command.items.forEach((item) => { this._runCommand(item); });
       return undefined;
