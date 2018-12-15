@@ -294,12 +294,14 @@ class BinaryTable extends Component {
     this.props.viewModel.setListener(this);
     this.state = {
       row: 0,
-      floatRow: 0,
       startAddress: 0,
       focusAddress: 64,
       columnCount: 16,
       columnUnit: 4,
       addressWidth: 0,
+    };
+    this.cache = {
+      floatRow: 0,
     };
     this.tableData = { };
     this.containerReference = React.createRef();
@@ -513,7 +515,8 @@ class BinaryTable extends Component {
       } else if (displayRow >= (row + state.rowCount)) {
         row = displayRow - state.rowCount + 1;
       }
-      return { floatRow: row, row: row };
+      this.cache.floatRow = row;
+      return { row };
     };
     this.setState(handler);
   }
@@ -535,6 +538,9 @@ class BinaryTable extends Component {
   handleMouseEnter(sender, e) {
     const address = sender.props.address;
     const buttons = e.buttons;
+    if (buttons === 0) {
+      return;
+    }
 
     const handler = () => {
       if (buttons === 1) {
@@ -548,11 +554,14 @@ class BinaryTable extends Component {
   handleWheel(e) {
     const deltaRow = e.deltaY / 24;
     this.setState((state, props) => {
-      let nextFloatRow = BinaryTable.limitRowNumber(state.floatRow + deltaRow, state.columnCount, props.viewModel.getFileSize());
-      return {
-        floatRow: nextFloatRow,
-        row: Math.floor(state.floatRow),
-      };
+      let nextFloatRow = BinaryTable.limitRowNumber(this.cache.floatRow + deltaRow, state.columnCount, props.viewModel.getFileSize());
+      this.cache.floatRow = nextFloatRow;
+      const nextRow = Math.floor(nextFloatRow);
+      if (nextRow !== state.row) {
+        return { row: nextRow };
+      } else {
+        return undefined;
+      }
     });
   }
 
