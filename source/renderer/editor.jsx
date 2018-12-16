@@ -202,7 +202,7 @@ class BinaryTableViewModel {
   }
 }
 
-class BinaryTableRow extends Component {
+class BinaryTableAddressCell extends Component {
   shouldComponentUpdate(nextProps) {
     return this.props.address !== nextProps.address;
   }
@@ -210,11 +210,11 @@ class BinaryTableRow extends Component {
   render() {
     const address = this.props.address;
     const text = sprintf('%08X', address);
-    return <span key={'BinaryTableRow:span:' + address} className="binary-table-address">{text}</span>;
+    return <span key={'BinaryTableAddressCell:span:' + address} className="binary-table-address">{text}</span>;
   }
 }
 
-BinaryTableRow.propTypes = {
+BinaryTableAddressCell.propTypes = {
   address: PropTypes.number.isRequired,
 };
 
@@ -294,7 +294,7 @@ class BinaryTable extends Component {
       for (let j = 0; j < this.state.rowCount; j += 1) {
         const rowAddress = (j + this.state.row) * columnCount;
         const rowIndex = Math.floor(rowAddress / columnCount);
-        const row = <BinaryTableRow key={'BinaryTableRow:' + (rowIndex % this.state.rowCount)} address={rowAddress} />;
+        const row = <BinaryTableAddressCell key={'BinaryTableAddressCell:' + (rowIndex % this.state.rowCount)} address={rowAddress} />;
         items.push(row);
 
         const values = viewModel.getBuffer(rowAddress, columnCount);
