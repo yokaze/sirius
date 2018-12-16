@@ -5,6 +5,7 @@ import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
 import { sprintf } from 'sprintf-js';
 
+import BinaryTableDataRow from './components/BinaryTableDataRow';
 import BinaryTableExpressionRow from './components/BinaryTableExpressionRow';
 import SiriusDocument from '../common/SiriusDocument';
 import SiriusDocumentCommand from '../common/SiriusDocumentCommand';
@@ -236,114 +237,6 @@ class BinaryTableDataHeaderRow extends Component {
 
 BinaryTableDataHeaderRow.propTypes = {
   columnCount: PropTypes.number.isRequired,
-};
-
-class BinaryTableDataCell extends Component {
-  constructor(props) {
-    super(props);
-    this.handleMouseDown = this.handleMouseDown.bind(this);
-    this.handleMouseEnter = this.handleMouseEnter.bind(this);
-  }
-
-  shouldComponentUpdate(nextProps) {
-    let changed = (this.props.address !== nextProps.address);
-    changed = changed || (this.props.value !== nextProps.value);
-    changed = changed || (this.props.focused !== nextProps.focused);
-    changed = changed || (this.props.selected !== nextProps.selected);
-    return changed;
-  }
-
-  render() {
-    let className = 'binary-table-cell';
-    if (this.props.selected) {
-      className = 'binary-table-data-cell-selected';
-    } else if (this.props.focused) {
-      className = 'binary-table-data-cell-focused';
-    }
-    const valid = (this.props.value !== undefined);
-    const text = valid ? sprintf('%02X', this.props.value) : '--';
-    return (<span
-      key={'span'}
-      className={className}
-      onMouseDown={this.handleMouseDown}
-      onMouseEnter={this.handleMouseEnter}
-    >{text}</span>);
-  }
-
-  handleMouseDown(e) {
-    this.props.onMouseDown(this, e);
-  }
-
-  handleMouseEnter(e) {
-    this.props.onMouseEnter(this, e);
-  }
-}
-
-BinaryTableDataCell.propTypes = {
-  address: PropTypes.number.isRequired,
-  value: PropTypes.number,
-  focused: PropTypes.bool.isRequired,
-  selected: PropTypes.bool.isRequired,
-  onMouseDown: PropTypes.func.isRequired,
-  onMouseEnter: PropTypes.func.isRequired,
-};
-
-class BinaryTableDataRow extends Component {
-  shouldComponentUpdate(nextProps) {
-    if (this.props.values.length !== nextProps.values.length) {
-      return true;
-    }
-    let changed = (this.props.address !== nextProps.address);
-    changed = changed || (this.props.length !== nextProps.length);
-    changed = changed || (this.props.focusIndex !== nextProps.focusIndex);
-    changed = changed || (this.props.selectedRange !== nextProps.selectedRange);
-    for (let i = 0; i < this.props.values.length; i += 1) {
-      changed = changed || (this.props.values[i] !== nextProps.values[i]);
-    }
-    return changed;
-  }
-
-  render() {
-    const values = this.props.values;
-    const length = this.props.length;
-    const rowAddress = this.props.address;
-    const onMouseDown = this.props.onMouseDown;
-    const onMouseEnter = this.props.onMouseEnter;
-    const focusIndex = this.props.focusIndex;
-    let selectedRange = this.props.selectedRange;
-    if (selectedRange === undefined) {
-      selectedRange = [0, 0];
-    }
-
-    const children = [];
-    for (let i = 0; i < length; i += 1) {
-      const cellAddress = rowAddress + i;
-      const value = values[i];
-      const focused = (i === focusIndex);
-      const selected = (selectedRange[0] <= i) && (i < selectedRange[1]);
-      const cell = (<BinaryTableDataCell
-        key={'BinaryTableCell:' + i}
-        address={cellAddress}
-        value={value}
-        focused={focused}
-        selected={selected}
-        onMouseDown={onMouseDown}
-        onMouseEnter={onMouseEnter}
-      />);
-      children.push(cell);
-    }
-    return <span key="span">{children}</span>;
-  }
-}
-
-BinaryTableDataRow.propTypes = {
-  address: PropTypes.number.isRequired,
-  length: PropTypes.number.isRequired,
-  values: PropTypes.instanceOf(Uint8Array).isRequired,
-  focusIndex: PropTypes.number,
-  selectedRange: PropTypes.arrayOf(PropTypes.number),
-  onMouseDown: PropTypes.func.isRequired,
-  onMouseEnter: PropTypes.func.isRequired,
 };
 
 class BinaryTable extends Component {
@@ -630,9 +523,8 @@ class BinaryTable extends Component {
       const nextRow = Math.floor(nextFloatRow);
       if (nextRow !== state.row) {
         return { row: nextRow };
-      } else {
-        return undefined;
       }
+      return undefined;
     });
   }
 
@@ -674,7 +566,7 @@ class BinaryTable extends Component {
       this.complementStateChange(state, {
         fontFamily: preference.fontFamily,
         fontSize: preference.fontSize,
-        columnUnit: preference.columnUnit
+        columnUnit: preference.columnUnit,
       }),
     );
   }
