@@ -4,6 +4,7 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
+import { sprintf } from 'sprintf-js';
 
 import BinaryTableAddressCell from './components/BinaryTableAddressCell';
 import BinaryTableDataRow from './components/BinaryTableDataRow';
@@ -271,7 +272,7 @@ class BinaryTable extends Component {
         <Measure onResize={(contentRect) => { this.onAddressResized(contentRect); }}>
           {({ measureRef }) =>
             (<span ref={measureRef} style={{ display: 'inline-block' }} key="addressBox">
-              <span key="address" className="binary-table-address">&ensp;Address</span>
+              <BinaryTableAddressCell key="address" value={'\xA0Address'} />
             </span>)
           }
         </Measure>
@@ -284,9 +285,11 @@ class BinaryTable extends Component {
       for (let j = 0; j < this.state.rowCount; j += 1) {
         const rowAddress = (j + this.state.row) * columnCount;
         const rowIndex = Math.floor(rowAddress / columnCount);
-        const row = <BinaryTableAddressCell key={'BinaryTableAddressCell:' + (rowIndex % this.state.rowCount)} address={rowAddress} />;
-        items.push(row);
-
+        {
+          const text = sprintf('%08X', rowAddress);
+          const row = <BinaryTableAddressCell key={'BinaryTableAddressCell:' + (rowIndex % this.state.rowCount)} value={text} />;
+          items.push(row);
+        }
         const values = viewModel.getBuffer(rowAddress, columnCount);
         if (this.tableData[rowIndex] === undefined) {
           this.tableData[rowIndex] = values;

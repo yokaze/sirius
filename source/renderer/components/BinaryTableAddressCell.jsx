@@ -2,7 +2,6 @@ import { create } from 'jss';
 import preset from 'jss-preset-default';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
-import { sprintf } from 'sprintf-js';
 
 const jss = create(preset());
 const styles = {
@@ -20,13 +19,11 @@ const classes = sheet.attach().classes;
 
 export default class BinaryTableAddressCell extends Component {
   shouldComponentUpdate(nextProps) {
-    return this.props.address !== nextProps.address;
+    return this.props.value !== nextProps.value;
   }
 
   render() {
-    const address = this.props.address;
-    const text = sprintf('%08X', address);
-    return <span key="span" className={classes.default}>{text}</span>;
+    return <span key="span" className={classes.default}>{this.props.value}</span>;
   }
 }
 
@@ -40,5 +37,5 @@ BinaryTableAddressCell.setFontSize = (fontSize) => {
 };
 
 BinaryTableAddressCell.propTypes = {
-  address: PropTypes.number.isRequired,
+  value: PropTypes.string.isRequired,
 };

@@ -53,14 +53,3 @@ span {
     text-align: center;
     width: 32px;
 }
-
-.binary-table-address {
-    display: inline-block;
-    font-family: Roboto Mono, monospace;
-    font-size: 16px;
-    height: 24px;
-    line-height: 24px;
-    margin-left: 16px;
-    margin-right: 6px;
-    text-align: right;
-}
