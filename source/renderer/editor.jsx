@@ -26,8 +26,8 @@ const whiteStyle = {
   display: 'inline-block',
   fontFamily: 'Monaco, monospace',
   fontSize: '16px',
-  height: '24px',
-  lineHeight: '24px',
+  height: '1px',
+  lineHeight: '1px',
   textAlign: 'center',
   width: '24px',
 };

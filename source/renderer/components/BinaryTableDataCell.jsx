@@ -8,8 +8,8 @@ const jss = create(preset());
 const styles = {
   default: {
     display: 'inline-block',
-    height: '24px',
-    lineHeight: '24px',
+    marginBottom: '2px',
+    marginTop: '2px',
     textAlign: 'center',
     width: '32px',
   },
@@ -18,8 +18,6 @@ const styles = {
     borderColor: 'silver',
     borderStyle: 'solid',
     display: 'inline-block',
-    height: '20px',
-    lineHeight: '20px',
     outline: '0',
     textAlign: 'center',
     width: '28px',
@@ -27,8 +25,8 @@ const styles = {
   selected: {
     backgroundColor: 'silver',
     display: 'inline-block',
-    height: '24px',
-    lineHeight: '24px',
+    paddingBottom: '2px',
+    paddingTop: '2px',
     outline: '0',
     textAlign: 'center',
     width: '32px',

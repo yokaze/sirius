@@ -15,7 +15,7 @@ export default class BinaryTableHeaderRow extends Component {
       title = (i < 16) ? `+${title}` : title;
       cells.push(<BinaryTableHeaderCell key={i} value={title} />);
     }
-    return <span key="binary-table-data-header-row" className="binary-table-data-header-row">{cells}</span>;
+    return <span key="binary-table-data-header-row">{cells}</span>;
   }
 }
 

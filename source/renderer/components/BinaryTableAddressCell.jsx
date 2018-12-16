@@ -7,10 +7,10 @@ const jss = create(preset());
 const styles = {
   default: {
     display: 'inline-block',
-    height: '24px',
-    lineHeight: '24px',
+    marginBottom: '2px',
     marginLeft: '16px',
     marginRight: '6px',
+    marginTop: '2px',
     textAlign: 'right',
   },
 };
