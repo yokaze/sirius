@@ -514,7 +514,7 @@ class BinaryTable extends Component {
         if (nextState.addressWidth === undefined) {
           return diff;
         }
-        const rowCount = Math.floor((nextState.tableHeight / 24) - 2);
+        const rowCount = Math.floor((nextState.tableHeight / 25) - 2);
         let columnCount = Math.floor(Math.max(nextState.columnUnit, (nextState.totalWidth - nextState.addressWidth - 24 - 22 - 1) / 46));
         columnCount = Math.floor(columnCount / nextState.columnUnit) * nextState.columnUnit;
         return Object.assign(diff, { rowCount, columnCount });

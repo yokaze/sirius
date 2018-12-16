@@ -10,9 +10,10 @@ const styles = {
     fontFamily: 'Roboto Mono, monospace',
     fontSize: '16px',
     marginBottom: '2px',
+    marginLeft: '5px',
+    marginRight: '5px',
     marginTop: '2px',
     textAlign: 'center',
-    width: '32px',
   },
 };
 const sheet = jss.createStyleSheet(styles, { link: true });

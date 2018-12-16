@@ -18,7 +18,7 @@ const ipcClient = new SiriusIpcClient();
 
 function sendPreference(state) {
   let fontFamily = state.fontFamily;
-  let fontSize = parseInt(state.fontSize, 10);
+  let fontSize = Math.min(Math.max(8, parseInt(state.fontSize, 10)), 96);
   const columnUnit = state.columnUnit;
   if (fontFamily === '') {
     fontFamily = defaultFontFamily;

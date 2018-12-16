@@ -8,25 +8,28 @@ const styles = {
   default: {
     display: 'inline-block',
     marginBottom: '2px',
+    marginLeft: '1px',
+    marginRight: '1px',
     marginTop: '2px',
     textAlign: 'center',
-    width: '14px',
   },
   focused: {
     border: '2px',
     borderColor: 'silver',
     borderStyle: 'solid',
     display: 'inline-block',
+    marginLeft: '-1px',
+    marginRight: '-1px',
     textAlign: 'center',
-    width: '10px',
   },
   selected: {
     backgroundColor: 'silver',
     display: 'inline-block',
     paddingBottom: '2px',
+    paddingLeft: '1px',
+    paddingRight: '1px',
     paddingTop: '2px',
     textAlign: 'center',
-    width: '14px',
   },
 };
 const sheet = jss.createStyleSheet(styles, { link: true });

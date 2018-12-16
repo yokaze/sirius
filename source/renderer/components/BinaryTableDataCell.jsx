@@ -9,27 +9,30 @@ const styles = {
   default: {
     display: 'inline-block',
     marginBottom: '2px',
+    marginLeft: '5px',
+    marginRight: '5px',
     marginTop: '2px',
     textAlign: 'center',
-    width: '32px',
   },
   focused: {
     border: '2px',
     borderColor: 'silver',
     borderStyle: 'solid',
     display: 'inline-block',
+    paddingLeft: '3px',
+    paddingRight: '3px',
     outline: '0',
     textAlign: 'center',
-    width: '28px',
   },
   selected: {
     backgroundColor: 'silver',
     display: 'inline-block',
     paddingBottom: '2px',
+    paddingLeft: '5px',
+    paddingRight: '5px',
     paddingTop: '2px',
     outline: '0',
     textAlign: 'center',
-    width: '32px',
   },
 };
 const sheet = jss.createStyleSheet(styles, { link: true });
