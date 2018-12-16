@@ -70,20 +70,20 @@ export default class BinaryTableExpressionCell extends Component {
       onMouseEnter={this.onMouseEnter}
     >{this.props.value}</span>);
   }
-
-  static setFontFamily(fontFamily) {
-    const entry = `${fontFamily}, monospace`;
-    sheet.getRule('default').prop('font-family', entry);
-    sheet.getRule('focused').prop('font-family', entry);
-    sheet.getRule('selected').prop('font-family', entry);
-  }
-
-  static setFontSize(fontSize) {
-    sheet.getRule('default').prop('font-size', fontSize);
-    sheet.getRule('focused').prop('font-size', fontSize);
-    sheet.getRule('selected').prop('font-size', fontSize);
-  }
 }
+
+BinaryTableExpressionCell.setFontFamily = (fontFamily) => {
+  const entry = `${fontFamily}, monospace`;
+  sheet.getRule('default').prop('font-family', entry);
+  sheet.getRule('focused').prop('font-family', entry);
+  sheet.getRule('selected').prop('font-family', entry);
+};
+
+BinaryTableExpressionCell.setFontSize = (fontSize) => {
+  sheet.getRule('default').prop('font-size', fontSize);
+  sheet.getRule('focused').prop('font-size', fontSize);
+  sheet.getRule('selected').prop('font-size', fontSize);
+};
 
 BinaryTableExpressionCell.propTypes = {
   listener: PropTypes.shape({

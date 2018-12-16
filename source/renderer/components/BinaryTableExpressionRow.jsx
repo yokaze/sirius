@@ -49,15 +49,15 @@ export default class BinaryTableExpressionRow extends Component {
     }
     return <span key="span">{children}</span>;
   }
-
-  static setFontFamily(fontFamily) {
-    BinaryTableExpressionCell.setFontFamily(fontFamily);
-  }
-
-  static setFontSize(fontSize) {
-    BinaryTableExpressionCell.setFontSize(fontSize);
-  }
 }
+
+BinaryTableExpressionRow.setFontFamily = (fontFamily) => {
+  BinaryTableExpressionCell.setFontFamily(fontFamily);
+};
+
+BinaryTableExpressionRow.setFontSize = (fontSize) => {
+  BinaryTableExpressionCell.setFontSize(fontSize);
+};
 
 BinaryTableExpressionRow.propTypes = {
   listener: PropTypes.shape({

@@ -1,3 +1,4 @@
+/* eslint-env browser */
 import { ipcRenderer, remote } from 'electron';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
@@ -12,8 +13,6 @@ import SiriusDocumentCommand from '../common/SiriusDocumentCommand';
 import SiriusIpcClient from '../ipc/SiriusIpcClient';
 
 const ipcClient = new SiriusIpcClient();
-
-const applicationModel = remote.require('./app').Model;
 
 const WriteMode = {
   Overwrite: 0,
@@ -87,8 +86,7 @@ class BinaryTableViewModel {
       } else {
         this.insertValueAt(selected, b);
       }
-    }
-    else {
+    } else {
       this.isEditing = true;
       this.editValue = value * 16;
     }
@@ -132,8 +130,8 @@ class BinaryTableViewModel {
     return this.isEditing;
   }
 
-  setIpcClient(ipcClient) {
-    this.ipcClient = ipcClient;
+  setIpcClient(client) {
+    this.ipcClient = client;
   }
 
   onReceivedRenewalBinary(sender, renewalBinary) {
@@ -275,7 +273,7 @@ class BinaryTable extends Component {
     if (this.state.rowCount !== undefined) {
       const columnCount = this.state.columnCount;
       items.push(<span key="binary-table-header-row" className="binary-table-header-row">
-        <Measure onResize={contentRect => { this.onAddressResized(contentRect); }}>
+        <Measure onResize={(contentRect) => { this.onAddressResized(contentRect); }}>
           {({ measureRef }) =>
             (<span ref={measureRef} style={{ display: 'inline-block' }} key="addressBox">
               <span key="address" className="binary-table-address">&ensp;Address</span>
@@ -355,7 +353,7 @@ class BinaryTable extends Component {
         <div key={'write-mode'} className="binary-table-address">{(this.props.viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>
       </span>);
     }
-    return (<Measure onResize={contentRect => { this.onResized(contentRect); }}>
+    return (<Measure onResize={(contentRect) => { this.onResized(contentRect); }}>
       {({ measureRef }) =>
         (<div
           ref={measureRef}
@@ -372,7 +370,7 @@ class BinaryTable extends Component {
   handleKeyDown(e) {
     const keyCode = e.keyCode;
     const shiftKey = e.shiftKey;
-    const handler = (state, props) => {
+    const handler = (state) => {
       const viewModel = this.props.viewModel;
       const handleTypeHex = (value) => {
         if (viewModel.getWriteMode() === WriteMode.Overwrite) {
