@@ -9,6 +9,7 @@ import { sprintf } from 'sprintf-js';
 import BinaryTableAddressCell from './components/BinaryTableAddressCell';
 import BinaryTableDataRow from './components/BinaryTableDataRow';
 import BinaryTableExpressionRow from './components/BinaryTableExpressionRow';
+import BinaryTableHeaderRow from './components/BinaryTableHeaderRow';
 import SiriusConstants from '../common/SiriusConstants';
 import SiriusDocument from '../common/SiriusDocument';
 import SiriusDocumentCommand from '../common/SiriusDocumentCommand';
@@ -203,26 +204,6 @@ class BinaryTableViewModel {
   }
 }
 
-class BinaryTableDataHeaderRow extends Component {
-  shouldComponentUpdate(nextProps) {
-    return this.props.columnCount !== nextProps.columnCount;
-  }
-
-  render() {
-    const cells = [];
-    for (let i = 0; i < this.props.columnCount; i += 1) {
-      let title = i.toString(16).toUpperCase();
-      title = (i < 16) ? ('+' + title) : title;
-      cells.push(<li key={i}>{title}</li>);
-    }
-    return <span key="binary-table-data-header-row" className="binary-table-data-header-row">{cells}</span>;
-  }
-}
-
-BinaryTableDataHeaderRow.propTypes = {
-  columnCount: PropTypes.number.isRequired,
-};
-
 class BinaryTable extends Component {
   constructor(props) {
     super(props);
@@ -254,12 +235,14 @@ class BinaryTable extends Component {
       const fontSize = this.state.fontSize;
       if (this.cache.fontFamily !== fontFamily) {
         this.cache.fontFamily = fontFamily;
+        BinaryTableHeaderRow.setFontFamily(fontFamily);
         BinaryTableAddressCell.setFontFamily(fontFamily);
         BinaryTableDataRow.setFontFamily(fontFamily);
         BinaryTableExpressionRow.setFontFamily(fontFamily);
       }
       if (this.cache.fontSize !== fontSize) {
         this.cache.fontSize = fontSize;
+        BinaryTableHeaderRow.setFontSize(fontSize);
         BinaryTableAddressCell.setFontSize(fontSize);
         BinaryTableDataRow.setFontSize(fontSize);
         BinaryTableExpressionRow.setFontSize(fontSize);
@@ -276,7 +259,7 @@ class BinaryTable extends Component {
             </span>)
           }
         </Measure>
-        <BinaryTableDataHeaderRow key="binary-table-data-header-row" columnCount={columnCount} />
+        <BinaryTableHeaderRow key="binary-table-header-row" columnCount={columnCount} />
       </span>);
       items.push(<br key="br-head" />);
       const viewModel = this.props.viewModel;

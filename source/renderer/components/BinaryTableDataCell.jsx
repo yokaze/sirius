@@ -52,6 +52,14 @@ export default class BinaryTableDataCell extends Component {
     return changed;
   }
 
+  handleMouseDown(e) {
+    this.props.onMouseDown(this, e);
+  }
+
+  handleMouseEnter(e) {
+    this.props.onMouseEnter(this, e);
+  }
+
   render() {
     let className = classes.default;
     if (this.props.selected) {
@@ -67,14 +75,6 @@ export default class BinaryTableDataCell extends Component {
       onMouseDown={this.handleMouseDown}
       onMouseEnter={this.handleMouseEnter}
     >{text}</span>);
-  }
-
-  handleMouseDown(e) {
-    this.props.onMouseDown(this, e);
-  }
-
-  handleMouseEnter(e) {
-    this.props.onMouseEnter(this, e);
   }
 }
 
@@ -98,4 +98,8 @@ BinaryTableDataCell.propTypes = {
   selected: PropTypes.bool.isRequired,
   onMouseDown: PropTypes.func.isRequired,
   onMouseEnter: PropTypes.func.isRequired,
+};
+
+BinaryTableDataCell.defaultProps = {
+  value: undefined,
 };

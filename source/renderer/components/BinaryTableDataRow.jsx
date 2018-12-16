@@ -37,7 +37,7 @@ export default class BinaryTableDataRow extends Component {
       const focused = (i === focusIndex);
       const selected = (selectedRange[0] <= i) && (i < selectedRange[1]);
       const cell = (<BinaryTableDataCell
-        key={'BinaryTableCell:' + i}
+        key={i}
         address={cellAddress}
         value={value}
         focused={focused}
@@ -67,4 +67,9 @@ BinaryTableDataRow.propTypes = {
   selectedRange: PropTypes.arrayOf(PropTypes.number),
   onMouseDown: PropTypes.func.isRequired,
   onMouseEnter: PropTypes.func.isRequired,
+};
+
+BinaryTableDataRow.defaultProps = {
+  focusIndex: undefined,
+  selectedRange: undefined,
 };
