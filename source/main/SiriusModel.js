@@ -173,7 +173,7 @@ export default class SiriusModel {
   }
 
   getIndexUrl() {
-    return this.getUrlForFileName('../renderer/index.html');
+    return this.getUrlForFileName('../renderer/editor.html');
   }
 
   getUrlForFileName(fileName) {
