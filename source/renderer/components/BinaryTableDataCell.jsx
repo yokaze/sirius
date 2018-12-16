@@ -2,6 +2,7 @@ import { create } from 'jss';
 import preset from 'jss-preset-default';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import { sprintf } from 'sprintf-js';
 
 const jss = create(preset());
 const styles = {

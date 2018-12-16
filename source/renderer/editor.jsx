@@ -1,11 +1,11 @@
 /* eslint-env browser */
-import { ipcRenderer, remote } from 'electron';
+import { ipcRenderer } from 'electron';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
-import { sprintf } from 'sprintf-js';
 
+import BinaryTableAddressCell from './components/BinaryTableAddressCell';
 import BinaryTableDataRow from './components/BinaryTableDataRow';
 import BinaryTableExpressionRow from './components/BinaryTableExpressionRow';
 import SiriusConstants from '../common/SiriusConstants';
@@ -201,22 +201,6 @@ class BinaryTableViewModel {
     ipcClient.sendDocumentCommand(command);
   }
 }
-
-class BinaryTableAddressCell extends Component {
-  shouldComponentUpdate(nextProps) {
-    return this.props.address !== nextProps.address;
-  }
-
-  render() {
-    const address = this.props.address;
-    const text = sprintf('%08X', address);
-    return <span key={'BinaryTableAddressCell:span:' + address} className="binary-table-address">{text}</span>;
-  }
-}
-
-BinaryTableAddressCell.propTypes = {
-  address: PropTypes.number.isRequired,
-};
 
 class BinaryTableDataHeaderRow extends Component {
   shouldComponentUpdate(nextProps) {
