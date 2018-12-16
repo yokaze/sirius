@@ -370,6 +370,14 @@ class BinaryTable extends Component {
   }
 
   render() {
+    if (this.cache.fontFamily !== this.state.fontFamily) {
+      this.cache.fontFamily = this.state.fontFamily;
+      BinaryTableExpressionRow.setFontFamily(this.state.fontFamily);
+    }
+    if (this.cache.fontSize !== this.state.fontSize) {
+      this.cache.fontSize = this.state.fontSize;
+      BinaryTableExpressionRow.setFontSize(this.state.fontSize);
+    }
     const items = [];
     if (this.state.rowCount !== undefined) {
       const columnCount = this.state.columnCount;
@@ -663,7 +671,11 @@ class BinaryTable extends Component {
 
   onViewModelUpdatePreference(sender, preference) {
     this.setState(state =>
-      this.complementStateChange(state, { columnUnit: preference.columnUnit }),
+      this.complementStateChange(state, {
+        fontFamily: preference.fontFamily,
+        fontSize: preference.fontSize,
+        columnUnit: preference.columnUnit
+      }),
     );
   }
 

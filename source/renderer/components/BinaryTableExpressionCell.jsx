@@ -7,7 +7,6 @@ const jss = create(preset());
 const styles = {
   default: {
     display: 'inline-block',
-    fontFamily: 'Roboto Mono, monospace',
     height: '24px',
     lineHeight: '24px',
     textAlign: 'center',
@@ -18,7 +17,6 @@ const styles = {
     borderColor: 'silver',
     borderStyle: 'solid',
     display: 'inline-block',
-    fontFamily: 'Roboto Mono, monospace',
     height: '20px',
     lineHeight: '20px',
     textAlign: 'center',
@@ -27,7 +25,6 @@ const styles = {
   selected: {
     backgroundColor: 'silver',
     display: 'inline-block',
-    fontFamily: 'Roboto Mono, monospace',
     height: '24px',
     lineHeight: '24px',
     textAlign: 'center',
@@ -40,7 +37,6 @@ const classes = sheet.attach().classes;
 export default class BinaryTableExpressionCell extends Component {
   constructor(props) {
     super(props);
-    BinaryTableExpressionCell.setFontSize(16);
     this.onMouseDown = this.onMouseDown.bind(this);
     this.onMouseEnter = this.onMouseEnter.bind(this);
   }
@@ -75,6 +71,13 @@ export default class BinaryTableExpressionCell extends Component {
     >{this.props.value}</span>);
   }
 
+  static setFontFamily(fontFamily) {
+    const entry = `${fontFamily}, monospace`;
+    sheet.getRule('default').prop('font-family', entry);
+    sheet.getRule('focused').prop('font-family', entry);
+    sheet.getRule('selected').prop('font-family', entry);
+  }
+
   static setFontSize(fontSize) {
     sheet.getRule('default').prop('font-size', fontSize);
     sheet.getRule('focused').prop('font-size', fontSize);
@@ -92,3 +95,6 @@ BinaryTableExpressionCell.propTypes = {
   selected: PropTypes.bool.isRequired,
   value: PropTypes.string.isRequired,
 };
+
+BinaryTableExpressionCell.setFontFamily('Roboto Mono');
+BinaryTableExpressionCell.setFontSize(16);
