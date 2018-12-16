@@ -8,6 +8,7 @@ import { sprintf } from 'sprintf-js';
 
 import BinaryTableDataRow from './components/BinaryTableDataRow';
 import BinaryTableExpressionRow from './components/BinaryTableExpressionRow';
+import SiriusConstants from '../common/SiriusConstants';
 import SiriusDocument from '../common/SiriusDocument';
 import SiriusDocumentCommand from '../common/SiriusDocumentCommand';
 import SiriusIpcClient from '../ipc/SiriusIpcClient';
@@ -248,6 +249,8 @@ class BinaryTable extends Component {
       columnCount: 16,
       columnUnit: 4,
       addressWidth: 0,
+      fontFamily: SiriusConstants.defaultFontFamily,
+      fontSize: SiriusConstants.defaultFontSize,
     };
     this.cache = {
       floatRow: 0,

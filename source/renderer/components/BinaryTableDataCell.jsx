@@ -7,7 +7,6 @@ const jss = create(preset());
 const styles = {
   default: {
     display: 'inline-block',
-    fontSize: '16px',
     height: '24px',
     lineHeight: '24px',
     textAlign: 'center',
@@ -18,7 +17,6 @@ const styles = {
     borderColor: 'silver',
     borderStyle: 'solid',
     display: 'inline-block',
-    fontSize: '16px',
     height: '20px',
     lineHeight: '20px',
     outline: '0',
@@ -28,7 +26,6 @@ const styles = {
   selected: {
     backgroundColor: 'silver',
     display: 'inline-block',
-    fontSize: '16px',
     height: '24px',
     lineHeight: '24px',
     outline: '0',
@@ -101,5 +98,3 @@ BinaryTableDataCell.propTypes = {
   onMouseDown: PropTypes.func.isRequired,
   onMouseEnter: PropTypes.func.isRequired,
 };
-
-BinaryTableDataCell.setFontFamily('Roboto Mono');

@@ -95,6 +95,3 @@ BinaryTableExpressionCell.propTypes = {
   selected: PropTypes.bool.isRequired,
   value: PropTypes.string.isRequired,
 };
-
-BinaryTableExpressionCell.setFontFamily('Roboto Mono');
-BinaryTableExpressionCell.setFontSize(16);

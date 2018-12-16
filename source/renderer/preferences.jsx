@@ -8,10 +8,11 @@ import Input from '@material-ui/core/Input';
 import Radio from '@material-ui/core/Radio';
 import RadioGroup from '@material-ui/core/RadioGroup';
 
+import SiriusConstants from '../common/SiriusConstants';
 import SiriusIpcClient from '../ipc/SiriusIpcClient';
 
-const defaultFontFamily = 'Roboto Mono';
-const defaultFontSize = 16;
+const defaultFontFamily = SiriusConstants.defaultFontFamily;
+const defaultFontSize = SiriusConstants.defaultFontSize;
 const defaultColumnUnit = 4;
 const ipcClient = new SiriusIpcClient();
 
