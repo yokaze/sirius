@@ -10,7 +10,9 @@ export default class SiriusDocument {
 
   applyCommand(command) {
     const undoCommand = this._runCommand(command);
-    this.undoBuffer.push([undoCommand, command]);
+    if (undoCommand !== undefined) {
+      this.undoBuffer.push([undoCommand, command]);
+    }
   }
 
   undo() {
@@ -99,14 +101,15 @@ export default class SiriusDocument {
       this.clipData = this.getBuffer(command.address, command.length);
     } else if (command.type === SiriusDocumentCommand.Paste.getType()) {
       if (this.clipData === undefined) {
-        console.log('clip board is empty');
         return undefined;
       }
       const insertCommand = new SiriusDocumentCommand.Insert(command.address, this.clipData);
       return this._runCommand(insertCommand);
     } else if (command.type === SiriusDocumentCommand.Composite.getType()) {
-      command.items.forEach((item) => { this._runCommand(item); });
-      return undefined;
+      const undoCommands = command.items.map(item => this._runCommand(item)).reverse();
+      return new SiriusDocumentCommand.Composite(undoCommands);
+    } else if (command.type === undefined) {
+      assert(false);
     }
     return undefined;
   }

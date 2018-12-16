@@ -171,12 +171,18 @@ class BinaryTableViewModel {
 
   onAppRequestPaste() {
     const range = this.getSelectedRange();
+    let removeCommand;
     if (range[0] !== range[1]) {
-      console.log('remove data here');
+      removeCommand = new SiriusDocumentCommand.Remove(range[0], range[1] - range[0]);
     }
     const address = range[0];
-    const command = new SiriusDocumentCommand.Paste(address);
-    this._applyCommand(command);
+    const pasteCommand = new SiriusDocumentCommand.Paste(address);
+    if (removeCommand === undefined) {
+      this._applyCommand(pasteCommand);
+    } else {
+      const command = new SiriusDocumentCommand.Composite([removeCommand, pasteCommand]);
+      this._applyCommand(command);
+    }
     this.listener.onViewModelReloaded();
   }
 
