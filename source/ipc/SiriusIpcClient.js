@@ -6,6 +6,9 @@ export default class {
     ipcRenderer.on(SiriusIpcCommand.onRendererReceivedRenewalBinary, (e, renewalBinary) => {
       this.listener.onReceivedRenewalBinary(this, renewalBinary);
     });
+    ipcRenderer.on(SiriusIpcCommand.onAppUpdateClipboard, (e, data) => {
+      this.listener.onAppUpdateClipboard(this, data);
+    });
     ipcRenderer.on(SiriusIpcCommand.onAppUpdatePreference, (e, preference) => {
       this.listener.onAppUpdatePreference(this, preference);
     });

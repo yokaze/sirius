@@ -4,6 +4,7 @@ import path from 'path';
 import url from 'url';
 import uuid from 'uuid/v4';
 
+import SiriusClipboard from '../common/SiriusClipboard';
 import SiriusDocument from '../common/SiriusDocument';
 import SiriusIpcCommand from '../ipc/SiriusIpcCommand';
 
@@ -14,6 +15,9 @@ export default class SiriusModel {
 
     //  Data UUID -> SiriusDocument
     this.documents = {};
+
+    this.clipboard = new SiriusClipboard();
+    this.clipboard.setListener(this);
 
     this.preferencesWindow = undefined;
 
@@ -38,6 +42,7 @@ export default class SiriusModel {
     const handle = uuid();
     this.handles[windowId] = handle;
     this.documents[handle] = new SiriusDocument();
+    this.documents[handle].setClipboard(this.clipboard);
   }
 
   open() {
@@ -63,6 +68,7 @@ export default class SiriusModel {
           windowId = this.openEditor();
         }
         const doc = new SiriusDocument();
+        doc.setClipboard(this.clipboard);
         BrowserWindow.fromId(windowId).setTitle(fileName);
         doc.setFileData(data);
         const handle = uuid();
@@ -183,6 +189,15 @@ export default class SiriusModel {
     const doc = this.documents[handle].getFileData();
     const window = BrowserWindow.fromId(windowId);
     window.webContents.send(SiriusIpcCommand.onRendererReceivedRenewalBinary, doc);
+  }
+
+  onClipboardDataChanged() {
+    const data = this.clipboard.getData();
+    for (const key in this.handles) {
+      const windowId = parseInt(key, 10);
+      const window = BrowserWindow.fromId(windowId);
+      window.webContents.send(SiriusIpcCommand.onAppUpdateClipboard, data);
+    }
   }
 
   onDocumentCommandReceived(e, command) {

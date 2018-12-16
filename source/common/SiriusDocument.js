@@ -1,4 +1,5 @@
 import assert from 'assert';
+import SiriusClipboard from './SiriusClipboard';
 import SiriusDocumentCommand from '../common/SiriusDocumentCommand';
 
 export default class SiriusDocument {
@@ -6,6 +7,7 @@ export default class SiriusDocument {
     this.fileData = [];
     this.undoBuffer = [];
     this.redoBuffer = [];
+    this.clipboard = new SiriusClipboard();
   }
 
   applyCommand(command) {
@@ -59,6 +61,15 @@ export default class SiriusDocument {
     return ret;
   }
 
+  getClipboard() {
+    return this.clipboard;
+  }
+
+  setClipboard(clipboard) {
+    assert(clipboard instanceof SiriusClipboard);
+    this.clipboard = clipboard;
+  }
+
   _runCommand(command) {
     if (command.type === SiriusDocumentCommand.Insert.getType()) {
       if (command.address <= this.fileData.length) {
@@ -98,12 +109,13 @@ export default class SiriusDocument {
       this._runCommand(copyCommand);
       return this._runCommand(removeCommand);
     } else if (command.type === SiriusDocumentCommand.Copy.getType()) {
-      this.clipData = this.getBuffer(command.address, command.length);
+      this.clipboard.setData(this.getBuffer(command.address, command.length));
     } else if (command.type === SiriusDocumentCommand.Paste.getType()) {
-      if (this.clipData === undefined) {
+      if (this.clipboard.isEmpty()) {
         return undefined;
       }
-      const insertCommand = new SiriusDocumentCommand.Insert(command.address, this.clipData);
+      const data = this.clipboard.getData();
+      const insertCommand = new SiriusDocumentCommand.Insert(command.address, data);
       return this._runCommand(insertCommand);
     } else if (command.type === SiriusDocumentCommand.Composite.getType()) {
       const undoCommands = command.items.map(item => this._runCommand(item)).reverse();

@@ -1,5 +1,6 @@
 export default {
   onRendererReceivedRenewalBinary: 'onRendererReceivedRenewalBinary',
+  onAppUpdateClipboard: 'onAppUpdateClipboard',
   onAppUpdatePreference: 'onAppUpdatePreference',
   onAppRequestCut: 'onAppRequestCut',
   onAppRequestCopy: 'onAppRequestCopy',

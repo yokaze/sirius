@@ -140,6 +140,10 @@ class BinaryTableViewModel {
     this.listener.onViewModelReloaded();
   }
 
+  onAppUpdateClipboard(sender, data) {
+    this.document.getClipboard().setData(data);
+  }
+
   onAppUpdatePreference(sender, preference) {
     this.listener.onViewModelUpdatePreference(this, preference);
   }
