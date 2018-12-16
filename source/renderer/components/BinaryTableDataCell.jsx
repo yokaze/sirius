@@ -1,5 +1,46 @@
+import { create } from 'jss';
+import preset from 'jss-preset-default';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+
+const jss = create(preset());
+const styles = {
+  default: {
+    display: 'inline-block',
+    fontFamily: 'Roboto Mono, monospace',
+    fontSize: '16px',
+    height: '24px',
+    lineHeight: '24px',
+    textAlign: 'center',
+    width: '32px',
+  },
+  focused: {
+    border: '2px',
+    borderColor: 'silver',
+    borderStyle: 'solid',
+    display: 'inline-block',
+    fontFamily: 'Roboto Mono, monospace',
+    fontSize: '16px',
+    height: '20px',
+    lineHeight: '20px',
+    outline: '0',
+    textAlign: 'center',
+    width: '28px',
+  },
+  selected: {
+    backgroundColor: 'silver',
+    display: 'inline-block',
+    fontFamily: 'Roboto Mono, monospace',
+    fontSize: '16px',
+    height: '24px',
+    lineHeight: '24px',
+    outline: '0',
+    textAlign: 'center',
+    width: '32px',
+  },
+};
+const sheet = jss.createStyleSheet(styles, { link: true });
+const classes = sheet.attach().classes;
 
 export default class BinaryTableDataCell extends Component {
   constructor(props) {
@@ -17,11 +58,11 @@ export default class BinaryTableDataCell extends Component {
   }
 
   render() {
-    let className = 'binary-table-cell';
+    let className = classes.default;
     if (this.props.selected) {
-      className = 'binary-table-data-cell-selected';
+      className = classes.selected;
     } else if (this.props.focused) {
-      className = 'binary-table-data-cell-focused';
+      className = classes.focused;
     }
     const valid = (this.props.value !== undefined);
     const text = valid ? sprintf('%02X', this.props.value) : '--';
