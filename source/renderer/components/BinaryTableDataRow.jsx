@@ -51,6 +51,14 @@ export default class BinaryTableDataRow extends Component {
   }
 }
 
+BinaryTableDataRow.setFontFamily = (fontFamily) => {
+  BinaryTableDataCell.setFontFamily(fontFamily);
+};
+
+BinaryTableDataRow.setFontSize = (fontSize) => {
+  BinaryTableDataCell.setFontSize(fontSize);
+};
+
 BinaryTableDataRow.propTypes = {
   address: PropTypes.number.isRequired,
   length: PropTypes.number.isRequired,

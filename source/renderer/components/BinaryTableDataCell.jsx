@@ -7,7 +7,6 @@ const jss = create(preset());
 const styles = {
   default: {
     display: 'inline-block',
-    fontFamily: 'Roboto Mono, monospace',
     fontSize: '16px',
     height: '24px',
     lineHeight: '24px',
@@ -19,7 +18,6 @@ const styles = {
     borderColor: 'silver',
     borderStyle: 'solid',
     display: 'inline-block',
-    fontFamily: 'Roboto Mono, monospace',
     fontSize: '16px',
     height: '20px',
     lineHeight: '20px',
@@ -30,7 +28,6 @@ const styles = {
   selected: {
     backgroundColor: 'silver',
     display: 'inline-block',
-    fontFamily: 'Roboto Mono, monospace',
     fontSize: '16px',
     height: '24px',
     lineHeight: '24px',
@@ -83,6 +80,19 @@ export default class BinaryTableDataCell extends Component {
   }
 }
 
+BinaryTableDataCell.setFontFamily = (fontFamily) => {
+  const entry = `${fontFamily}, monospace`;
+  sheet.getRule('default').prop('font-family', entry);
+  sheet.getRule('focused').prop('font-family', entry);
+  sheet.getRule('selected').prop('font-family', entry);
+};
+
+BinaryTableDataCell.setFontSize = (fontSize) => {
+  sheet.getRule('default').prop('font-size', fontSize);
+  sheet.getRule('focused').prop('font-size', fontSize);
+  sheet.getRule('selected').prop('font-size', fontSize);
+};
+
 BinaryTableDataCell.propTypes = {
   address: PropTypes.number.isRequired,
   value: PropTypes.number,
@@ -91,3 +101,5 @@ BinaryTableDataCell.propTypes = {
   onMouseDown: PropTypes.func.isRequired,
   onMouseEnter: PropTypes.func.isRequired,
 };
+
+BinaryTableDataCell.setFontFamily('Roboto Mono');
