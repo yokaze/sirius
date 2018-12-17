@@ -226,6 +226,8 @@ class BinaryTable extends Component {
     this.handleKeyDown = this.handleKeyDown.bind(this);
     this.handleMouseDown = this.handleMouseDown.bind(this);
     this.handleMouseEnter = this.handleMouseEnter.bind(this);
+    this.handleDragOver = this.handleDragOver.bind(this);
+    this.handleDrop = this.handleDrop.bind(this);
     this.handleWheel = this.handleWheel.bind(this);
   }
 
@@ -340,6 +342,8 @@ class BinaryTable extends Component {
           ref={measureRef}
           className="binary-table"
           style={containerStyle}
+          onDragOver={this.handleDragOver}
+          onDrop={this.handleDrop}
           onKeyDown={this.handleKeyDown}
           onWheel={this.handleWheel}
           tabIndex={100000}
@@ -492,6 +496,15 @@ class BinaryTable extends Component {
       return { };
     };
     this.setState(handler);
+  }
+
+  handleDragOver(e) {
+    e.preventDefault();
+  }
+
+  handleDrop(e) {
+    e.preventDefault();
+    ipcClient.sendFileDropRequest(e.dataTransfer.files[0].path);
   }
 
   handleWheel(e) {

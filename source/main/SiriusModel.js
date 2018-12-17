@@ -32,6 +32,10 @@ export default class SiriusModel {
       this.onDocumentCommandReceived(e, command);
     });
 
+    ipcMain.on(SiriusIpcCommand.onEditorRequestFileDrop, (e, filePath) => {
+      this.onEditorRequestFileDrop(e, filePath);
+    })
+
     ipcMain.on(SiriusIpcCommand.onPreferenceCommand, (e, command) => {
       this.onPreferenceCommandReceived(e, command);
     });
@@ -50,35 +54,7 @@ export default class SiriusModel {
       properties: ['openFile'],
     });
     if (fileNames !== undefined) {
-      const fileName = fileNames[0];
-      fs.readFile(fileName, (err, data) => {
-        let windowId;
-        let initialized = false;
-        {
-          //  If a blank document window is focused, open document in it.
-          const currentWindow = BrowserWindow.getFocusedWindow();
-          const currentHandle = this.handles[currentWindow.id];
-          const doc = this.documents[currentHandle];
-          if (doc.isBlankDocument()) {
-            windowId = currentWindow.id;
-            initialized = true;
-          }
-        }
-        if (windowId === undefined) {
-          windowId = this.openEditor();
-        }
-        const doc = new SiriusDocument();
-        doc.setClipboard(this.clipboard);
-        BrowserWindow.fromId(windowId).setTitle(fileName);
-        doc.setFileData(data);
-        const handle = uuid();
-        this.handles[windowId] = handle;
-        this.documents[handle] = doc;
-
-        if (initialized) {
-          this.updateWindowBinary(windowId);
-        }
-      });
+      this._openFile(fileNames[0]);
     }
   }
 
@@ -214,11 +190,48 @@ export default class SiriusModel {
     }
   }
 
+  onEditorRequestFileDrop(e, filePath) {
+    this._openFile(filePath);
+  }
+
   onPreferenceCommandReceived(e, command) {
     for (const key in this.handles) {
       const windowId = parseInt(key, 10);
       const window = BrowserWindow.fromId(windowId);
       window.webContents.send(SiriusIpcCommand.onAppUpdatePreference, command);
     }
+  }
+
+  _openFile(filePath) {
+    fs.readFile(filePath, (err, data) => {
+      let windowId;
+      let initialized = false;
+      {
+        //  If a blank document window is focused, open document in it.
+        const currentWindow = BrowserWindow.getFocusedWindow();
+        if (currentWindow) {
+          const currentHandle = this.handles[currentWindow.id];
+          const doc = this.documents[currentHandle];
+          if (doc.isBlankDocument()) {
+            windowId = currentWindow.id;
+            initialized = true;
+          }
+        }
+      }
+      if (windowId === undefined) {
+        windowId = this.openEditor();
+      }
+      const doc = new SiriusDocument();
+      doc.setClipboard(this.clipboard);
+      BrowserWindow.fromId(windowId).setTitle(filePath);
+      doc.setFileData(data);
+      const handle = uuid();
+      this.handles[windowId] = handle;
+      this.documents[handle] = doc;
+
+      if (initialized) {
+        this.updateWindowBinary(windowId);
+      }
+    });
   }
 }

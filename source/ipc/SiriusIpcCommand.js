@@ -6,6 +6,7 @@ export default {
   onAppRequestCopy: 'onAppRequestCopy',
   onAppRequestPaste: 'onAppRequestPaste',
   onAppRequestSelectAll: 'onAppRequestSelectAll',
+  onEditorRequestFileDrop: 'onEditorRequestFileDrop',
   onDocumentCommand: 'onDocumentCommand',
   onPreferenceCommand: 'onPreferenceCommand',
 };

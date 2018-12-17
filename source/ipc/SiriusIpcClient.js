@@ -34,6 +34,10 @@ export default class {
     ipcRenderer.send(SiriusIpcCommand.onDocumentCommand, command);
   }
 
+  sendFileDropRequest(filePath) {
+    ipcRenderer.send(SiriusIpcCommand.onEditorRequestFileDrop, filePath);
+  }
+
   sendPreferenceCommand(command) {
     ipcRenderer.send(SiriusIpcCommand.onPreferenceCommand, command);
   }
