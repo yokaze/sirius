@@ -1,10 +1,13 @@
 <html>
     <head>
         <title>About</title>
+        <link rel="stylesheet" type="text/css" href="base.css">
     </head>
     <body>
-        <h1>Sirius</h1>
-        <p>(C) 2018 Rue Yokaze.</p>
-        <p>Distributed under the MIT License.</p>
+        <div id="root" style="height: 100%; width: 100%;" />
+        <script>
+            require('babel-register');
+            require('./about.jsx');
+        </script>
     </body>
 </html>

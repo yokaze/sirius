@@ -33,6 +33,14 @@ function sendPreference(state) {
   });
 }
 
+function handleDragOver(e) {
+  e.preventDefault();
+}
+
+function handleDrop(e) {
+  e.preventDefault();
+}
+
 class PreferencesView extends Component {
   constructor(props) {
     super(props);
@@ -74,29 +82,31 @@ class PreferencesView extends Component {
   }
 
   render() {
-    return (<div style={{ margin: 8 }}>
-      <FormControl>
-        <FormLabel component="legend">Font Family</FormLabel>
-        <Input placeholder={defaultFontFamily} onChange={this.fontFamilyInputChanged} />
-      </FormControl>
-      <FormControl>
-        <FormLabel component="legend">Font Size</FormLabel>
-        <Input placeholder={`${defaultFontSize}`} onChange={this.fontSizeInputChanged} />
-      </FormControl>
-      <FormControl>
-        <FormLabel component="legend">Column Unit</FormLabel>
-        <RadioGroup
-          row
-          value={`${this.state.columnUnit}`}
-          onChange={this.columnUnitGroupChanged}
-        >
-          <FormControlLabel value="1" control={<Radio />} label="1" />
-          <FormControlLabel value="2" control={<Radio />} label="2" />
-          <FormControlLabel value="4" control={<Radio />} label="4" />
-          <FormControlLabel value="8" control={<Radio />} label="8" />
-          <FormControlLabel value="16" control={<Radio />} label="16" />
-        </RadioGroup>
-      </FormControl>
+    return (<div style={{ display: 'inline-block', width: '100%', height: '100%' }} onDragOver={handleDragOver} onDrop={handleDrop}>
+      <div style={{ margin: 16 }}>
+        <FormControl>
+          <FormLabel component="legend">Font Family</FormLabel>
+          <Input placeholder={defaultFontFamily} onChange={this.fontFamilyInputChanged} />
+        </FormControl>
+        <FormControl>
+          <FormLabel component="legend">Font Size</FormLabel>
+          <Input placeholder={`${defaultFontSize}`} onChange={this.fontSizeInputChanged} />
+        </FormControl>
+        <FormControl>
+          <FormLabel component="legend">Column Unit</FormLabel>
+          <RadioGroup
+            row
+            value={`${this.state.columnUnit}`}
+            onChange={this.columnUnitGroupChanged}
+          >
+            <FormControlLabel value="1" control={<Radio />} label="1" />
+            <FormControlLabel value="2" control={<Radio />} label="2" />
+            <FormControlLabel value="4" control={<Radio />} label="4" />
+            <FormControlLabel value="8" control={<Radio />} label="8" />
+            <FormControlLabel value="16" control={<Radio />} label="16" />
+          </RadioGroup>
+        </FormControl>
+      </div>
     </div>);
   }
 }
