@@ -206,6 +206,10 @@ export default class SiriusModel {
 
   _openFile(filePath) {
     fs.readFile(filePath, (err, data) => {
+      if (err) {
+        dialog.showErrorBox('Sirius', err.message);
+        return;
+      }
       let windowId;
       let initialized = false;
       {
