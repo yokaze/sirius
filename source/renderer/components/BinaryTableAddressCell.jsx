@@ -6,7 +6,7 @@ import React, { Component } from 'react';
 const jss = create(preset());
 const styles = {
   default: {
-    display: 'inline-block',
+    display: 'block',
     marginBottom: '2px',
     marginLeft: '16px',
     marginRight: '6px',

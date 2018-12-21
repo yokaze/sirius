@@ -267,14 +267,19 @@ class BinaryTable extends Component {
       const viewModel = this.props.viewModel;
       const selectedRange = viewModel.getSelectedRange();
       const focusedAddress = selectedRange[0];
+      const addressCells = [];
+      for (let j = 0; j < this.state.rowCount + 3; j += 1) {
+        const rowAddress = (j + this.state.row) * columnCount;
+        const rowIndex = Math.floor(rowAddress / columnCount);
+        const text = sprintf('%08X', rowAddress);
+        const row = <BinaryTableAddressCell key={'BinaryTableAddressCell:' + (rowIndex % (this.state.rowCount + 3))} value={text} />;
+        addressCells.push(row);
+      }
+      items.push(<div key="address" style={{display: 'inline-block'}}>{addressCells}</div>);
+      const tableCells = [];
       for (let j = 0; j < this.state.rowCount; j += 1) {
         const rowAddress = (j + this.state.row) * columnCount;
         const rowIndex = Math.floor(rowAddress / columnCount);
-        {
-          const text = sprintf('%08X', rowAddress);
-          const row = <BinaryTableAddressCell key={'BinaryTableAddressCell:' + (rowIndex % this.state.rowCount)} value={text} />;
-          items.push(row);
-        }
         const values = viewModel.getBuffer(rowAddress, columnCount);
         if (this.tableData[rowIndex] === undefined) {
           this.tableData[rowIndex] = values;
@@ -309,7 +314,7 @@ class BinaryTable extends Component {
         if (rowSelectedRange[0] === rowSelectedRange[1]) {
           rowSelectedRange = undefined;
         }
-        items.push(<BinaryTableDataRow
+        tableCells.push(<BinaryTableDataRow
           key={'DataRow:' + (rowIndex % this.state.rowCount)}
           values={values}
           address={rowAddress}
@@ -319,8 +324,8 @@ class BinaryTable extends Component {
           onMouseDown={this.handleMouseDown}
           onMouseEnter={this.handleMouseEnter}
         />);
-        items.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
-        items.push(<BinaryTableExpressionRow
+        tableCells.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
+        tableCells.push(<BinaryTableExpressionRow
           key={'ExpressionRow:' + (rowIndex % this.state.rowCount)}
           listener={this}
           address={rowAddress}
@@ -329,8 +334,10 @@ class BinaryTable extends Component {
           focusIndex={rowFocusIndex}
           selectedRange={rowSelectedRange}
         />);
-        items.push(<br key={'br' + rowAddress} />);
+        tableCells.push(<br key={'br' + rowAddress} />);
       }
+      items.push(<div key="table" style={{display: 'inline-block'}}>{tableCells}</div>);
+      items.push(<br key="br-footer" />);
       items.push(<span key="binary-table-footer-row" className="binary-table-footer-row">
         <span key="address" className="binary-table-address">&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;</span>
         <div key={'write-mode'} className="binary-table-address">{(this.props.viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>
