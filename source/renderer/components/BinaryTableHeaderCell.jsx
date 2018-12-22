@@ -17,15 +17,17 @@ const styles = {
   },
 };
 const sheet = jss.createStyleSheet(styles, { link: true });
-const classes = sheet.attach().classes;
+const { classes } = sheet.attach();
 
 export default class BinaryTableHeaderCell extends Component {
   shouldComponentUpdate(nextProps) {
-    return (this.props.value !== nextProps.value);
+    const { value } = this.props;
+    return (value !== nextProps.value);
   }
 
   render() {
-    return <span key="span" className={classes.default}>{this.props.value}</span>;
+    const { value } = this.props;
+    return <span key="span" className={classes.default}>{value}</span>;
   }
 }
 

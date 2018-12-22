@@ -11,19 +11,18 @@ import RadioGroup from '@material-ui/core/RadioGroup';
 import SiriusConstants from '../common/SiriusConstants';
 import SiriusIpcClient from '../ipc/SiriusIpcClient';
 
-const defaultFontFamily = SiriusConstants.defaultFontFamily;
-const defaultFontSize = SiriusConstants.defaultFontSize;
+const { defaultFontFamily, defaultFontSize } = SiriusConstants;
 const defaultColumnUnit = 4;
 const ipcClient = new SiriusIpcClient();
 
 function sendPreference(state) {
-  let fontFamily = state.fontFamily;
+  let { fontFamily } = state;
   let fontSize = Math.min(Math.max(8, parseInt(state.fontSize, 10)), 96);
-  const columnUnit = state.columnUnit;
+  const { columnUnit } = state;
   if (fontFamily === '') {
     fontFamily = defaultFontFamily;
   }
-  if (isNaN(fontSize)) {
+  if (Number.isNaN(fontSize)) {
     fontSize = defaultFontSize;
   }
   ipcClient.sendPreferenceCommand({
@@ -55,7 +54,7 @@ class PreferencesView extends Component {
   }
 
   fontFamilyInputChanged(e) {
-    const value = e.target.value;
+    const { value } = e.target;
     this.setState((state) => {
       const diff = { fontFamily: value };
       sendPreference(Object.assign(state, diff));
@@ -64,7 +63,7 @@ class PreferencesView extends Component {
   }
 
   fontSizeInputChanged(e) {
-    const value = e.target.value;
+    const { value } = e.target;
     this.setState((state) => {
       const diff = { fontSize: value };
       sendPreference(Object.assign(state, diff));
@@ -82,32 +81,35 @@ class PreferencesView extends Component {
   }
 
   render() {
-    return (<div style={{ display: 'inline-block', width: '100%', height: '100%' }} onDragOver={handleDragOver} onDrop={handleDrop}>
-      <div style={{ margin: 16 }}>
-        <FormControl>
-          <FormLabel component="legend">Font Family</FormLabel>
-          <Input placeholder={defaultFontFamily} onChange={this.fontFamilyInputChanged} />
-        </FormControl>
-        <FormControl>
-          <FormLabel component="legend">Font Size</FormLabel>
-          <Input placeholder={`${defaultFontSize}`} onChange={this.fontSizeInputChanged} />
-        </FormControl>
-        <FormControl>
-          <FormLabel component="legend">Column Unit</FormLabel>
-          <RadioGroup
-            row
-            value={`${this.state.columnUnit}`}
-            onChange={this.columnUnitGroupChanged}
-          >
-            <FormControlLabel value="1" control={<Radio />} label="1" />
-            <FormControlLabel value="2" control={<Radio />} label="2" />
-            <FormControlLabel value="4" control={<Radio />} label="4" />
-            <FormControlLabel value="8" control={<Radio />} label="8" />
-            <FormControlLabel value="16" control={<Radio />} label="16" />
-          </RadioGroup>
-        </FormControl>
+    const { columnUnit } = this.state;
+    return (
+      <div style={{ display: 'inline-block', width: '100%', height: '100%' }} onDragOver={handleDragOver} onDrop={handleDrop}>
+        <div style={{ margin: 16 }}>
+          <FormControl>
+            <FormLabel component="legend">Font Family</FormLabel>
+            <Input placeholder={defaultFontFamily} onChange={this.fontFamilyInputChanged} />
+          </FormControl>
+          <FormControl>
+            <FormLabel component="legend">Font Size</FormLabel>
+            <Input placeholder={`${defaultFontSize}`} onChange={this.fontSizeInputChanged} />
+          </FormControl>
+          <FormControl>
+            <FormLabel component="legend">Column Unit</FormLabel>
+            <RadioGroup
+              row
+              value={`${columnUnit}`}
+              onChange={this.columnUnitGroupChanged}
+            >
+              <FormControlLabel value="1" control={<Radio />} label="1" />
+              <FormControlLabel value="2" control={<Radio />} label="2" />
+              <FormControlLabel value="4" control={<Radio />} label="4" />
+              <FormControlLabel value="8" control={<Radio />} label="8" />
+              <FormControlLabel value="16" control={<Radio />} label="16" />
+            </RadioGroup>
+          </FormControl>
+        </div>
       </div>
-    </div>);
+    );
   }
 }
 

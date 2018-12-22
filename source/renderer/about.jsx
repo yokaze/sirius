@@ -11,13 +11,19 @@ function handleDrop(e) {
 }
 
 function AboutView() {
-  return (<div style={{ display: 'inline-block', width: '100%', height: '100%' }} onDragOver={handleDragOver} onDrop={handleDrop}>
-    <div style={{ margin: 16 }}>
-      <h1>Sirius</h1>
-      <p>(C) 2018 Rue Yokaze.</p>
-      <p>Distributed under the MIT License.</p>
+  return (
+    <div
+      style={{ display: 'inline-block', width: '100%', height: '100%' }}
+      onDragOver={handleDragOver}
+      onDrop={handleDrop}
+    >
+      <div style={{ margin: 16 }}>
+        <h1>Sirius</h1>
+        <p>(C) 2018 Rue Yokaze.</p>
+        <p>Distributed under the MIT License.</p>
+      </div>
     </div>
-  </div>);
+  );
 }
 
 ReactDOM.render(

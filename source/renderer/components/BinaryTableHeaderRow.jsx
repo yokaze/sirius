@@ -5,12 +5,14 @@ import BinaryTableHeaderCell from './BinaryTableHeaderCell';
 
 export default class BinaryTableHeaderRow extends Component {
   shouldComponentUpdate(nextProps) {
-    return this.props.columnCount !== nextProps.columnCount;
+    const { columnCount } = this.props;
+    return columnCount !== nextProps.columnCount;
   }
 
   render() {
+    const { columnCount } = this.props;
     const cells = [];
-    for (let i = 0; i < this.props.columnCount; i += 1) {
+    for (let i = 0; i < columnCount; i += 1) {
       let title = i.toString(16).toUpperCase();
       title = (i < 16) ? `+${title}` : title;
       cells.push(<BinaryTableHeaderCell key={i} value={title} />);
