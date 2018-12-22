@@ -356,10 +356,9 @@ class BinaryTable extends Component {
   }
 
   handleKeyDown(e) {
-    const keyCode = e.keyCode;
-    const shiftKey = e.shiftKey;
+    const { keyCode, shiftKey } = e;
     const handler = (state) => {
-      const viewModel = this.props.viewModel;
+      const { viewModel } = this.props;
       const handleTypeHex = (value) => {
         if (viewModel.getWriteMode() === WriteMode.Overwrite) {
           viewModel.processCharacter(value);
@@ -368,7 +367,7 @@ class BinaryTable extends Component {
         }
       };
 
-      const columnCount = state.columnCount;
+      const { columnCount } = state;
       if ((keyCode >= 48) && (keyCode <= 57)) {
         handleTypeHex(keyCode - 48);
       } else if ((keyCode >= 65) && (keyCode <= 70)) {
@@ -545,9 +544,7 @@ class BinaryTable extends Component {
 
   onAddressResized(contentRect) {
     const addressWidth = contentRect.entry.width;
-    this.setState(state =>
-      this.complementStateChange(state, { addressWidth }),
-    );
+    this.setState(state => this.complementStateChange(state, { addressWidth }));
   }
 
   onViewModelReloaded() {
@@ -565,7 +562,7 @@ class BinaryTable extends Component {
   }
 
   onExpressionCellMouseDown(address, e) {
-    const shiftKey = e.shiftKey;
+    const { shiftKey } = e;
 
     const handler = () => {
       if (shiftKey === false) {
@@ -578,7 +575,7 @@ class BinaryTable extends Component {
   }
 
   onExpressionCellMouseEnter(address, e) {
-    const buttons = e.buttons;
+    const { buttons } = e;
 
     const handler = () => {
       if (buttons === 1) {
