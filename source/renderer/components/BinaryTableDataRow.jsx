@@ -23,9 +23,9 @@ export default class BinaryTableDataRow extends Component {
 
   render() {
     const {
-      listener, length, values, focusIndex,
+      listener, length, values, focusIndex, measured,
     } = this.props;
-    const rowAddress = this.props.address;
+    const { address: rowAddress } = this.props;
     let { selectedRange } = this.props;
     if (selectedRange === undefined) {
       selectedRange = [0, 0];
@@ -34,6 +34,7 @@ export default class BinaryTableDataRow extends Component {
     const children = [];
     for (let i = 0; i < length; i += 1) {
       const cellAddress = rowAddress + i;
+      const cellMesaured = measured && (i === 0);
       const value = values[i];
       const focused = (i === focusIndex);
       const selected = (selectedRange[0] <= i) && (i < selectedRange[1]);
@@ -45,6 +46,7 @@ export default class BinaryTableDataRow extends Component {
           value={value}
           focused={focused}
           selected={selected}
+          measured={cellMesaured}
         />
       );
       children.push(cell);
@@ -71,6 +73,7 @@ BinaryTableDataRow.propTypes = {
   values: PropTypes.instanceOf(Uint8Array).isRequired,
   focusIndex: PropTypes.number,
   selectedRange: PropTypes.arrayOf(PropTypes.number),
+  measured: PropTypes.bool.isRequired,
 };
 
 BinaryTableDataRow.defaultProps = {

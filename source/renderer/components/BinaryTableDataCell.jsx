@@ -2,16 +2,17 @@ import { create } from 'jss';
 import preset from 'jss-preset-default';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import Measure from 'react-measure';
 import { sprintf } from 'sprintf-js';
 
 const jss = create(preset());
 const styles = {
   default: {
     display: 'inline-block',
-    marginBottom: '2px',
-    marginLeft: '5px',
-    marginRight: '5px',
-    marginTop: '2px',
+    paddingBottom: '2px',
+    paddingLeft: '5px',
+    paddingRight: '5px',
+    paddingTop: '2px',
     textAlign: 'center',
   },
   focused: {
@@ -43,6 +44,7 @@ export default class BinaryTableDataCell extends Component {
     super(props);
     this.handleMouseDown = this.handleMouseDown.bind(this);
     this.handleMouseEnter = this.handleMouseEnter.bind(this);
+    this.handleResize = this.handleResize.bind(this);
   }
 
   shouldComponentUpdate(nextProps) {
@@ -66,8 +68,16 @@ export default class BinaryTableDataCell extends Component {
     listener.onDataCellMouseEnter(address, e);
   }
 
+  handleResize(contentRect) {
+    const { width, height } = contentRect.entry;
+    const { listener } = this.props;
+    listener.onDataCellResized({ width, height });
+  }
+
   render() {
-    const { value, focused, selected } = this.props;
+    const {
+      value, focused, selected, measured,
+    } = this.props;
     let className = classes.default;
     if (selected) {
       className = classes.selected;
@@ -76,6 +86,25 @@ export default class BinaryTableDataCell extends Component {
     }
     const valid = (value !== undefined);
     const text = valid ? sprintf('%02X', value) : '--';
+    if (measured) {
+      return (
+        <Measure onResize={this.handleResize}>
+          {({ measureRef }) => (
+            <span ref={measureRef} style={{ display: 'inline-block' }}>
+              <span
+                key="span"
+                className={className}
+                onMouseDown={this.handleMouseDown}
+                onMouseEnter={this.handleMouseEnter}
+              >
+                {text}
+              </span>
+            </span>
+          )
+        }
+        </Measure>
+      );
+    }
     return (
       <span
         key="span"
@@ -104,6 +133,7 @@ BinaryTableDataCell.setFontSize = (fontSize) => {
 
 BinaryTableDataCell.propTypes = {
   listener: PropTypes.shape({
+    onDataCellResized: PropTypes.function,
     onDataCellMouseDown: PropTypes.function,
     onDataCellMouseEnter: PropTypes.function,
   }).isRequired,
@@ -111,6 +141,7 @@ BinaryTableDataCell.propTypes = {
   value: PropTypes.number,
   focused: PropTypes.bool.isRequired,
   selected: PropTypes.bool.isRequired,
+  measured: PropTypes.bool.isRequired,
 };
 
 BinaryTableDataCell.defaultProps = {

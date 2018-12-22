@@ -218,6 +218,7 @@ class BinaryTable extends Component {
       addressWidth: 0,
       fontFamily: SiriusConstants.defaultFontFamily,
       fontSize: SiriusConstants.defaultFontSize,
+      rowHeight: 0,
     };
     this.cache = {
       floatRow: 0,
@@ -319,6 +320,7 @@ class BinaryTable extends Component {
           length={columnCount}
           focusIndex={rowFocusIndex}
           selectedRange={rowSelectedRange}
+          measured={j === 0}
         />);
         tableCells.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
         tableCells.push(<BinaryTableExpressionRow
@@ -498,6 +500,11 @@ class BinaryTable extends Component {
     this.setState(handler);
   }
 
+  onDataCellResized(size) {
+    const diff = { dataCellWidth: size.width, rowHeight: size.height };
+    this.setState(state => this.complementStateChange(state, diff));
+  }
+
   handleDragOver(e) {
     e.preventDefault();
   }
@@ -521,13 +528,17 @@ class BinaryTable extends Component {
   }
 
   complementStateChange(state, diff) {
-    if (diff.addressWidth || diff.totalWidth || diff.tableHeight || diff.columnUnit) {
+    if (diff.addressWidth || diff.totalWidth || diff.tableHeight || diff.columnUnit || diff.rowHeight) {
       if ((diff.columnCount === undefined) || (diff.rowCount === undefined)) {
         const nextState = Object.assign(state, diff);
         if (nextState.addressWidth === undefined) {
           return diff;
         }
-        const rowCount = Math.floor((nextState.tableHeight / 25) - 2);
+        let rowCount = 1;
+        if (nextState.rowHeight !== 0) {
+          //  2 for excluding header and footer
+          rowCount = Math.floor((nextState.tableHeight / nextState.rowHeight) - 2);
+        }
         let columnCount = Math.floor(Math.max(nextState.columnUnit, (nextState.totalWidth - nextState.addressWidth - 24 - 22 - 1) / 46));
         columnCount = Math.floor(columnCount / nextState.columnUnit) * nextState.columnUnit;
         return Object.assign(diff, { rowCount, columnCount });
