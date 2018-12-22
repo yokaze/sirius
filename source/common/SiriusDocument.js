@@ -48,6 +48,10 @@ export default class SiriusDocument {
     return new Uint8Array(this.fileData);
   }
 
+  getFileSize() {
+    return this.fileData.length;
+  }
+
   setFileData(fileData) {
     assert(fileData instanceof Uint8Array);
     this.fileData = [...fileData];

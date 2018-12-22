@@ -6,6 +6,7 @@ import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
 import { sprintf } from 'sprintf-js';
 
+import BinaryTableAddressArea from './components/BinaryTableAddressArea';
 import BinaryTableAddressCell from './components/BinaryTableAddressCell';
 import BinaryTableDataRow from './components/BinaryTableDataRow';
 import BinaryTableExpressionRow from './components/BinaryTableExpressionRow';
@@ -96,7 +97,7 @@ class BinaryTableViewModel {
   }
 
   getFileSize() {
-    return this.document.getFileData().length;
+    return this.document.getFileSize();
   }
 
   getSelectedRange() {
@@ -267,15 +268,13 @@ class BinaryTable extends Component {
       const viewModel = this.props.viewModel;
       const selectedRange = viewModel.getSelectedRange();
       const focusedAddress = selectedRange[0];
-      const addressCells = [];
-      for (let j = 0; j < this.state.rowCount + 3; j += 1) {
-        const rowAddress = (j + this.state.row) * columnCount;
-        const rowIndex = Math.floor(rowAddress / columnCount);
-        const text = sprintf('%08X', rowAddress);
-        const row = <BinaryTableAddressCell key={'BinaryTableAddressCell:' + (rowIndex % (this.state.rowCount + 3))} value={text} />;
-        addressCells.push(row);
+      {
+        const addresses = new Float64Array(this.state.rowCount);
+        for (let j = 0; j < this.state.rowCount; j += 1) {
+          addresses[j] = (j + this.state.row) * columnCount;
+        }
+        items.push(<BinaryTableAddressArea key="BinaryTableAddressArea" addresses={addresses} />);
       }
-      items.push(<div key="address" style={{display: 'inline-block'}}>{addressCells}</div>);
       const tableCells = [];
       for (let j = 0; j < this.state.rowCount; j += 1) {
         const rowAddress = (j + this.state.row) * columnCount;
@@ -336,7 +335,7 @@ class BinaryTable extends Component {
         />);
         tableCells.push(<br key={'br' + rowAddress} />);
       }
-      items.push(<div key="table" style={{display: 'inline-block'}}>{tableCells}</div>);
+      items.push(<div key="table" style={{ display: 'inline-block' }}>{tableCells}</div>);
       items.push(<br key="br-footer" />);
       items.push(<span key="binary-table-footer-row" className="binary-table-footer-row">
         <span key="address" className="binary-table-address">&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;</span>

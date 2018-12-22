@@ -6,11 +6,10 @@ import React, { Component } from 'react';
 const jss = create(preset());
 const styles = {
   default: {
-    display: 'block',
-    marginBottom: '2px',
-    marginLeft: '16px',
-    marginRight: '6px',
-    marginTop: '2px',
+    paddingBottom: '2px',
+    paddingLeft: '16px',
+    paddingRight: '6px',
+    paddingTop: '2px',
     textAlign: 'right',
   },
 };
@@ -23,7 +22,7 @@ export default class BinaryTableAddressCell extends Component {
   }
 
   render() {
-    return <span key="span" className={classes.default}>{this.props.value}</span>;
+    return <div key="div" className={classes.default}>{this.props.value}</div>;
   }
 }
 
