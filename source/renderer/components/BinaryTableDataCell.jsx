@@ -38,6 +38,9 @@ const styles = {
     outline: '0',
     textAlign: 'center',
   },
+  container: {
+    display: 'inline-block',
+  },
 };
 const sheet = jss.createStyleSheet(styles, { link: true });
 const { classes } = sheet.attach();
@@ -89,26 +92,7 @@ export default class BinaryTableDataCell extends Component {
     }
     const valid = (value !== undefined);
     const text = valid ? sprintf('%02X', value) : '--';
-    if (measured) {
-      return (
-        <Measure onResize={this.handleResize}>
-          {({ measureRef }) => (
-            <span ref={measureRef} style={{ display: 'inline-block' }}>
-              <span
-                key="span"
-                className={className}
-                onMouseDown={this.handleMouseDown}
-                onMouseEnter={this.handleMouseEnter}
-              >
-                {text}
-              </span>
-            </span>
-          )
-        }
-        </Measure>
-      );
-    }
-    return (
+    const content = (
       <span
         key="span"
         className={className}
@@ -118,6 +102,19 @@ export default class BinaryTableDataCell extends Component {
         {text}
       </span>
     );
+    if (measured) {
+      return (
+        <Measure onResize={this.handleResize}>
+          {({ measureRef }) => (
+            <span ref={measureRef} className={classes.container}>
+              {content}
+            </span>
+          )
+        }
+        </Measure>
+      );
+    }
+    return content;
   }
 }
 
