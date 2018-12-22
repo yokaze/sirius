@@ -225,8 +225,6 @@ class BinaryTable extends Component {
     this.tableData = { };
     this.containerReference = React.createRef();
     this.handleKeyDown = this.handleKeyDown.bind(this);
-    this.onDataCellMouseDown = this.onDataCellMouseDown.bind(this);
-    this.onDataCellMouseEnter = this.onDataCellMouseEnter.bind(this);
     this.handleDragOver = this.handleDragOver.bind(this);
     this.handleDrop = this.handleDrop.bind(this);
     this.handleWheel = this.handleWheel.bind(this);
@@ -475,8 +473,7 @@ class BinaryTable extends Component {
     this.setState(handler);
   }
 
-  onDataCellMouseDown(sender, e) {
-    const address = sender.props.address;
+  onDataCellMouseDown(address, e) {
     const shiftKey = e.shiftKey;
 
     const handler = () => {
@@ -489,13 +486,12 @@ class BinaryTable extends Component {
     this.setState(handler);
   }
 
-  onDataCellMouseEnter(sender, e) {
+  onDataCellMouseEnter(address, e) {
     const buttons = e.buttons;
     if (buttons !== 1) {
       return;
     }
 
-    const address = sender.props.address;
     const handler = () => {
       this.props.viewModel.setSelectionEndAddress(address);
       return { };

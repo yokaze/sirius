@@ -54,11 +54,11 @@ export default class BinaryTableDataCell extends Component {
   }
 
   handleMouseDown(e) {
-    this.props.onMouseDown(this, e);
+    this.props.listener.onDataCellMouseDown(this.props.address, e);
   }
 
   handleMouseEnter(e) {
-    this.props.onMouseEnter(this, e);
+    this.props.listener.onDataCellMouseEnter(this.props.address, e);
   }
 
   render() {
@@ -93,12 +93,14 @@ BinaryTableDataCell.setFontSize = (fontSize) => {
 };
 
 BinaryTableDataCell.propTypes = {
+  listener: PropTypes.shape({
+    onDataCellMouseDown: PropTypes.function,
+    onDataCellMouseEnter: PropTypes.function,
+  }).isRequired,
   address: PropTypes.number.isRequired,
   value: PropTypes.number,
   focused: PropTypes.bool.isRequired,
   selected: PropTypes.bool.isRequired,
-  onMouseDown: PropTypes.func.isRequired,
-  onMouseEnter: PropTypes.func.isRequired,
 };
 
 BinaryTableDataCell.defaultProps = {

@@ -23,8 +23,7 @@ export default class BinaryTableDataRow extends Component {
     const values = props.values;
     const length = props.length;
     const rowAddress = props.address;
-    const onMouseDown = props.listener.onDataCellMouseDown;
-    const onMouseEnter = props.listener.onDataCellMouseEnter;
+    const listener = props.listener;
     const focusIndex = props.focusIndex;
     let selectedRange = props.selectedRange;
     if (selectedRange === undefined) {
@@ -39,12 +38,11 @@ export default class BinaryTableDataRow extends Component {
       const selected = (selectedRange[0] <= i) && (i < selectedRange[1]);
       const cell = (<BinaryTableDataCell
         key={i}
+        listener={listener}
         address={cellAddress}
         value={value}
         focused={focused}
         selected={selected}
-        onMouseDown={onMouseDown}
-        onMouseEnter={onMouseEnter}
       />);
       children.push(cell);
     }
