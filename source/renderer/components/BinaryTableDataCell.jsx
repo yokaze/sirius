@@ -8,6 +8,7 @@ import { sprintf } from 'sprintf-js';
 const jss = create(preset());
 const styles = {
   default: {
+    cursor: 'text',
     display: 'inline-block',
     paddingBottom: '2px',
     paddingLeft: '5px',
@@ -19,6 +20,7 @@ const styles = {
     border: '2px',
     borderColor: 'silver',
     borderStyle: 'solid',
+    cursor: 'text',
     display: 'inline-block',
     paddingLeft: '3px',
     paddingRight: '3px',
@@ -27,6 +29,7 @@ const styles = {
   },
   selected: {
     backgroundColor: 'silver',
+    cursor: 'text',
     display: 'inline-block',
     paddingBottom: '2px',
     paddingLeft: '5px',

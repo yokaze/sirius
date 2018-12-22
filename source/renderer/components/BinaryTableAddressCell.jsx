@@ -6,6 +6,7 @@ import React, { Component } from 'react';
 const jss = create(preset());
 const styles = {
   default: {
+    cursor: 'default',
     paddingBottom: '2px',
     paddingLeft: '16px',
     paddingRight: '6px',

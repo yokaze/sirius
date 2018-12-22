@@ -6,6 +6,7 @@ import React, { Component } from 'react';
 const jss = create(preset());
 const styles = {
   default: {
+    cursor: 'default',
     display: 'inline-block',
     fontFamily: 'Roboto Mono, monospace',
     fontSize: '16px',

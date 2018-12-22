@@ -6,17 +6,19 @@ import React, { Component } from 'react';
 const jss = create(preset());
 const styles = {
   default: {
+    cursor: 'text',
     display: 'inline-block',
-    marginBottom: '2px',
-    marginLeft: '1px',
-    marginRight: '1px',
-    marginTop: '2px',
+    paddingBottom: '2px',
+    paddingLeft: '1px',
+    paddingRight: '1px',
+    paddingTop: '2px',
     textAlign: 'center',
   },
   focused: {
     border: '2px',
     borderColor: 'silver',
     borderStyle: 'solid',
+    cursor: 'text',
     display: 'inline-block',
     marginLeft: '-1px',
     marginRight: '-1px',
@@ -24,6 +26,7 @@ const styles = {
   },
   selected: {
     backgroundColor: 'silver',
+    cursor: 'text',
     display: 'inline-block',
     paddingBottom: '2px',
     paddingLeft: '1px',
