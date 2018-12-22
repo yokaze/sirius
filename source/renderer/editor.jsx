@@ -218,6 +218,8 @@ class BinaryTable extends Component {
       addressWidth: 0,
       fontFamily: SiriusConstants.defaultFontFamily,
       fontSize: SiriusConstants.defaultFontSize,
+      dataCellWidth: 0,
+      expressionCellWidth: 0,
       rowHeight: 0,
     };
     this.cache = {
@@ -331,6 +333,7 @@ class BinaryTable extends Component {
           values={this.tableData[rowIndex]}
           focusIndex={rowFocusIndex}
           selectedRange={rowSelectedRange}
+          measured={j === 0}
         />);
         tableCells.push(<br key={'br' + rowAddress} />);
       }
@@ -528,7 +531,7 @@ class BinaryTable extends Component {
   }
 
   complementStateChange(state, diff) {
-    if (diff.addressWidth || diff.totalWidth || diff.tableHeight || diff.columnUnit || diff.rowHeight) {
+    if (diff.addressWidth || diff.totalWidth || diff.tableHeight || diff.columnUnit || diff.rowHeight || diff.dataCellWidth || diff.expressionCellWidth) {
       if ((diff.columnCount === undefined) || (diff.rowCount === undefined)) {
         const nextState = Object.assign(state, diff);
         if (nextState.addressWidth === undefined) {
@@ -539,8 +542,12 @@ class BinaryTable extends Component {
           //  2 for excluding header and footer
           rowCount = Math.floor((nextState.tableHeight / nextState.rowHeight) - 2);
         }
-        let columnCount = Math.floor(Math.max(nextState.columnUnit, (nextState.totalWidth - nextState.addressWidth - 24 - 22 - 1) / 46));
-        columnCount = Math.floor(columnCount / nextState.columnUnit) * nextState.columnUnit;
+        let columnCount = 1;
+        if ((nextState.dataCellWidth !== 0) && (nextState.expressionCellWidth !== 0)) {
+          const cellWidth = nextState.dataCellWidth + nextState.expressionCellWidth;
+          columnCount = Math.floor(Math.max(nextState.columnUnit, (nextState.totalWidth - nextState.addressWidth - cellWidth - 1) / cellWidth));
+        }
+        columnCount = Math.max(1, Math.floor(columnCount / nextState.columnUnit) * nextState.columnUnit);
         return Object.assign(diff, { rowCount, columnCount });
       }
     }
@@ -595,6 +602,11 @@ class BinaryTable extends Component {
       return { };
     };
     this.setState(handler);
+  }
+
+  onExpressionCellResized(size) {
+    const diff = { expressionCellWidth: size.width };
+    this.setState(state => this.complementStateChange(state, diff));
   }
 
   static limitRowNumber(row, columnCount, fileSize) {

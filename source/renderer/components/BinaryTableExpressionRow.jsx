@@ -17,7 +17,7 @@ export default class BinaryTableExpressionRow extends Component {
 
   render() {
     const {
-      listener, address, length, focusIndex, values,
+      listener, address, length, values, focusIndex, measured,
     } = this.props;
     let { selectedRange } = this.props;
     if (selectedRange === undefined) {
@@ -39,6 +39,7 @@ export default class BinaryTableExpressionRow extends Component {
       }
       const focused = (i === focusIndex);
       const selected = (selectedRange[0] <= i) && (i < selectedRange[1]);
+      const cellMeasured = measured && (i === 0);
       children.push(<BinaryTableExpressionCell
         key={i.toString()}
         listener={listener}
@@ -46,6 +47,7 @@ export default class BinaryTableExpressionRow extends Component {
         value={text}
         focused={focused}
         selected={selected}
+        measured={cellMeasured}
       />);
     }
     return <span key="span">{children}</span>;
@@ -61,15 +63,13 @@ BinaryTableExpressionRow.setFontSize = (fontSize) => {
 };
 
 BinaryTableExpressionRow.propTypes = {
-  listener: PropTypes.shape({
-    onExpressionCellMouseDown: PropTypes.function,
-    onExpressionCellMouseEnter: PropTypes.function,
-  }).isRequired,
+  listener: PropTypes.shape({}).isRequired,
   address: PropTypes.number.isRequired,
   length: PropTypes.number.isRequired,
+  values: PropTypes.instanceOf(Uint8Array).isRequired,
   focusIndex: PropTypes.number,
   selectedRange: PropTypes.arrayOf(PropTypes.number),
-  values: PropTypes.instanceOf(Uint8Array).isRequired,
+  measured: PropTypes.bool.isRequired,
 };
 
 BinaryTableExpressionRow.defaultProps = {

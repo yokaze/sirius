@@ -2,6 +2,7 @@ import { create } from 'jss';
 import preset from 'jss-preset-default';
 import PropTypes from 'prop-types';
 import React, { Component } from 'react';
+import Measure from 'react-measure';
 
 const jss = create(preset());
 const styles = {
@@ -34,6 +35,9 @@ const styles = {
     paddingTop: '2px',
     textAlign: 'center',
   },
+  container: {
+    display: 'inline-block',
+  },
 };
 const sheet = jss.createStyleSheet(styles, { link: true });
 const { classes } = sheet.attach();
@@ -41,8 +45,9 @@ const { classes } = sheet.attach();
 export default class BinaryTableExpressionCell extends Component {
   constructor(props) {
     super(props);
-    this.onMouseDown = this.onMouseDown.bind(this);
-    this.onMouseEnter = this.onMouseEnter.bind(this);
+    this.handleMouseDown = this.handleMouseDown.bind(this);
+    this.handleMouseEnter = this.handleMouseEnter.bind(this);
+    this.handleResize = this.handleResize.bind(this);
   }
 
   shouldComponentUpdate(nextProps) {
@@ -53,34 +58,55 @@ export default class BinaryTableExpressionCell extends Component {
     return changed;
   }
 
-  onMouseDown(e) {
+  handleMouseDown(e) {
     const { listener, address } = this.props;
     listener.onExpressionCellMouseDown(address, e);
   }
 
-  onMouseEnter(e) {
+  handleMouseEnter(e) {
     const { listener, address } = this.props;
     listener.onExpressionCellMouseEnter(address, e);
   }
 
+  handleResize(contentRect) {
+    const { width, height } = contentRect.entry;
+    const { listener } = this.props;
+    listener.onExpressionCellResized({ width, height });
+  }
+
   render() {
-    const { focused, selected, value } = this.props;
+    const {
+      value, focused, selected, measured,
+    } = this.props;
     let className = classes.default;
     if (selected) {
       className = classes.selected;
     } else if (focused) {
       className = classes.focused;
     }
-    return (
+    const content = (
       <span
         key="span"
         className={className}
-        onMouseDown={this.onMouseDown}
-        onMouseEnter={this.onMouseEnter}
+        onMouseDown={this.handleMouseDown}
+        onMouseEnter={this.handleMouseEnter}
       >
         {value}
       </span>
     );
+    if (measured) {
+      return (
+        <Measure onResize={this.handleResize}>
+          {({ measureRef }) => (
+            <span ref={measureRef} className={classes.container}>
+              {content}
+            </span>
+          )
+        }
+        </Measure>
+      );
+    }
+    return content;
   }
 }
 
@@ -101,9 +127,11 @@ BinaryTableExpressionCell.propTypes = {
   listener: PropTypes.shape({
     onExpressionCellMouseDown: PropTypes.function,
     onExpressionCellMouseEnter: PropTypes.function,
+    onExpressionCellResized: PropTypes.function,
   }).isRequired,
   address: PropTypes.number.isRequired,
+  value: PropTypes.string.isRequired,
   focused: PropTypes.bool.isRequired,
   selected: PropTypes.bool.isRequired,
-  value: PropTypes.string.isRequired,
+  measured: PropTypes.bool.isRequired,
 };

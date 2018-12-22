@@ -64,10 +64,7 @@ BinaryTableDataRow.setFontSize = (fontSize) => {
 };
 
 BinaryTableDataRow.propTypes = {
-  listener: PropTypes.shape({
-    onDataCellMouseDown: PropTypes.function,
-    onDataCellMouseEnter: PropTypes.function,
-  }).isRequired,
+  listener: PropTypes.shape({}).isRequired,
   address: PropTypes.number.isRequired,
   length: PropTypes.number.isRequired,
   values: PropTypes.instanceOf(Uint8Array).isRequired,
