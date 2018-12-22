@@ -14,15 +14,17 @@ const styles = {
   },
 };
 const sheet = jss.createStyleSheet(styles, { link: true });
-const classes = sheet.attach().classes;
+const { classes } = sheet.attach();
 
 export default class BinaryTableAddressCell extends Component {
   shouldComponentUpdate(nextProps) {
-    return this.props.value !== nextProps.value;
+    const { value } = this.props;
+    return value !== nextProps.value;
   }
 
   render() {
-    return <div key="div" className={classes.default}>{this.props.value}</div>;
+    const { value } = this.props;
+    return <div key="div" className={classes.default}>{value}</div>;
   }
 }
 

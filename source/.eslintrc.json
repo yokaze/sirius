@@ -1,7 +1,6 @@
 {
     "extends": "airbnb",
     "rules": {
-        "jsx-a11y/href-no-hash": [0],
         "jsx-a11y/no-static-element-interactions": [0],
         "no-underscore-dangle": [0],
         "react/no-typos": [0]

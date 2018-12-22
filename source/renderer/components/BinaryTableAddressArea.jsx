@@ -13,16 +13,18 @@ const styles = {
   },
 };
 const sheet = jss.createStyleSheet(styles, { link: true });
-const classes = sheet.attach().classes;
+const { classes } = sheet.attach();
 
 export default class BinaryTableAddressArea extends Component {
   shouldComponentUpdate(nextProps) {
-    return this.props.addresses !== nextProps.addresses;
+    const { addresses } = this.props;
+    return addresses !== nextProps.addresses;
   }
 
   render() {
+    const { addresses } = this.props;
     const items = [];
-    this.props.addresses.forEach((address) => {
+    addresses.forEach((address) => {
       const text = sprintf('%08X', address);
       items.push(<BinaryTableAddressCell key={address} value={text} />);
     });
