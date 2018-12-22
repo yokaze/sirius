@@ -225,8 +225,8 @@ class BinaryTable extends Component {
     this.tableData = { };
     this.containerReference = React.createRef();
     this.handleKeyDown = this.handleKeyDown.bind(this);
-    this.handleMouseDown = this.handleMouseDown.bind(this);
-    this.handleMouseEnter = this.handleMouseEnter.bind(this);
+    this.onDataCellMouseDown = this.onDataCellMouseDown.bind(this);
+    this.onDataCellMouseEnter = this.onDataCellMouseEnter.bind(this);
     this.handleDragOver = this.handleDragOver.bind(this);
     this.handleDrop = this.handleDrop.bind(this);
     this.handleWheel = this.handleWheel.bind(this);
@@ -315,13 +315,12 @@ class BinaryTable extends Component {
         }
         tableCells.push(<BinaryTableDataRow
           key={'DataRow:' + (rowIndex % this.state.rowCount)}
+          listener={this}
           values={values}
           address={rowAddress}
           length={columnCount}
           focusIndex={rowFocusIndex}
           selectedRange={rowSelectedRange}
-          onMouseDown={this.handleMouseDown}
-          onMouseEnter={this.handleMouseEnter}
         />);
         tableCells.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
         tableCells.push(<BinaryTableExpressionRow
@@ -476,7 +475,7 @@ class BinaryTable extends Component {
     this.setState(handler);
   }
 
-  handleMouseDown(sender, e) {
+  onDataCellMouseDown(sender, e) {
     const address = sender.props.address;
     const shiftKey = e.shiftKey;
 
@@ -490,7 +489,7 @@ class BinaryTable extends Component {
     this.setState(handler);
   }
 
-  handleMouseEnter(sender, e) {
+  onDataCellMouseEnter(sender, e) {
     const buttons = e.buttons;
     if (buttons !== 1) {
       return;

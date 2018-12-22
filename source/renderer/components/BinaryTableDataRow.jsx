@@ -19,13 +19,14 @@ export default class BinaryTableDataRow extends Component {
   }
 
   render() {
-    const values = this.props.values;
-    const length = this.props.length;
-    const rowAddress = this.props.address;
-    const onMouseDown = this.props.onMouseDown;
-    const onMouseEnter = this.props.onMouseEnter;
-    const focusIndex = this.props.focusIndex;
-    let selectedRange = this.props.selectedRange;
+    const props = this.props;
+    const values = props.values;
+    const length = props.length;
+    const rowAddress = props.address;
+    const onMouseDown = props.listener.onDataCellMouseDown;
+    const onMouseEnter = props.listener.onDataCellMouseEnter;
+    const focusIndex = props.focusIndex;
+    let selectedRange = props.selectedRange;
     if (selectedRange === undefined) {
       selectedRange = [0, 0];
     }
@@ -60,13 +61,15 @@ BinaryTableDataRow.setFontSize = (fontSize) => {
 };
 
 BinaryTableDataRow.propTypes = {
+  listener: PropTypes.shape({
+    onDataCellMouseDown: PropTypes.function,
+    onDataCellMouseEnter: PropTypes.function,
+  }).isRequired,
   address: PropTypes.number.isRequired,
   length: PropTypes.number.isRequired,
   values: PropTypes.instanceOf(Uint8Array).isRequired,
   focusIndex: PropTypes.number,
   selectedRange: PropTypes.arrayOf(PropTypes.number),
-  onMouseDown: PropTypes.func.isRequired,
-  onMouseEnter: PropTypes.func.isRequired,
 };
 
 BinaryTableDataRow.defaultProps = {
