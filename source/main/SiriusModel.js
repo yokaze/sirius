@@ -6,6 +6,7 @@ import uuid from 'uuid/v4';
 
 import SiriusClipboard from '../common/SiriusClipboard';
 import SiriusDocument from '../common/SiriusDocument';
+import SiriusFileHandle from './SiriusFileHandle';
 import SiriusIpcCommand from '../ipc/SiriusIpcCommand';
 
 export default class SiriusModel {
@@ -205,39 +206,40 @@ export default class SiriusModel {
   }
 
   _openFile(filePath) {
-    fs.readFile(filePath, (err, data) => {
-      if (err) {
-        dialog.showErrorBox('Sirius', err.message);
-        return;
-      }
-      let windowId;
-      let initialized = false;
-      {
-        //  If a blank document window is focused, open document in it.
-        const currentWindow = BrowserWindow.getFocusedWindow();
-        if (currentWindow) {
-          const currentHandle = this.handles[currentWindow.id];
-          const doc = this.documents.get(currentHandle);
-          if (doc.isBlankDocument()) {
-            windowId = currentWindow.id;
-            initialized = true;
-          }
+    let fileHandle;
+    try {
+      fileHandle = new SiriusFileHandle(filePath);
+    } catch (e) {
+      dialog.showErrorBox('Sirius', e.message);
+      return;
+    }
+    let windowId;
+    let initialized = false;
+    {
+      //  If a blank document window is focused, open document in it.
+      const currentWindow = BrowserWindow.getFocusedWindow();
+      if (currentWindow) {
+        const currentHandle = this.handles[currentWindow.id];
+        const doc = this.documents.get(currentHandle);
+        if (doc.isBlankDocument()) {
+          windowId = currentWindow.id;
+          initialized = true;
         }
       }
-      if (windowId === undefined) {
-        windowId = this.openEditor();
-      }
-      const doc = new SiriusDocument();
-      doc.setClipboard(this.clipboard);
-      BrowserWindow.fromId(windowId).setTitle(filePath);
-      doc.setFileData(data);
-      const handle = uuid();
-      this.handles[windowId] = handle;
-      this.documents.set(handle, doc);
+    }
+    if (windowId === undefined) {
+      windowId = this.openEditor();
+    }
+    const doc = new SiriusDocument();
+    doc.setClipboard(this.clipboard);
+    doc.setFileHandle(fileHandle);
+    BrowserWindow.fromId(windowId).setTitle(filePath);
+    const handle = uuid();
+    this.handles[windowId] = handle;
+    this.documents.set(handle, doc);
 
-      if (initialized) {
-        this.updateWindowBinary(windowId);
-      }
-    });
+    if (initialized) {
+      this.updateWindowBinary(windowId);
+    }
   }
 }

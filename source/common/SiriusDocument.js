@@ -1,4 +1,5 @@
 import assert from 'assert';
+
 import SiriusClipboard from './SiriusClipboard';
 import SiriusDocumentCommand from './SiriusDocumentCommand';
 
@@ -8,6 +9,14 @@ export default class SiriusDocument {
     this.undoBuffer = [];
     this.redoBuffer = [];
     this.clipboard = new SiriusClipboard();
+  }
+
+  isBlankDocument() {
+    let ret = true;
+    ret = ret && (this.fileData.length === 0);
+    ret = ret && (this.undoBuffer.length === 0);
+    ret = ret && (this.redoBuffer.length === 0);
+    return ret;
   }
 
   applyCommand(command) {
@@ -57,14 +66,6 @@ export default class SiriusDocument {
     this.fileData = [...fileData];
   }
 
-  isBlankDocument() {
-    let ret = true;
-    ret = ret && (this.fileData.length === 0);
-    ret = ret && (this.undoBuffer.length === 0);
-    ret = ret && (this.redoBuffer.length === 0);
-    return ret;
-  }
-
   getClipboard() {
     return this.clipboard;
   }
@@ -72,6 +73,12 @@ export default class SiriusDocument {
   setClipboard(clipboard) {
     assert(clipboard instanceof SiriusClipboard);
     this.clipboard = clipboard;
+  }
+
+  setFileHandle(fileHandle) {
+    this.fileHandle = fileHandle;
+    const fileSize = fileHandle.getSize();
+    this.setFileData(fileHandle.getBuffer(0, fileSize));
   }
 
   _runCommand(command) {
