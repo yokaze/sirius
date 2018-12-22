@@ -138,13 +138,15 @@ class BinaryTableViewModel {
     this.ipcClient = client;
   }
 
-  onReceivedRenewalBinary(sender, renewalBinary) {
-    this.document.setFileData(renewalBinary);
-    this.listener.onViewModelReloaded();
-  }
-
   onAppUpdateClipboard(sender, data) {
     this.document.getClipboard().setData(data);
+  }
+
+  onAppUpdateFileHandle(sender, fileHandle) {
+    const fileSize = ipcClient.receiveFileSizeSync(fileHandle);
+    const fileData = ipcClient.receiveFileBufferSync(fileHandle, 0, fileSize);
+    this.document.setFileData(new Uint8Array(fileData));
+    this.listener.onViewModelReloaded();
   }
 
   onAppUpdatePreference(sender, preference) {

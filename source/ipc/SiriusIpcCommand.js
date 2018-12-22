@@ -1,12 +1,16 @@
 export default {
-  onRendererReceivedRenewalBinary: 'onRendererReceivedRenewalBinary',
+  onAppSendFileBuffer: 'onAppSendFileBuffer',
   onAppUpdateClipboard: 'onAppUpdateClipboard',
+  onAppUpdateFileHandle: 'onAppUpdateFileHandle',
   onAppUpdatePreference: 'onAppUpdatePreference',
   onAppRequestCut: 'onAppRequestCut',
   onAppRequestCopy: 'onAppRequestCopy',
   onAppRequestPaste: 'onAppRequestPaste',
   onAppRequestSelectAll: 'onAppRequestSelectAll',
   onEditorRequestFileDrop: 'onEditorRequestFileDrop',
+  onEditorRequestFileBuffer: 'onEditorRequestFileBuffer',
+  onEditorRequestFileBufferSync: 'onEditorRequestFileBufferSync',
+  onEditorRequestFileSizeSync: 'onEditorRequestFileSizeSync',
   onDocumentCommand: 'onDocumentCommand',
   onPreferenceCommand: 'onPreferenceCommand',
 };

@@ -35,7 +35,18 @@ export default class SiriusModel {
 
     ipcMain.on(SiriusIpcCommand.onEditorRequestFileDrop, (e, filePath) => {
       this.onEditorRequestFileDrop(e, filePath);
-    })
+    });
+
+    ipcMain.on(SiriusIpcCommand.onEditorRequestFileBufferSync, (e, fileHandle, address, length) => {
+      const doc = this.documents.get(fileHandle);
+      e.returnValue = [...doc.getBuffer(address, length)];
+    });
+
+    ipcMain.on(SiriusIpcCommand.onEditorRequestFileSizeSync, (e) => {
+      const windowId = e.sender.getOwnerBrowserWindow().id;
+      const handle = this.handles[windowId];
+      e.returnValue = this.documents.get(handle).getFileSize();
+    });
 
     ipcMain.on(SiriusIpcCommand.onPreferenceCommand, (e, command) => {
       this.onPreferenceCommandReceived(e, command);
@@ -165,9 +176,8 @@ export default class SiriusModel {
 
   updateWindowBinary(windowId) {
     const handle = this.handles[windowId];
-    const binary = this.documents.get(handle).getFileData();
     const window = BrowserWindow.fromId(windowId);
-    window.webContents.send(SiriusIpcCommand.onRendererReceivedRenewalBinary, binary);
+    window.webContents.send(SiriusIpcCommand.onAppUpdateFileHandle, handle);
   }
 
   onClipboardDataChanged() {
