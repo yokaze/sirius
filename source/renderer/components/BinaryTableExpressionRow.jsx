@@ -5,20 +5,21 @@ import BinaryTableExpressionCell from './BinaryTableExpressionCell';
 
 export default class BinaryTableExpressionRow extends Component {
   shouldComponentUpdate(nextProps) {
-    let changed = this.props.length !== nextProps.length;
-    changed = changed || (this.props.focusIndex !== nextProps.focusIndex);
-    changed = changed || (this.props.selectedRange !== nextProps.selectedRange);
-    changed = changed || (nextProps.values !== this.props.values);
+    const {
+      length, focusIndex, selectedRange, values,
+    } = this.props;
+    let changed = length !== nextProps.length;
+    changed = changed || (focusIndex !== nextProps.focusIndex);
+    changed = changed || (selectedRange !== nextProps.selectedRange);
+    changed = changed || (values !== nextProps.values);
     return changed;
   }
 
   render() {
-    const listener = this.props.listener;
-    const address = this.props.address;
-    const values = this.props.values;
-    const length = this.props.length;
-    const focusIndex = this.props.focusIndex;
-    let selectedRange = this.props.selectedRange;
+    const {
+      listener, address, length, focusIndex, values,
+    } = this.props;
+    let { selectedRange } = this.props;
     if (selectedRange === undefined) {
       selectedRange = [0, 0];
     }

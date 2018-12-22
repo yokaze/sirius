@@ -33,7 +33,7 @@ const styles = {
   },
 };
 const sheet = jss.createStyleSheet(styles, { link: true });
-const classes = sheet.attach().classes;
+const { classes } = sheet.attach();
 
 export default class BinaryTableExpressionCell extends Component {
   constructor(props) {
@@ -43,33 +43,41 @@ export default class BinaryTableExpressionCell extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    let changed = (this.props.focused !== nextProps.focused);
-    changed = changed || (this.props.selected !== nextProps.selected);
-    changed = changed || (this.props.value !== nextProps.value);
+    const { focused, selected, value } = this.props;
+    let changed = (focused !== nextProps.focused);
+    changed = changed || (selected !== nextProps.selected);
+    changed = changed || (value !== nextProps.value);
     return changed;
   }
 
   onMouseDown(e) {
-    this.props.listener.onExpressionCellMouseDown(this.props.address, e);
+    const { listener, address } = this.props;
+    listener.onExpressionCellMouseDown(address, e);
   }
 
   onMouseEnter(e) {
-    this.props.listener.onExpressionCellMouseEnter(this.props.address, e);
+    const { listener, address } = this.props;
+    listener.onExpressionCellMouseEnter(address, e);
   }
 
   render() {
+    const { focused, selected, value } = this.props;
     let className = classes.default;
-    if (this.props.selected) {
+    if (selected) {
       className = classes.selected;
-    } else if (this.props.focused) {
+    } else if (focused) {
       className = classes.focused;
     }
-    return (<span
-      key="span"
-      className={className}
-      onMouseDown={this.onMouseDown}
-      onMouseEnter={this.onMouseEnter}
-    >{this.props.value}</span>);
+    return (
+      <span
+        key="span"
+        className={className}
+        onMouseDown={this.onMouseDown}
+        onMouseEnter={this.onMouseEnter}
+      >
+        {value}
+      </span>
+    );
   }
 }
 
