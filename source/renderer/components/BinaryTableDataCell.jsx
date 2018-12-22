@@ -36,7 +36,7 @@ const styles = {
   },
 };
 const sheet = jss.createStyleSheet(styles, { link: true });
-const classes = sheet.attach().classes;
+const { classes } = sheet.attach();
 
 export default class BinaryTableDataCell extends Component {
   constructor(props) {
@@ -46,36 +46,46 @@ export default class BinaryTableDataCell extends Component {
   }
 
   shouldComponentUpdate(nextProps) {
-    let changed = (this.props.address !== nextProps.address);
-    changed = changed || (this.props.value !== nextProps.value);
-    changed = changed || (this.props.focused !== nextProps.focused);
-    changed = changed || (this.props.selected !== nextProps.selected);
+    const {
+      address, value, focused, selected,
+    } = this.props;
+    let changed = (address !== nextProps.address);
+    changed = changed || (value !== nextProps.value);
+    changed = changed || (focused !== nextProps.focused);
+    changed = changed || (selected !== nextProps.selected);
     return changed;
   }
 
   handleMouseDown(e) {
-    this.props.listener.onDataCellMouseDown(this.props.address, e);
+    const { listener, address } = this.props;
+    listener.onDataCellMouseDown(address, e);
   }
 
   handleMouseEnter(e) {
-    this.props.listener.onDataCellMouseEnter(this.props.address, e);
+    const { listener, address } = this.props;
+    listener.onDataCellMouseEnter(address, e);
   }
 
   render() {
+    const { value, focused, selected } = this.props;
     let className = classes.default;
-    if (this.props.selected) {
+    if (selected) {
       className = classes.selected;
-    } else if (this.props.focused) {
+    } else if (focused) {
       className = classes.focused;
     }
-    const valid = (this.props.value !== undefined);
-    const text = valid ? sprintf('%02X', this.props.value) : '--';
-    return (<span
-      key={'span'}
-      className={className}
-      onMouseDown={this.handleMouseDown}
-      onMouseEnter={this.handleMouseEnter}
-    >{text}</span>);
+    const valid = (value !== undefined);
+    const text = valid ? sprintf('%02X', value) : '--';
+    return (
+      <span
+        key="span"
+        className={className}
+        onMouseDown={this.handleMouseDown}
+        onMouseEnter={this.handleMouseEnter}
+      >
+        {text}
+      </span>
+    );
   }
 }
 

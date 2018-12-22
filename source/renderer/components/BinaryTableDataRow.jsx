@@ -5,27 +5,28 @@ import BinaryTableDataCell from './BinaryTableDataCell';
 
 export default class BinaryTableDataRow extends Component {
   shouldComponentUpdate(nextProps) {
-    if (this.props.values.length !== nextProps.values.length) {
+    const {
+      address, length, values, focusIndex, selectedRange,
+    } = this.props;
+    if (values.length !== nextProps.values.length) {
       return true;
     }
-    let changed = (this.props.address !== nextProps.address);
-    changed = changed || (this.props.length !== nextProps.length);
-    changed = changed || (this.props.focusIndex !== nextProps.focusIndex);
-    changed = changed || (this.props.selectedRange !== nextProps.selectedRange);
-    for (let i = 0; i < this.props.values.length; i += 1) {
-      changed = changed || (this.props.values[i] !== nextProps.values[i]);
+    let changed = (address !== nextProps.address);
+    changed = changed || (length !== nextProps.length);
+    changed = changed || (focusIndex !== nextProps.focusIndex);
+    changed = changed || (selectedRange !== nextProps.selectedRange);
+    for (let i = 0; i < values.length; i += 1) {
+      changed = changed || (values[i] !== nextProps.values[i]);
     }
     return changed;
   }
 
   render() {
-    const props = this.props;
-    const values = props.values;
-    const length = props.length;
-    const rowAddress = props.address;
-    const listener = props.listener;
-    const focusIndex = props.focusIndex;
-    let selectedRange = props.selectedRange;
+    const {
+      listener, length, values, focusIndex,
+    } = this.props;
+    const rowAddress = this.props.address;
+    let { selectedRange } = this.props;
     if (selectedRange === undefined) {
       selectedRange = [0, 0];
     }
@@ -36,14 +37,16 @@ export default class BinaryTableDataRow extends Component {
       const value = values[i];
       const focused = (i === focusIndex);
       const selected = (selectedRange[0] <= i) && (i < selectedRange[1]);
-      const cell = (<BinaryTableDataCell
-        key={i}
-        listener={listener}
-        address={cellAddress}
-        value={value}
-        focused={focused}
-        selected={selected}
-      />);
+      const cell = (
+        <BinaryTableDataCell
+          key={i}
+          listener={listener}
+          address={cellAddress}
+          value={value}
+          focused={focused}
+          selected={selected}
+        />
+      );
       children.push(cell);
     }
     return <span key="span">{children}</span>;
