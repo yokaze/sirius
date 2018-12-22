@@ -15,6 +15,7 @@ import SiriusConstants from '../common/SiriusConstants';
 import SiriusDocument from '../common/SiriusDocument';
 import SiriusDocumentCommand from '../common/SiriusDocumentCommand';
 import SiriusIpcClient from '../ipc/SiriusIpcClient';
+import SiriusIpcFileHandle from '../ipc/SiriusIpcFileHandle';
 
 const ipcClient = new SiriusIpcClient();
 
@@ -143,9 +144,12 @@ class BinaryTableViewModel {
   }
 
   onAppUpdateFileHandle(sender, fileHandle) {
-    const fileSize = ipcClient.receiveFileSizeSync(fileHandle);
-    const fileData = ipcClient.receiveFileBufferSync(fileHandle, 0, fileSize);
-    this.document.setFileData(new Uint8Array(fileData));
+    const oldFileHandle = this.document.getFileHandle();
+    if (oldFileHandle !== undefined) {
+      oldFileHandle.destroy();
+    }
+
+    this.document.setFileHandle(new SiriusIpcFileHandle(fileHandle));
     this.listener.onViewModelReloaded();
   }
 

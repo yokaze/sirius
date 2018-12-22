@@ -75,6 +75,10 @@ export default class SiriusDocument {
     this.clipboard = clipboard;
   }
 
+  getFileHandle(fileHandle) {
+    return this.fileHandle;
+  }
+
   setFileHandle(fileHandle) {
     this.fileHandle = fileHandle;
     const fileSize = fileHandle.getSize();

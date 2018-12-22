@@ -1,16 +1,18 @@
 export default {
+  onAppRequestCopy: 'onAppRequestCopy',
+  onAppRequestCut: 'onAppRequestCut',
+  onAppRequestPaste: 'onAppRequestPaste',
+  onAppRequestSelectAll: 'onAppRequestSelectAll',
   onAppSendFileBuffer: 'onAppSendFileBuffer',
   onAppUpdateClipboard: 'onAppUpdateClipboard',
   onAppUpdateFileHandle: 'onAppUpdateFileHandle',
   onAppUpdatePreference: 'onAppUpdatePreference',
-  onAppRequestCut: 'onAppRequestCut',
-  onAppRequestCopy: 'onAppRequestCopy',
-  onAppRequestPaste: 'onAppRequestPaste',
-  onAppRequestSelectAll: 'onAppRequestSelectAll',
+
+  onDocumentCommand: 'onDocumentCommand',
   onEditorRequestFileDrop: 'onEditorRequestFileDrop',
   onEditorRequestFileBuffer: 'onEditorRequestFileBuffer',
   onEditorRequestFileBufferSync: 'onEditorRequestFileBufferSync',
   onEditorRequestFileSizeSync: 'onEditorRequestFileSizeSync',
-  onDocumentCommand: 'onDocumentCommand',
+
   onPreferenceCommand: 'onPreferenceCommand',
 };
