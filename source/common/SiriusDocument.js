@@ -75,7 +75,7 @@ export default class SiriusDocument {
     this.clipboard = clipboard;
   }
 
-  getFileHandle(fileHandle) {
+  getFileHandle() {
     return this.fileHandle;
   }
 

@@ -1,5 +1,4 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron';
-import fs from 'fs';
 import path from 'path';
 import url from 'url';
 import uuid from 'uuid/v4';
@@ -12,7 +11,7 @@ import SiriusIpcCommand from '../ipc/SiriusIpcCommand';
 export default class SiriusModel {
   constructor() {
     //  Window ID -> Data UUID
-    this.handles = {};
+    this.handles = new Map();
 
     //  Data UUID -> SiriusDocument
     this.documents = new Map();
@@ -24,7 +23,7 @@ export default class SiriusModel {
 
     ipcMain.on('editor-initialized', (e) => {
       const windowId = e.sender.getOwnerBrowserWindow().id;
-      if (this.handles[windowId] !== undefined) {
+      if (this.handles.get(windowId) !== undefined) {
         this.updateWindowBinary(windowId);
       }
     });
@@ -44,7 +43,7 @@ export default class SiriusModel {
 
     ipcMain.on(SiriusIpcCommand.onEditorRequestFileSizeSync, (e) => {
       const windowId = e.sender.getOwnerBrowserWindow().id;
-      const handle = this.handles[windowId];
+      const handle = this.handles.get(windowId);
       e.returnValue = this.documents.get(handle).getFileSize();
     });
 
@@ -56,7 +55,7 @@ export default class SiriusModel {
   createNew() {
     const windowId = this.openEditor();
     const handle = uuid();
-    this.handles[windowId] = handle;
+    this.handles.set(windowId, handle);
 
     const doc = new SiriusDocument();
     doc.setClipboard(this.clipboard);
@@ -80,34 +79,28 @@ export default class SiriusModel {
 
   undo() {
     const currentWindow = BrowserWindow.getFocusedWindow();
-    const handle = this.handles[currentWindow.id];
-    const doc = this.documents.get(handle);
+    const currentHandle = this.handles.get(currentWindow.id);
+    const doc = this.documents.get(currentHandle);
     doc.undo();
 
-    const fileData = doc.getFileData();
-    for (const key in this.handles) {
-      const windowId = parseInt(key, 10);
-      const windowHandle = this.handles[windowId];
-      if (handle === windowHandle) {
+    this.handles.forEach((handle, windowId) => {
+      if (currentHandle === handle) {
         this.updateWindowBinary(windowId);
       }
-    }
+    });
   }
 
   redo() {
     const currentWindow = BrowserWindow.getFocusedWindow();
-    const handle = this.handles[currentWindow];
-    const doc = this.documents.get(handle);
+    const currentHandle = this.handles.get(currentWindow);
+    const doc = this.documents.get(currentHandle);
     doc.redo();
 
-    const fileData = doc.getFileData();
-    for (const key in this.handles) {
-      const windowId = parseInt(key, 10);
-      const windowHandle = this.handles[windowId];
-      if (handle === windowHandle) {
+    this.handles.forEach((handle, windowId) => {
+      if (currentHandle === handle) {
         this.updateWindowBinary(windowId);
       }
-    }
+    });
   }
 
   cut() {
@@ -141,7 +134,7 @@ export default class SiriusModel {
   duplicateActiveEditor() {
     const currentWindow = BrowserWindow.getFocusedWindow();
     const nextWindowId = this.openEditor();
-    this.handles[nextWindowId] = this.handles[currentWindow.id];
+    this.handles.set(nextWindowId, this.handles.get(currentWindow.id));
   }
 
   openAbout() {
@@ -175,32 +168,29 @@ export default class SiriusModel {
   }
 
   updateWindowBinary(windowId) {
-    const handle = this.handles[windowId];
+    const handle = this.handles.get(windowId);
     const window = BrowserWindow.fromId(windowId);
     window.webContents.send(SiriusIpcCommand.onAppUpdateFileHandle, handle);
   }
 
   onClipboardDataChanged() {
     const data = this.clipboard.getData();
-    for (const key in this.handles) {
-      const windowId = parseInt(key, 10);
+    this.handles.forEach((handle, windowId) => {
       const window = BrowserWindow.fromId(windowId);
       window.webContents.send(SiriusIpcCommand.onAppUpdateClipboard, data);
-    }
+    });
   }
 
   onDocumentCommandReceived(e, command) {
     const senderWindowId = e.sender.getOwnerBrowserWindow().id;
-    const senderHandle = this.handles[senderWindowId];
+    const senderHandle = this.handles.get(senderWindowId);
     this.documents.get(senderHandle).applyCommand(command);
 
-    for (const key in this.handles) {
-      const windowId = parseInt(key, 10);
-      const handle = this.handles[windowId];
+    this.handles.forEach((handle, windowId) => {
       if ((senderWindowId !== windowId) && (senderHandle === handle)) {
         this.updateWindowBinary(windowId);
       }
-    }
+    });
   }
 
   onEditorRequestFileDrop(e, filePath) {
@@ -208,11 +198,10 @@ export default class SiriusModel {
   }
 
   onPreferenceCommandReceived(e, command) {
-    for (const key in this.handles) {
-      const windowId = parseInt(key, 10);
+    this.handles.forEach((handle, windowId) => {
       const window = BrowserWindow.fromId(windowId);
       window.webContents.send(SiriusIpcCommand.onAppUpdatePreference, command);
-    }
+    });
   }
 
   _openFile(filePath) {
@@ -229,7 +218,7 @@ export default class SiriusModel {
       //  If a blank document window is focused, open document in it.
       const currentWindow = BrowserWindow.getFocusedWindow();
       if (currentWindow) {
-        const currentHandle = this.handles[currentWindow.id];
+        const currentHandle = this.handles.get(currentWindow.id);
         const doc = this.documents.get(currentHandle);
         if (doc.isBlankDocument()) {
           windowId = currentWindow.id;
@@ -245,7 +234,7 @@ export default class SiriusModel {
     doc.setFileHandle(fileHandle);
     BrowserWindow.fromId(windowId).setTitle(filePath);
     const handle = uuid();
-    this.handles[windowId] = handle;
+    this.handles.set(windowId, handle);
     this.documents.set(handle, doc);
 
     if (initialized) {
