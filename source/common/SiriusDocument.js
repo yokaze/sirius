@@ -49,43 +49,27 @@ export default class SiriusDocument {
 
   getBuffer(address, length) {
     const fileSize = this.getFileSize();
-    const actualLength = Math.max(0, Math.min(length, fileSize - address));
-    const buffer = new Uint8Array(actualLength);
-    if (actualLength === 0) {
-      return buffer;
-    }
+    length = Math.max(0, Math.min(length, fileSize - address));
+    const buffer = new Uint8Array(length);
 
-    let blockAddress = 0;
-    let writeOffset = 0;
-    for (let i = 0; i < this.fileData.length; i += 1) {
-      const block = this.fileData[i];
-      const blockLength = block.size;
-      if ((blockAddress + blockLength) <= address) {
-        blockAddress += block.size;
-        continue;
-      }
-      if ((address + length) <= blockAddress) {
-        break;
-      }
+    const blocks = this._blockIterator(address, address + length);
+    for (let i = 0; i < blocks.length; i += 1) {
+      const { address: blockAddress, block } = blocks[i];
+      const blockSize = block.size;
+      const writeOffset = Math.max(0, blockAddress - address);
       const readOffset = address + writeOffset - blockAddress;
-      const writeLength = Math.min(length - writeOffset, blockLength - readOffset);
+      const writeLength = Math.min(length - writeOffset, blockSize - readOffset);
 
       if (block.data === undefined) {
         block.data = this.fileHandle.getBuffer(blockAddress, block.size);
       }
       buffer.set(block.data.subarray(readOffset, readOffset + writeLength), writeOffset);
-      blockAddress += block.size;
-      writeOffset += block.size;
     }
     return buffer;
   }
 
   getFileSize() {
-    let fileSize = 0;
-    for (let i = 0; i < this.fileData.length; i += 1) {
-      fileSize += this.fileData[i].size;
-    }
-    return fileSize;
+    return this.fileData.reduce((size, block) => size + block.size, 0);
   }
 
   getClipboard() {
@@ -112,6 +96,26 @@ export default class SiriusDocument {
         file: true, address: i * blockSize, size: blockSize, data: undefined, storage: undefined,
       });
     }
+  }
+
+  _blockIterator(startAddress, endAddress) {
+    const items = [];
+    const blockCount = this.fileData.length;
+    let blockAddress = 0;
+    for (let i = 0; i < blockCount; i += 1) {
+      const block = this.fileData[i];
+      const blockSize = block.size;
+      if ((blockAddress + blockSize) <= startAddress) {
+        blockAddress += blockSize;
+        continue;
+      }
+      if (endAddress <= blockAddress) {
+        break;
+      }
+      items.push({ address: blockAddress, block });
+      blockAddress += blockSize;
+    }
+    return items;
   }
 
   _runCommand(command) {
