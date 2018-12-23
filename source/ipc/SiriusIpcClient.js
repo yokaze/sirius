@@ -7,6 +7,7 @@ export default class {
     this._onAppRequestCut = this._onAppRequestCut.bind(this);
     this._onAppRequestPaste = this._onAppRequestPaste.bind(this);
     this._onAppRequestSelectAll = this._onAppRequestSelectAll.bind(this);
+    this._onAppRequestStructureView = this._onAppRequestStructureView.bind(this);
     this._onAppSendFileBuffer = this._onAppSendFileBuffer.bind(this);
     this._onAppUpdateClipboard = this._onAppUpdateClipboard.bind(this);
     this._onAppUpdateFileHandle = this._onAppUpdateFileHandle.bind(this);
@@ -15,6 +16,7 @@ export default class {
     ipcRenderer.on(SiriusIpcCommand.onAppRequestCut, this._onAppRequestCut);
     ipcRenderer.on(SiriusIpcCommand.onAppRequestPaste, this._onAppRequestPaste);
     ipcRenderer.on(SiriusIpcCommand.onAppRequestSelectAll, this._onAppRequestSelectAll);
+    ipcRenderer.on(SiriusIpcCommand.onAppRequestStructureView, this._onAppRequestStructureView);
     ipcRenderer.on(SiriusIpcCommand.onAppSendFileBuffer, this._onAppSendFileBuffer);
     ipcRenderer.on(SiriusIpcCommand.onAppUpdateClipboard, this._onAppUpdateClipboard);
     ipcRenderer.on(SiriusIpcCommand.onAppUpdateFileHandle, this._onAppUpdateFileHandle);
@@ -26,6 +28,7 @@ export default class {
     ipcRenderer.removeListener(SiriusIpcCommand.onAppRequestCut, this._onAppRequestCut);
     ipcRenderer.removeListener(SiriusIpcCommand.onAppRequestPaste, this._onAppRequestPaste);
     ipcRenderer.removeListener(SiriusIpcCommand.onAppRequestSelectAll, this._onAppRequestSelectAll);
+    ipcRenderer.removeListener(SiriusIpcCommand.onAppRequestStructureView, this._onAppRequestStructureView);
     ipcRenderer.removeListener(SiriusIpcCommand.onAppSendFileBuffer, this._onAppSendFileBuffer);
     ipcRenderer.removeListener(SiriusIpcCommand.onAppUpdateClipboard, this._onAppUpdateClipboard);
     ipcRenderer.removeListener(SiriusIpcCommand.onAppUpdateFileHandle, this._onAppUpdateFileHandle);
@@ -79,6 +82,12 @@ export default class {
   _onAppRequestSelectAll() {
     if (this.listener && this.listener.onAppRequestSelectAll) {
       this.listener.onAppRequestSelectAll(this);
+    }
+  }
+
+  _onAppRequestStructureView() {
+    if (this.listener && this.listener.onAppRequestStructureView) {
+      this.listener.onAppRequestStructureView(this);
     }
   }
 

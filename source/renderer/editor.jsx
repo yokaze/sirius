@@ -11,6 +11,7 @@ import BinaryTableAddressCell from './components/BinaryTableAddressCell';
 import BinaryTableDataRow from './components/BinaryTableDataRow';
 import BinaryTableExpressionRow from './components/BinaryTableExpressionRow';
 import BinaryTableHeaderRow from './components/BinaryTableHeaderRow';
+import MidiParser from '../parser/MidiParser';
 import SiriusConstants from '../common/SiriusConstants';
 import SiriusDocument from '../common/SiriusDocument';
 import SiriusDocumentCommand from '../common/SiriusDocumentCommand';
@@ -203,6 +204,11 @@ class BinaryTableViewModel {
     this.selectionStartAddress = 0;
     this.selectionEndAddress = this.getFileSize();
     this.listener.onViewModelReloaded();
+  }
+
+  onAppRequestStructureView() {
+    const midiParser = new MidiParser(this.document);
+    console.log(midiParser.parseBlock(0, this.document.getFileSize()));
   }
 
   _applyCommand(command) {

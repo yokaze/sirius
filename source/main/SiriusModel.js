@@ -131,6 +131,11 @@ export default class SiriusModel {
     return browserWindow.id;
   }
 
+  displayStructureView() {
+    const window = BrowserWindow.getFocusedWindow();
+    window.webContents.send(SiriusIpcCommand.onAppRequestStructureView);
+  }
+
   duplicateActiveEditor() {
     const currentWindow = BrowserWindow.getFocusedWindow();
     const nextWindowId = this.openEditor();

@@ -3,6 +3,7 @@ export default {
   onAppRequestCut: 'onAppRequestCut',
   onAppRequestPaste: 'onAppRequestPaste',
   onAppRequestSelectAll: 'onAppRequestSelectAll',
+  onAppRequestStructureView: 'onAppRequestStructureView',
   onAppSendFileBuffer: 'onAppSendFileBuffer',
   onAppUpdateClipboard: 'onAppUpdateClipboard',
   onAppUpdateFileHandle: 'onAppUpdateFileHandle',
