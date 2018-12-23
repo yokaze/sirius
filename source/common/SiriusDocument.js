@@ -61,7 +61,7 @@ export default class SiriusDocument {
       const writeLength = Math.min(length - writeOffset, blockSize - readOffset);
 
       if (block.data === undefined) {
-        block.data = this.fileHandle.getBuffer(blockAddress, block.size);
+        block.data = this.fileHandle.getBuffer(block.address, block.size);
       }
       buffer.set(block.data.subarray(readOffset, readOffset + writeLength), writeOffset);
     }
@@ -116,6 +116,12 @@ export default class SiriusDocument {
       blockAddress += blockSize;
     }
     return items;
+  }
+
+  _swapBlocks(blocks, nextBlocks) {
+    const index = this.fileData.findIndex(b => (b === blocks[0]));
+    assert(index >= 0);
+    this.fileData.splice(index, blocks.length, ...nextBlocks);
   }
 
   _runCommand(command) {
@@ -178,10 +184,43 @@ export default class SiriusDocument {
   }
 
   _runRemoveCommand(command) {
-    assert((command.address + command.length) <= this.fileData.length);
-    const backup = this.getBuffer(command.address, command.length);
-    const undoCommand = new SiriusDocumentCommand.Insert(command.address, backup);
-    this.fileData.splice(command.address, command.length);
+    const { address, length } = command;
+    assert((address + length) <= this.getFileSize());
+    const backup = this.getBuffer(address, length);
+    const undoCommand = new SiriusDocumentCommand.Insert(address, backup);
+
+    const blocks = this._blockIterator(address, address + length);
+    const nextBlocks = [];
+    for (let i = 0; i < blocks.length; i += 1) {
+      const { address: blockAddress, block } = blocks[i];
+      const blockSize = block.size;
+      const blockRemoveStart = Math.max(0, address - blockAddress);
+      const blockRemoveEnd = Math.min(blockSize, address + length - blockAddress);
+      if ((blockRemoveStart === 0) && (blockRemoveEnd === blockSize)) {
+        continue;
+      } else if (blockRemoveStart === 0) {
+        block.address += blockRemoveEnd;
+        if (block.data) {
+          block.data = block.data.subarray(blockRemoveEnd);
+        }
+        nextBlocks.push(block);
+      } else if (blockRemoveEnd === blockSize) {
+        block.size = blockRemoveStart;
+        nextBlocks.push(block);
+      } else {
+        block.size = blockRemoveStart;
+        nextBlocks.push(block);
+        const rightBlock = {
+          file: true,
+          address: block.address + blockRemoveEnd,
+          size: blockSize - blockRemoveEnd,
+          data: undefined,
+          storage: undefined,
+        };
+        nextBlocks.push(rightBlock);
+      }
+    }
+    this._swapBlocks(blocks.map(b => b.block), nextBlocks);
     return undoCommand;
   }
 
