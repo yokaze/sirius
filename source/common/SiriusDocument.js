@@ -109,64 +109,29 @@ export default class SiriusDocument {
     for (let i = 0; i < blockCount; i += 1) {
       const blockSize = Math.min(maxBlockSize, fileSize - i * maxBlockSize);
       this.fileData.push({
-        file: true, size: blockSize, data: undefined, storage: undefined,
+        file: true, address: i * blockSize, size: blockSize, data: undefined, storage: undefined,
       });
     }
   }
 
   _runCommand(command) {
     if (command.type === SiriusDocumentCommand.Insert.getType()) {
-      if (command.address <= this.fileData.length) {
-        this.fileData.splice(command.address, 0, ...command.data);
-        const undoCommand = new SiriusDocumentCommand.Remove(command.address, command.data.length);
-        return undoCommand;
-      }
-      //  Fill zeros from file-end to insert address
-      const fillData = new Uint8Array(command.address - this.fileData.length);
-      const fillCommand = new SiriusDocumentCommand.Insert(this.fileData.length, fillData);
-      const undo1 = this._runCommand(fillCommand);
-      const undo2 = this._runCommand(command);
-      return new SiriusDocumentCommand.Composite([undo2, undo1]);
+      return this._runInsertCommand(command);
     }
     if (command.type === SiriusDocumentCommand.Overwrite.getType()) {
-      if ((command.address + command.data.length) <= this.fileData.length) {
-        const backup = this.getBuffer(command.address, command.data.length);
-        this.fileData.splice(command.address, command.data.length, ...command.data);
-        const undoCommand = new SiriusDocumentCommand.Overwrite(command.address, backup);
-        return undoCommand;
-      }
-      //  Fill zeros from file-end to overwrite area
-      const desiredLength = command.address + command.data.length;
-      const fillData = new Uint8Array(desiredLength - this.fileData.length);
-      const fillCommand = new SiriusDocumentCommand.Insert(this.fileData.length, fillData);
-      const undo1 = this._runCommand(fillCommand);
-      const undo2 = this._runCommand(command);
-      return new SiriusDocumentCommand.Composite([undo2, undo1]);
+      return this._runOverwriteCommand(command);
     }
     if (command.type === SiriusDocumentCommand.Remove.getType()) {
-      assert((command.address + command.length) <= this.fileData.length);
-      const backup = this.getBuffer(command.address, command.length);
-      const undoCommand = new SiriusDocumentCommand.Insert(command.address, backup);
-      this.fileData.splice(command.address, command.length);
-      return undoCommand;
+      return this._runRemoveCommand(command);
     }
     if (command.type === SiriusDocumentCommand.Cut.getType()) {
-      const copyCommand = new SiriusDocumentCommand.Copy(command.address, command.length);
-      const removeCommand = new SiriusDocumentCommand.Remove(command.address, command.length);
-      this._runCommand(copyCommand);
-      return this._runCommand(removeCommand);
+      return this._runCutCommand(command);
     }
     if (command.type === SiriusDocumentCommand.Copy.getType()) {
-      this.clipboard.setData(this.getBuffer(command.address, command.length));
-      return undefined;
+      return this._runCopyCommand(command);
     }
     if (command.type === SiriusDocumentCommand.Paste.getType()) {
-      if (this.clipboard.isEmpty()) {
-        return undefined;
-      }
-      const data = this.clipboard.getData();
-      const insertCommand = new SiriusDocumentCommand.Insert(command.address, data);
-      return this._runCommand(insertCommand);
+      return this._runPasteCommand(command);
     }
     if (command.type === SiriusDocumentCommand.Composite.getType()) {
       const undoCommands = command.items.map(item => this._runCommand(item)).reverse();
@@ -176,5 +141,64 @@ export default class SiriusDocument {
       assert(false);
     }
     return undefined;
+  }
+
+  _runInsertCommand(command) {
+    if (command.address <= this.fileData.length) {
+      this.fileData.splice(command.address, 0, ...command.data);
+      const undoCommand = new SiriusDocumentCommand.Remove(command.address, command.data.length);
+      return undoCommand;
+    }
+    //  Fill zeros from file-end to insert address
+    const fillData = new Uint8Array(command.address - this.fileData.length);
+    const fillCommand = new SiriusDocumentCommand.Insert(this.fileData.length, fillData);
+    const undo1 = this._runCommand(fillCommand);
+    const undo2 = this._runCommand(command);
+    return new SiriusDocumentCommand.Composite([undo2, undo1]);
+  }
+
+  _runOverwriteCommand(command) {
+    if ((command.address + command.data.length) <= this.fileData.length) {
+      const backup = this.getBuffer(command.address, command.data.length);
+      this.fileData.splice(command.address, command.data.length, ...command.data);
+      const undoCommand = new SiriusDocumentCommand.Overwrite(command.address, backup);
+      return undoCommand;
+    }
+    //  Fill zeros from file-end to overwrite area
+    const desiredLength = command.address + command.data.length;
+    const fillData = new Uint8Array(desiredLength - this.fileData.length);
+    const fillCommand = new SiriusDocumentCommand.Insert(this.fileData.length, fillData);
+    const undo1 = this._runCommand(fillCommand);
+    const undo2 = this._runCommand(command);
+    return new SiriusDocumentCommand.Composite([undo2, undo1]);
+  }
+
+  _runRemoveCommand(command) {
+    assert((command.address + command.length) <= this.fileData.length);
+    const backup = this.getBuffer(command.address, command.length);
+    const undoCommand = new SiriusDocumentCommand.Insert(command.address, backup);
+    this.fileData.splice(command.address, command.length);
+    return undoCommand;
+  }
+
+  _runCutCommand(command) {
+    const copyCommand = new SiriusDocumentCommand.Copy(command.address, command.length);
+    const removeCommand = new SiriusDocumentCommand.Remove(command.address, command.length);
+    this._runCommand(copyCommand);
+    return this._runCommand(removeCommand);
+  }
+
+  _runCopyCommand(command) {
+    this.clipboard.setData(this.getBuffer(command.address, command.length));
+    return undefined;
+  }
+
+  _runPasteCommand(command) {
+    if (this.clipboard.isEmpty()) {
+      return undefined;
+    }
+    const data = this.clipboard.getData();
+    const insertCommand = new SiriusDocumentCommand.Insert(command.address, data);
+    return this._runCommand(insertCommand);
   }
 }
