@@ -70,7 +70,7 @@ class BinaryTableViewModel {
   }
 
   removeValueAt(address, length) {
-    const executable = ((address + length) <= this.document.getFileData().length);
+    const executable = ((address + length) <= this.document.getFileSize());
     if (executable) {
       const command = new SiriusDocumentCommand.Remove(address, length);
       this._applyCommand(command);

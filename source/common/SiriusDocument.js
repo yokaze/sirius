@@ -2,6 +2,9 @@ import assert from 'assert';
 
 import SiriusClipboard from './SiriusClipboard';
 import SiriusDocumentCommand from './SiriusDocumentCommand';
+import SiriusConstants from './SiriusConstants';
+
+const { maxBlockSize, minBlockSize } = SiriusConstants;
 
 export default class SiriusDocument {
   constructor() {
@@ -45,25 +48,44 @@ export default class SiriusDocument {
   }
 
   getBuffer(address, length) {
-    const bufferLength = Math.max(0, Math.min(length, this.fileData.length - address));
-    const view = new Uint8Array(bufferLength);
-    for (let i = 0; i < bufferLength; i += 1) {
-      view[i] = this.fileData[address + i];
+    const fileSize = this.getFileSize();
+    const actualLength = Math.max(0, Math.min(length, fileSize - address));
+    const buffer = new Uint8Array(actualLength);
+    if (actualLength === 0) {
+      return buffer;
     }
-    return view;
-  }
 
-  getFileData() {
-    return new Uint8Array(this.fileData);
+    let blockAddress = 0;
+    let writeOffset = 0;
+    for (let i = 0; i < this.fileData.length; i += 1) {
+      const block = this.fileData[i];
+      const blockLength = block.size;
+      if ((blockAddress + blockLength) <= address) {
+        blockAddress += block.size;
+        continue;
+      }
+      if ((address + length) <= blockAddress) {
+        break;
+      }
+      const readOffset = address + writeOffset - blockAddress;
+      const writeLength = Math.min(length - writeOffset, blockLength - readOffset);
+
+      if (block.data === undefined) {
+        block.data = this.fileHandle.getBuffer(blockAddress, block.size);
+      }
+      buffer.set(block.data.subarray(readOffset, readOffset + writeLength), writeOffset);
+      blockAddress += block.size;
+      writeOffset += block.size;
+    }
+    return buffer;
   }
 
   getFileSize() {
-    return this.fileData.length;
-  }
-
-  setFileData(fileData) {
-    assert(fileData instanceof Uint8Array);
-    this.fileData = [...fileData];
+    let fileSize = 0;
+    for (let i = 0; i < this.fileData.length; i += 1) {
+      fileSize += this.fileData[i].size;
+    }
+    return fileSize;
   }
 
   getClipboard() {
@@ -81,8 +103,15 @@ export default class SiriusDocument {
 
   setFileHandle(fileHandle) {
     this.fileHandle = fileHandle;
+    this.fileData = [];
     const fileSize = fileHandle.getSize();
-    this.setFileData(fileHandle.getBuffer(0, fileSize));
+    const blockCount = Math.ceil(fileSize / maxBlockSize);
+    for (let i = 0; i < blockCount; i += 1) {
+      const blockSize = Math.min(maxBlockSize, fileSize - i * maxBlockSize);
+      this.fileData.push({
+        file: true, size: blockSize, data: undefined, storage: undefined,
+      });
+    }
   }
 
   _runCommand(command) {
