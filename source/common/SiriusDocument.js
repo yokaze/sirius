@@ -154,30 +154,49 @@ export default class SiriusDocument {
   }
 
   _runInsertCommand(command) {
-    if (command.address <= this.fileData.length) {
+    if (command.address <= this.getFileSize()) {
       this.fileData.splice(command.address, 0, ...command.data);
       const undoCommand = new SiriusDocumentCommand.Remove(command.address, command.data.length);
       return undoCommand;
     }
     //  Fill zeros from file-end to insert address
-    const fillData = new Uint8Array(command.address - this.fileData.length);
-    const fillCommand = new SiriusDocumentCommand.Insert(this.fileData.length, fillData);
+    const fillData = new Uint8Array(command.address - this.getFileSize());
+    const fillCommand = new SiriusDocumentCommand.Insert(this.getFileSize(), fillData);
     const undo1 = this._runCommand(fillCommand);
     const undo2 = this._runCommand(command);
     return new SiriusDocumentCommand.Composite([undo2, undo1]);
   }
 
   _runOverwriteCommand(command) {
-    if ((command.address + command.data.length) <= this.fileData.length) {
-      const backup = this.getBuffer(command.address, command.data.length);
-      this.fileData.splice(command.address, command.data.length, ...command.data);
-      const undoCommand = new SiriusDocumentCommand.Overwrite(command.address, backup);
+    const { address } = command;
+    const { length } = command.data;
+    if ((address + length) <= this.getFileSize()) {
+      const backup = this.getBuffer(address, length);
+      const undoCommand = new SiriusDocumentCommand.Overwrite(address, backup);
+
+      const blocks = this._blockIterator(address, address + length);
+      const nextBlocks = [];
+      for (let i = 0; i < blocks.length; i += 1) {
+        const { address: blockAddress, block } = blocks[i];
+        const blockSize = block.size;
+        const blockOverwriteStart = Math.max(0, address - blockAddress);
+        const blockOverwriteEnd = Math.min(blockSize, address + length - blockAddress);
+        if (block.data === undefined) {
+          block.data = this.fileHandle.getBuffer(block.address, block.size);
+        }
+        block.file = false;
+        block.data.set(
+          command.data.subarray(0, blockOverwriteEnd - blockOverwriteStart), blockOverwriteStart,
+        );
+        nextBlocks.push(block);
+      }
+      this._swapBlocks(blocks.map(b => b.block), nextBlocks);
       return undoCommand;
     }
     //  Fill zeros from file-end to overwrite area
-    const desiredLength = command.address + command.data.length;
-    const fillData = new Uint8Array(desiredLength - this.fileData.length);
-    const fillCommand = new SiriusDocumentCommand.Insert(this.fileData.length, fillData);
+    const desiredLength = address + length;
+    const fillData = new Uint8Array(desiredLength - this.getFileSize());
+    const fillCommand = new SiriusDocumentCommand.Insert(this.getFileSize(), fillData);
     const undo1 = this._runCommand(fillCommand);
     const undo2 = this._runCommand(command);
     return new SiriusDocumentCommand.Composite([undo2, undo1]);
