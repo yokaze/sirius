@@ -28,7 +28,9 @@ export default class {
     ipcRenderer.removeListener(SiriusIpcCommand.onAppRequestCut, this._onAppRequestCut);
     ipcRenderer.removeListener(SiriusIpcCommand.onAppRequestPaste, this._onAppRequestPaste);
     ipcRenderer.removeListener(SiriusIpcCommand.onAppRequestSelectAll, this._onAppRequestSelectAll);
-    ipcRenderer.removeListener(SiriusIpcCommand.onAppRequestStructureView, this._onAppRequestStructureView);
+    ipcRenderer.removeListener(
+      SiriusIpcCommand.onAppRequestStructureView, this._onAppRequestStructureView,
+    );
     ipcRenderer.removeListener(SiriusIpcCommand.onAppSendFileBuffer, this._onAppSendFileBuffer);
     ipcRenderer.removeListener(SiriusIpcCommand.onAppUpdateClipboard, this._onAppUpdateClipboard);
     ipcRenderer.removeListener(SiriusIpcCommand.onAppUpdateFileHandle, this._onAppUpdateFileHandle);

@@ -363,7 +363,7 @@ class BinaryTable extends Component {
   }
 
   onDataCellMouseDown(address, e) {
-    const shiftKey = e.shiftKey;
+    const { shiftKey } = e;
 
     const handler = () => {
       if (shiftKey === false) {
@@ -440,9 +440,9 @@ class BinaryTable extends Component {
   }
 
   onResized(contentRect) {
-    this.setState(state =>
-      this.complementStateChange(state, { totalWidth: contentRect.entry.width, tableHeight: contentRect.entry.height }),
-    );
+    const { width, height } = contentRect.entry;
+    const diff = { totalWidth: width, tableHeight: height };
+    this.setState(state => this.complementStateChange(state, diff));
   }
 
   onAddressResized(contentRect) {
@@ -455,23 +455,23 @@ class BinaryTable extends Component {
   }
 
   onViewModelUpdatePreference(sender, preference) {
-    this.setState(state =>
-      this.complementStateChange(state, {
-        fontFamily: preference.fontFamily,
-        fontSize: preference.fontSize,
-        columnUnit: preference.columnUnit,
-      }),
-    );
+    const diff = {
+      fontFamily: preference.fontFamily,
+      fontSize: preference.fontSize,
+      columnUnit: preference.columnUnit,
+    };
+    this.setState(state => this.complementStateChange(state, diff));
   }
 
   onExpressionCellMouseDown(address, e) {
     const { shiftKey } = e;
+    const { viewModel } = this.props;
 
     const handler = () => {
       if (shiftKey === false) {
-        this.props.viewModel.setSelectionStartAddress(address);
+        viewModel.setSelectionStartAddress(address);
       }
-      this.props.viewModel.setSelectionEndAddress(address);
+      viewModel.setSelectionEndAddress(address);
       return { };
     };
     this.setState(handler);
@@ -479,10 +479,11 @@ class BinaryTable extends Component {
 
   onExpressionCellMouseEnter(address, e) {
     const { buttons } = e;
+    const { viewModel } = this.props;
 
     const handler = () => {
       if (buttons === 1) {
-        this.props.viewModel.setSelectionEndAddress(address);
+        viewModel.setSelectionEndAddress(address);
       }
       return { };
     };
@@ -518,9 +519,9 @@ class BinaryTable extends Component {
         BinaryTableExpressionRow.setFontSize(fontSize);
       }
     }
+    const { rowCount, columnCount } = this.state;
     const items = [];
-    if (this.state.rowCount !== undefined) {
-      const columnCount = this.state.columnCount;
+    if (rowCount !== undefined) {
       items.push(<span key="binary-table-header-row" className="binary-table-header-row">
         <Measure onResize={(contentRect) => { this.onAddressResized(contentRect); }}>
           {({ measureRef }) =>
@@ -536,14 +537,14 @@ class BinaryTable extends Component {
       const selectedRange = viewModel.getSelectedRange();
       const focusedAddress = selectedRange[0];
       {
-        const addresses = new Float64Array(this.state.rowCount);
-        for (let j = 0; j < this.state.rowCount; j += 1) {
+        const addresses = new Float64Array(rowCount);
+        for (let j = 0; j < rowCount; j += 1) {
           addresses[j] = (j + this.state.row) * columnCount;
         }
         items.push(<BinaryTableAddressArea key="BinaryTableAddressArea" addresses={addresses} />);
       }
       const tableCells = [];
-      for (let j = 0; j < this.state.rowCount; j += 1) {
+      for (let j = 0; j < rowCount; j += 1) {
         const rowAddress = (j + this.state.row) * columnCount;
         const rowIndex = Math.floor(rowAddress / columnCount);
         const values = viewModel.getBuffer(rowAddress, columnCount);
@@ -581,7 +582,7 @@ class BinaryTable extends Component {
           rowSelectedRange = undefined;
         }
         tableCells.push(<BinaryTableDataRow
-          key={'DataRow:' + (rowIndex % this.state.rowCount)}
+          key={'DataRow:' + (rowIndex % rowCount)}
           listener={this}
           values={values}
           address={rowAddress}
@@ -592,7 +593,7 @@ class BinaryTable extends Component {
         />);
         tableCells.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
         tableCells.push(<BinaryTableExpressionRow
-          key={'ExpressionRow:' + (rowIndex % this.state.rowCount)}
+          key={'ExpressionRow:' + (rowIndex % rowCount)}
           listener={this}
           address={rowAddress}
           length={columnCount}
@@ -610,20 +611,25 @@ class BinaryTable extends Component {
         <div key={'write-mode'} className="binary-table-address">{(this.props.viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>
       </span>);
     }
-    return (<Measure onResize={(contentRect) => { this.onResized(contentRect); }}>
-      {({ measureRef }) =>
-        (<div
-          ref={measureRef}
-          className="binary-table"
-          style={containerStyle}
-          onDragOver={this.handleDragOver}
-          onDrop={this.handleDrop}
-          onKeyDown={this.handleKeyDown}
-          onWheel={this.handleWheel}
-          tabIndex={100000}
-        >{items}</div>)
+    return (
+      <Measure onResize={(contentRect) => { this.onResized(contentRect); }}>
+        {({ measureRef }) => (
+          <div
+            ref={measureRef}
+            className="binary-table"
+            style={containerStyle}
+            onDragOver={this.handleDragOver}
+            onDrop={this.handleDrop}
+            onKeyDown={this.handleKeyDown}
+            onWheel={this.handleWheel}
+            tabIndex={100000}
+          >
+            {items}
+          </div>
+        )
       }
-    </Measure>);
+      </Measure>
+    );
   }
 }
 
