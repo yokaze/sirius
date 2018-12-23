@@ -239,133 +239,6 @@ class BinaryTable extends Component {
     this.handleWheel = this.handleWheel.bind(this);
   }
 
-  render() {
-    {
-      const fontFamily = this.state.fontFamily;
-      const fontSize = this.state.fontSize;
-      if (this.cache.fontFamily !== fontFamily) {
-        this.cache.fontFamily = fontFamily;
-        BinaryTableHeaderRow.setFontFamily(fontFamily);
-        BinaryTableAddressCell.setFontFamily(fontFamily);
-        BinaryTableDataRow.setFontFamily(fontFamily);
-        BinaryTableExpressionRow.setFontFamily(fontFamily);
-      }
-      if (this.cache.fontSize !== fontSize) {
-        this.cache.fontSize = fontSize;
-        BinaryTableHeaderRow.setFontSize(fontSize);
-        BinaryTableAddressCell.setFontSize(fontSize);
-        BinaryTableDataRow.setFontSize(fontSize);
-        BinaryTableExpressionRow.setFontSize(fontSize);
-      }
-    }
-    const items = [];
-    if (this.state.rowCount !== undefined) {
-      const columnCount = this.state.columnCount;
-      items.push(<span key="binary-table-header-row" className="binary-table-header-row">
-        <Measure onResize={(contentRect) => { this.onAddressResized(contentRect); }}>
-          {({ measureRef }) =>
-            (<span ref={measureRef} style={{ display: 'inline-block' }} key="addressBox">
-              <BinaryTableAddressCell key="address" value={'\xA0Address'} />
-            </span>)
-          }
-        </Measure>
-        <BinaryTableHeaderRow key="binary-table-header-row" columnCount={columnCount} />
-      </span>);
-      items.push(<br key="br-head" />);
-      const viewModel = this.props.viewModel;
-      const selectedRange = viewModel.getSelectedRange();
-      const focusedAddress = selectedRange[0];
-      {
-        const addresses = new Float64Array(this.state.rowCount);
-        for (let j = 0; j < this.state.rowCount; j += 1) {
-          addresses[j] = (j + this.state.row) * columnCount;
-        }
-        items.push(<BinaryTableAddressArea key="BinaryTableAddressArea" addresses={addresses} />);
-      }
-      const tableCells = [];
-      for (let j = 0; j < this.state.rowCount; j += 1) {
-        const rowAddress = (j + this.state.row) * columnCount;
-        const rowIndex = Math.floor(rowAddress / columnCount);
-        const values = viewModel.getBuffer(rowAddress, columnCount);
-        if (this.tableData[rowIndex] === undefined) {
-          this.tableData[rowIndex] = values;
-        } else if (this.tableData[rowIndex].length !== values.length) {
-          this.tableData[rowIndex] = values;
-        } else {
-          let changed = false;
-          for (let i = 0; i < columnCount; i += 1) {
-            if (this.tableData[rowIndex][i] !== values[i]) {
-              changed = true;
-              break;
-            }
-          }
-          if (changed) {
-            this.tableData[rowIndex] = values;
-          }
-        }
-
-        let selectedIndex = (focusedAddress - rowAddress);
-        if (selectedIndex < 0) {
-          selectedIndex = -1;
-        } else if (selectedIndex >= columnCount) {
-          selectedIndex = -1;
-        }
-        let rowFocusIndex = focusedAddress - rowAddress;
-        if ((rowFocusIndex < 0) || (columnCount <= rowFocusIndex)) {
-          rowFocusIndex = undefined;
-        }
-        let rowSelectedRange = [selectedRange[0] - rowAddress, selectedRange[1] - rowAddress];
-        rowSelectedRange[0] = Math.min(Math.max(0, rowSelectedRange[0]), columnCount);
-        rowSelectedRange[1] = Math.min(Math.max(0, rowSelectedRange[1]), columnCount);
-        if (rowSelectedRange[0] === rowSelectedRange[1]) {
-          rowSelectedRange = undefined;
-        }
-        tableCells.push(<BinaryTableDataRow
-          key={'DataRow:' + (rowIndex % this.state.rowCount)}
-          listener={this}
-          values={values}
-          address={rowAddress}
-          length={columnCount}
-          focusIndex={rowFocusIndex}
-          selectedRange={rowSelectedRange}
-          measured={j === 0}
-        />);
-        tableCells.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
-        tableCells.push(<BinaryTableExpressionRow
-          key={'ExpressionRow:' + (rowIndex % this.state.rowCount)}
-          listener={this}
-          address={rowAddress}
-          length={columnCount}
-          values={this.tableData[rowIndex]}
-          focusIndex={rowFocusIndex}
-          selectedRange={rowSelectedRange}
-          measured={j === 0}
-        />);
-        tableCells.push(<br key={'br' + rowAddress} />);
-      }
-      items.push(<div key="table" style={{ display: 'inline-block' }}>{tableCells}</div>);
-      items.push(<br key="br-footer" />);
-      items.push(<span key="binary-table-footer-row" className="binary-table-footer-row">
-        <span key="address" className="binary-table-address">&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;</span>
-        <div key={'write-mode'} className="binary-table-address">{(this.props.viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>
-      </span>);
-    }
-    return (<Measure onResize={(contentRect) => { this.onResized(contentRect); }}>
-      {({ measureRef }) =>
-        (<div
-          ref={measureRef}
-          className="binary-table"
-          style={containerStyle}
-          onDragOver={this.handleDragOver}
-          onDrop={this.handleDrop}
-          onKeyDown={this.handleKeyDown}
-          onWheel={this.handleWheel}
-          tabIndex={100000}
-        >{items}</div>)
-      }
-    </Measure>);
-  }
-
   handleKeyDown(e) {
     const { keyCode, shiftKey } = e;
     const handler = (state) => {
@@ -619,6 +492,132 @@ class BinaryTable extends Component {
     const maxRow = Math.max(0, Math.floor(fileSize - 1) / columnCount);
     row = Math.max(0, row);
     return Math.min(row, maxRow);
+  }
+
+  render() {
+    {
+      const { fontFamily, fontSize } = this.state;
+      if (this.cache.fontFamily !== fontFamily) {
+        this.cache.fontFamily = fontFamily;
+        BinaryTableHeaderRow.setFontFamily(fontFamily);
+        BinaryTableAddressCell.setFontFamily(fontFamily);
+        BinaryTableDataRow.setFontFamily(fontFamily);
+        BinaryTableExpressionRow.setFontFamily(fontFamily);
+      }
+      if (this.cache.fontSize !== fontSize) {
+        this.cache.fontSize = fontSize;
+        BinaryTableHeaderRow.setFontSize(fontSize);
+        BinaryTableAddressCell.setFontSize(fontSize);
+        BinaryTableDataRow.setFontSize(fontSize);
+        BinaryTableExpressionRow.setFontSize(fontSize);
+      }
+    }
+    const items = [];
+    if (this.state.rowCount !== undefined) {
+      const columnCount = this.state.columnCount;
+      items.push(<span key="binary-table-header-row" className="binary-table-header-row">
+        <Measure onResize={(contentRect) => { this.onAddressResized(contentRect); }}>
+          {({ measureRef }) =>
+            (<span ref={measureRef} style={{ display: 'inline-block' }} key="addressBox">
+              <BinaryTableAddressCell key="address" value={'\xA0Address'} />
+            </span>)
+          }
+        </Measure>
+        <BinaryTableHeaderRow key="binary-table-header-row" columnCount={columnCount} />
+      </span>);
+      items.push(<br key="br-head" />);
+      const viewModel = this.props.viewModel;
+      const selectedRange = viewModel.getSelectedRange();
+      const focusedAddress = selectedRange[0];
+      {
+        const addresses = new Float64Array(this.state.rowCount);
+        for (let j = 0; j < this.state.rowCount; j += 1) {
+          addresses[j] = (j + this.state.row) * columnCount;
+        }
+        items.push(<BinaryTableAddressArea key="BinaryTableAddressArea" addresses={addresses} />);
+      }
+      const tableCells = [];
+      for (let j = 0; j < this.state.rowCount; j += 1) {
+        const rowAddress = (j + this.state.row) * columnCount;
+        const rowIndex = Math.floor(rowAddress / columnCount);
+        const values = viewModel.getBuffer(rowAddress, columnCount);
+        if (this.tableData[rowIndex] === undefined) {
+          this.tableData[rowIndex] = values;
+        } else if (this.tableData[rowIndex].length !== values.length) {
+          this.tableData[rowIndex] = values;
+        } else {
+          let changed = false;
+          for (let i = 0; i < columnCount; i += 1) {
+            if (this.tableData[rowIndex][i] !== values[i]) {
+              changed = true;
+              break;
+            }
+          }
+          if (changed) {
+            this.tableData[rowIndex] = values;
+          }
+        }
+
+        let selectedIndex = (focusedAddress - rowAddress);
+        if (selectedIndex < 0) {
+          selectedIndex = -1;
+        } else if (selectedIndex >= columnCount) {
+          selectedIndex = -1;
+        }
+        let rowFocusIndex = focusedAddress - rowAddress;
+        if ((rowFocusIndex < 0) || (columnCount <= rowFocusIndex)) {
+          rowFocusIndex = undefined;
+        }
+        let rowSelectedRange = [selectedRange[0] - rowAddress, selectedRange[1] - rowAddress];
+        rowSelectedRange[0] = Math.min(Math.max(0, rowSelectedRange[0]), columnCount);
+        rowSelectedRange[1] = Math.min(Math.max(0, rowSelectedRange[1]), columnCount);
+        if (rowSelectedRange[0] === rowSelectedRange[1]) {
+          rowSelectedRange = undefined;
+        }
+        tableCells.push(<BinaryTableDataRow
+          key={'DataRow:' + (rowIndex % this.state.rowCount)}
+          listener={this}
+          values={values}
+          address={rowAddress}
+          length={columnCount}
+          focusIndex={rowFocusIndex}
+          selectedRange={rowSelectedRange}
+          measured={j === 0}
+        />);
+        tableCells.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
+        tableCells.push(<BinaryTableExpressionRow
+          key={'ExpressionRow:' + (rowIndex % this.state.rowCount)}
+          listener={this}
+          address={rowAddress}
+          length={columnCount}
+          values={this.tableData[rowIndex]}
+          focusIndex={rowFocusIndex}
+          selectedRange={rowSelectedRange}
+          measured={j === 0}
+        />);
+        tableCells.push(<br key={'br' + rowAddress} />);
+      }
+      items.push(<div key="table" style={{ display: 'inline-block' }}>{tableCells}</div>);
+      items.push(<br key="br-footer" />);
+      items.push(<span key="binary-table-footer-row" className="binary-table-footer-row">
+        <span key="address" className="binary-table-address">&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;</span>
+        <div key={'write-mode'} className="binary-table-address">{(this.props.viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>
+      </span>);
+    }
+    return (<Measure onResize={(contentRect) => { this.onResized(contentRect); }}>
+      {({ measureRef }) =>
+        (<div
+          ref={measureRef}
+          className="binary-table"
+          style={containerStyle}
+          onDragOver={this.handleDragOver}
+          onDrop={this.handleDrop}
+          onKeyDown={this.handleKeyDown}
+          onWheel={this.handleWheel}
+          tabIndex={100000}
+        >{items}</div>)
+      }
+    </Measure>);
   }
 }
 
