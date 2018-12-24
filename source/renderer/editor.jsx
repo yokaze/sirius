@@ -240,6 +240,12 @@ class BinaryStructureNode extends Component {
 }
 
 class BinaryTable extends Component {
+  static limitRowNumber(row, columnCount, fileSize) {
+    const maxRow = Math.max(0, Math.floor(fileSize - 1) / columnCount);
+    row = Math.max(0, row);
+    return Math.min(row, maxRow);
+  }
+
   constructor(props) {
     super(props);
     this.props.viewModel.setListener(this);
@@ -437,34 +443,6 @@ class BinaryTable extends Component {
     });
   }
 
-  complementStateChange(state, diff) {
-    if (diff.addressWidth || diff.totalWidth || diff.tableHeight || diff.columnUnit || diff.rowHeight || diff.dataCellWidth || diff.expressionCellWidth ||
-        diff.useStructureView) {
-      if ((diff.columnCount === undefined) || (diff.rowCount === undefined)) {
-        const nextState = Object.assign(state, diff);
-        if (nextState.addressWidth === undefined) {
-          return diff;
-        }
-        let rowCount = 1;
-        if (nextState.rowHeight !== 0) {
-          //  2 for excluding header and footer
-          rowCount = Math.floor((nextState.tableHeight / nextState.rowHeight) - 2);
-        }
-        let columnCount = 1;
-        if ((nextState.dataCellWidth !== 0) && (nextState.expressionCellWidth !== 0)) {
-          const cellWidth = nextState.dataCellWidth + nextState.expressionCellWidth;
-          columnCount = Math.floor(Math.max(nextState.columnUnit, (nextState.totalWidth - nextState.addressWidth - cellWidth - 1) / cellWidth));
-        }
-        columnCount = Math.max(1, Math.floor(columnCount / nextState.columnUnit) * nextState.columnUnit);
-        if (nextState.useStructureView) {
-          columnCount = Math.min(columnCount, 16);
-        }
-        return Object.assign(diff, { rowCount, columnCount });
-      }
-    }
-    return diff;
-  }
-
   onResized(contentRect) {
     const { width, height } = contentRect.entry;
     const diff = { totalWidth: width, tableHeight: height };
@@ -521,15 +499,37 @@ class BinaryTable extends Component {
     this.setState(state => this.complementStateChange(state, diff));
   }
 
+  complementStateChange(state, diff) {
+    if (diff.addressWidth || diff.totalWidth || diff.tableHeight || diff.columnUnit || diff.rowHeight || diff.dataCellWidth || diff.expressionCellWidth ||
+        diff.useStructureView) {
+      if ((diff.columnCount === undefined) || (diff.rowCount === undefined)) {
+        const nextState = Object.assign(state, diff);
+        if (nextState.addressWidth === undefined) {
+          return diff;
+        }
+        let rowCount = 1;
+        if (nextState.rowHeight !== 0) {
+          //  2 for excluding header and footer
+          rowCount = Math.floor((nextState.tableHeight / nextState.rowHeight) - 2);
+        }
+        let columnCount = 1;
+        if ((nextState.dataCellWidth !== 0) && (nextState.expressionCellWidth !== 0)) {
+          const cellWidth = nextState.dataCellWidth + nextState.expressionCellWidth;
+          columnCount = Math.floor(Math.max(nextState.columnUnit, (nextState.totalWidth - nextState.addressWidth - cellWidth - 1) / cellWidth));
+        }
+        columnCount = Math.max(1, Math.floor(columnCount / nextState.columnUnit) * nextState.columnUnit);
+        if (nextState.useStructureView) {
+          columnCount = Math.min(columnCount, 16);
+        }
+        return Object.assign(diff, { rowCount, columnCount });
+      }
+    }
+    return diff;
+  }
+
   useStructureView() {
     const diff = { useStructureView: true };
     this.setState(state => this.complementStateChange(state, diff));
-  }
-
-  static limitRowNumber(row, columnCount, fileSize) {
-    const maxRow = Math.max(0, Math.floor(fileSize - 1) / columnCount);
-    row = Math.max(0, row);
-    return Math.min(row, maxRow);
   }
 
   render() {
