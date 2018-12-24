@@ -261,13 +261,13 @@ class BinaryTable extends Component {
     };
     this.tableData = { };
     this.containerReference = React.createRef();
-    this.handleKeyDown = this.handleKeyDown.bind(this);
-    this.handleDragOver = this.handleDragOver.bind(this);
-    this.handleDrop = this.handleDrop.bind(this);
-    this.handleWheel = this.handleWheel.bind(this);
+    this.onKeyDown = this.onKeyDown.bind(this);
+    this.onDragOver = this.onDragOver.bind(this);
+    this.onDrop = this.onDrop.bind(this);
+    this.onWheel = this.onWheel.bind(this);
   }
 
-  handleKeyDown(e) {
+  onKeyDown(e) {
     const { keyCode, shiftKey } = e;
     const handler = (state) => {
       const { viewModel } = this.props;
@@ -415,16 +415,16 @@ class BinaryTable extends Component {
     this.setState(state => this.complementStateChange(state, diff));
   }
 
-  handleDragOver(e) {
+  onDragOver(e) {
     e.preventDefault();
   }
 
-  handleDrop(e) {
+  onDrop(e) {
     e.preventDefault();
     ipcClient.sendFileDropRequest(e.dataTransfer.files[0].path);
   }
 
-  handleWheel(e) {
+  onWheel(e) {
     const deltaRow = e.deltaY / 24;
     this.setState((state, props) => {
       const nextFloatRow = BinaryTable.limitRowNumber(this.cache.floatRow + deltaRow, state.columnCount, props.viewModel.getFileSize());
@@ -660,10 +660,10 @@ class BinaryTable extends Component {
             ref={measureRef}
             className="binary-table"
             style={containerStyle}
-            onDragOver={this.handleDragOver}
-            onDrop={this.handleDrop}
-            onKeyDown={this.handleKeyDown}
-            onWheel={this.handleWheel}
+            onDragOver={this.onDragOver}
+            onDrop={this.onDrop}
+            onKeyDown={this.onKeyDown}
+            onWheel={this.onWheel}
             tabIndex={100000}
           >
             {items}

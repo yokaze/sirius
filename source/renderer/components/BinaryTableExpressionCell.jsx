@@ -45,9 +45,9 @@ const { classes } = sheet.attach();
 export default class BinaryTableExpressionCell extends Component {
   constructor(props) {
     super(props);
-    this.handleMouseDown = this.handleMouseDown.bind(this);
-    this.handleMouseEnter = this.handleMouseEnter.bind(this);
-    this.handleResize = this.handleResize.bind(this);
+    this.onMouseDown = this.onMouseDown.bind(this);
+    this.onMouseEnter = this.onMouseEnter.bind(this);
+    this.onResize = this.onResize.bind(this);
   }
 
   shouldComponentUpdate(nextProps) {
@@ -58,17 +58,17 @@ export default class BinaryTableExpressionCell extends Component {
     return changed;
   }
 
-  handleMouseDown(e) {
+  onMouseDown(e) {
     const { listener, address } = this.props;
     listener.onExpressionCellMouseDown(address, e);
   }
 
-  handleMouseEnter(e) {
+  onMouseEnter(e) {
     const { listener, address } = this.props;
     listener.onExpressionCellMouseEnter(address, e);
   }
 
-  handleResize(contentRect) {
+  onResize(contentRect) {
     const { width, height } = contentRect.entry;
     const { listener } = this.props;
     listener.onExpressionCellResized({ width, height });
@@ -88,15 +88,15 @@ export default class BinaryTableExpressionCell extends Component {
       <span
         key="span"
         className={className}
-        onMouseDown={this.handleMouseDown}
-        onMouseEnter={this.handleMouseEnter}
+        onMouseDown={this.onMouseDown}
+        onMouseEnter={this.onMouseEnter}
       >
         {value}
       </span>
     );
     if (measured) {
       return (
-        <Measure onResize={this.handleResize}>
+        <Measure onResize={this.onResize}>
           {({ measureRef }) => (
             <span ref={measureRef} className={classes.container}>
               {content}
