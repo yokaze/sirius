@@ -1,9 +1,9 @@
 /* eslint-env browser */
 import { ipcRenderer } from 'electron';
-import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
+import shallowEqualArrays from 'shallow-equal/arrays';
 import { sprintf } from 'sprintf-js';
 
 import BinaryTableAddressArea from './components/BinaryTableAddressArea';
@@ -265,7 +265,11 @@ class BinaryTable extends Component {
     this.cache = {
       floatRow: 0,
     };
-    this.tableData = { };
+    this.renderCache = {
+      values: new Map(),
+      focused: new Map(),
+      selected: new Map(),
+    };
     this.containerReference = React.createRef();
     this.onKeyDown = this.onKeyDown.bind(this);
     this.onDragOver = this.onDragOver.bind(this);
@@ -532,6 +536,31 @@ class BinaryTable extends Component {
     this.setState(state => this.complementStateChange(state, diff));
   }
 
+  updateRenderCache() {
+    const { viewModel } = this.props;
+    const { columnCount, row, rowCount } = this.state;
+    const { values, focused, selected } = this.renderCache;
+    const nextValues = new Map();
+    const nextFocused = new Map();
+    const nextSelected = new Map();
+    for (let i = 0; i < rowCount; i += 1) {
+      const rowAddress = (row + i) * columnCount;
+      {
+        const rowValues = values.get(rowAddress);
+        let nextRowValues = viewModel.getBuffer(rowAddress, columnCount);
+        if (
+          (rowValues !== undefined)
+          && (nextRowValues !== undefined)
+          && shallowEqualArrays(rowValues, nextRowValues)
+        ) {
+          nextRowValues = rowValues;
+        }
+        nextValues.set(rowAddress, nextRowValues);
+      }
+    }
+    this.renderCache.values = nextValues;
+  }
+
   render() {
     {
       const { fontFamily, fontSize } = this.state;
@@ -574,28 +603,11 @@ class BinaryTable extends Component {
         }
         items.push(<BinaryTableAddressArea key="BinaryTableAddressArea" addresses={addresses} />);
       }
+      this.updateRenderCache();
       const tableCells = [];
       for (let j = 0; j < rowCount; j += 1) {
         const rowAddress = (j + this.state.row) * columnCount;
         const rowIndex = Math.floor(rowAddress / columnCount);
-        const values = viewModel.getBuffer(rowAddress, columnCount);
-        if (this.tableData[rowIndex] === undefined) {
-          this.tableData[rowIndex] = values;
-        } else if (this.tableData[rowIndex].length !== values.length) {
-          this.tableData[rowIndex] = values;
-        } else {
-          let changed = false;
-          for (let i = 0; i < columnCount; i += 1) {
-            if (this.tableData[rowIndex][i] !== values[i]) {
-              changed = true;
-              break;
-            }
-          }
-          if (changed) {
-            this.tableData[rowIndex] = values;
-          }
-        }
-
         let selectedIndex = (focusedAddress - rowAddress);
         if (selectedIndex < 0) {
           selectedIndex = -1;
@@ -615,7 +627,7 @@ class BinaryTable extends Component {
         tableCells.push(<BinaryTableDataRow
           key={'DataRow:' + (rowIndex % rowCount)}
           listener={this}
-          values={values}
+          values={this.renderCache.values.get(rowAddress)}
           address={rowAddress}
           length={columnCount}
           focusIndex={rowFocusIndex}
@@ -628,7 +640,7 @@ class BinaryTable extends Component {
           listener={this}
           address={rowAddress}
           length={columnCount}
-          values={this.tableData[rowIndex]}
+          values={this.renderCache.values.get(rowAddress)}
           focusIndex={rowFocusIndex}
           selectedRange={rowSelectedRange}
           measured={j === 0}

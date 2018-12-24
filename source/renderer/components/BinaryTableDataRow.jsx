@@ -8,16 +8,11 @@ export default class BinaryTableDataRow extends Component {
     const {
       address, length, values, focusIndex, selectedRange,
     } = this.props;
-    if (values.length !== nextProps.values.length) {
-      return true;
-    }
     let changed = (address !== nextProps.address);
     changed = changed || (length !== nextProps.length);
     changed = changed || (focusIndex !== nextProps.focusIndex);
     changed = changed || (selectedRange !== nextProps.selectedRange);
-    for (let i = 0; i < values.length; i += 1) {
-      changed = changed || (values[i] !== nextProps.values[i]);
-    }
+    changed = changed || (values !== nextProps.values);
     return changed;
   }
 
