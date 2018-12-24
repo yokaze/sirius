@@ -4,7 +4,6 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
 import shallowEqualArrays from 'shallow-equal/arrays';
-import { sprintf } from 'sprintf-js';
 
 import BinaryTableAddressArea from './components/BinaryTableAddressArea';
 import BinaryTableAddressCell from './components/BinaryTableAddressCell';
@@ -267,8 +266,8 @@ class BinaryTable extends Component {
     };
     this.renderCache = {
       values: new Map(),
-      focused: new Map(),
-      selected: new Map(),
+      focusIndex: new Map(),
+      selectedRange: new Map(),
     };
     this.containerReference = React.createRef();
     this.onKeyDown = this.onKeyDown.bind(this);
@@ -539,10 +538,12 @@ class BinaryTable extends Component {
   updateRenderCache() {
     const { viewModel } = this.props;
     const { columnCount, row, rowCount } = this.state;
-    const { values, focused, selected } = this.renderCache;
+    const { values, selectedRange } = this.renderCache;
+    const focusIndex = viewModel.getSelectedRange()[0];
+    const selection = viewModel.getSelectedRange();
     const nextValues = new Map();
-    const nextFocused = new Map();
-    const nextSelected = new Map();
+    const nextFocusIndex = new Map();
+    const nextSelectedRange = new Map();
     for (let i = 0; i < rowCount; i += 1) {
       const rowAddress = (row + i) * columnCount;
       {
@@ -557,8 +558,34 @@ class BinaryTable extends Component {
         }
         nextValues.set(rowAddress, nextRowValues);
       }
+      {
+        let rowFocusIndex = focusIndex - rowAddress;
+        if ((rowFocusIndex < 0) || (rowFocusIndex >= columnCount)) {
+          rowFocusIndex = undefined;
+        }
+        nextFocusIndex.set(rowAddress, rowFocusIndex);
+      }
+      {
+        const rowSelectedRange = selectedRange.get(rowAddress);
+        const rowSelectionStart = Math.min(Math.max(0, selection[0] - rowAddress), columnCount);
+        const rowSelectionEnd = Math.min(Math.max(0, selection[1] - rowAddress), columnCount);
+        let nextRowSelectedRange = [rowSelectionStart, rowSelectionEnd];
+        if (rowSelectionStart === rowSelectionEnd) {
+          nextRowSelectedRange = undefined;
+        }
+        if (
+          (rowSelectedRange !== undefined)
+          && (nextRowSelectedRange !== undefined)
+          && shallowEqualArrays(rowSelectedRange, nextRowSelectedRange)
+        ) {
+          nextRowSelectedRange = rowSelectedRange;
+        }
+        nextSelectedRange.set(rowAddress, nextRowSelectedRange);
+      }
     }
     this.renderCache.values = nextValues;
+    this.renderCache.focusIndex = nextFocusIndex;
+    this.renderCache.selectedRange = nextSelectedRange;
   }
 
   render() {
@@ -579,7 +606,7 @@ class BinaryTable extends Component {
         BinaryTableExpressionRow.setFontSize(fontSize);
       }
     }
-    const { rowCount, columnCount } = this.state;
+    const { row, rowCount, columnCount } = this.state;
     const items = [];
     if (rowCount !== undefined) {
       items.push(<span key="binary-table-header-row" className="binary-table-header-row">
@@ -593,59 +620,45 @@ class BinaryTable extends Component {
         <BinaryTableHeaderRow key="binary-table-header-row" columnCount={columnCount} />
       </span>);
       items.push(<br key="br-head" />);
-      const viewModel = this.props.viewModel;
+      const { viewModel } = this.props;
       const selectedRange = viewModel.getSelectedRange();
       const focusedAddress = selectedRange[0];
       {
         const addresses = new Float64Array(rowCount);
         for (let j = 0; j < rowCount; j += 1) {
-          addresses[j] = (j + this.state.row) * columnCount;
+          addresses[j] = (j + row) * columnCount;
         }
         items.push(<BinaryTableAddressArea key="BinaryTableAddressArea" addresses={addresses} />);
       }
       this.updateRenderCache();
       const tableCells = [];
       for (let j = 0; j < rowCount; j += 1) {
-        const rowAddress = (j + this.state.row) * columnCount;
-        const rowIndex = Math.floor(rowAddress / columnCount);
-        let selectedIndex = (focusedAddress - rowAddress);
-        if (selectedIndex < 0) {
-          selectedIndex = -1;
-        } else if (selectedIndex >= columnCount) {
-          selectedIndex = -1;
-        }
-        let rowFocusIndex = focusedAddress - rowAddress;
-        if ((rowFocusIndex < 0) || (columnCount <= rowFocusIndex)) {
-          rowFocusIndex = undefined;
-        }
-        let rowSelectedRange = [selectedRange[0] - rowAddress, selectedRange[1] - rowAddress];
-        rowSelectedRange[0] = Math.min(Math.max(0, rowSelectedRange[0]), columnCount);
-        rowSelectedRange[1] = Math.min(Math.max(0, rowSelectedRange[1]), columnCount);
-        if (rowSelectedRange[0] === rowSelectedRange[1]) {
-          rowSelectedRange = undefined;
-        }
+        const rowAddress = (j + row) * columnCount;
+        const rowValue = this.renderCache.values.get(rowAddress);
+        const rowFocusIndex = this.renderCache.focusIndex.get(rowAddress);
+        const rowSelectedRange = this.renderCache.selectedRange.get(rowAddress);
         tableCells.push(<BinaryTableDataRow
-          key={'DataRow:' + (rowIndex % rowCount)}
+          key={`data:${rowAddress}`}
           listener={this}
-          values={this.renderCache.values.get(rowAddress)}
+          values={rowValue}
           address={rowAddress}
           length={columnCount}
           focusIndex={rowFocusIndex}
           selectedRange={rowSelectedRange}
           measured={j === 0}
         />);
-        tableCells.push(<span key={'white:' + rowAddress} style={whiteStyle}>&ensp;</span>);
+        tableCells.push(<span key={`white:${rowAddress}`} style={whiteStyle}>&ensp;</span>);
         tableCells.push(<BinaryTableExpressionRow
-          key={'ExpressionRow:' + (rowIndex % rowCount)}
+          key={`express:${rowAddress}`}
           listener={this}
           address={rowAddress}
           length={columnCount}
-          values={this.renderCache.values.get(rowAddress)}
+          values={rowValue}
           focusIndex={rowFocusIndex}
           selectedRange={rowSelectedRange}
           measured={j === 0}
         />);
-        tableCells.push(<br key={'br' + rowAddress} />);
+        tableCells.push(<br key={`br:${rowAddress}`} />);
       }
       items.push(<div key="table" style={{ display: 'inline-block' }}>{tableCells}</div>);
       const { useStructureView } = this.state;
