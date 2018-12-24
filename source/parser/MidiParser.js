@@ -17,7 +17,7 @@ export default class MidiParser {
           const template = [0x4D, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06];
           assert(this._testArray(header.subarray(0, 8), template));
         }
-        ret.push({ address: 0, value: 'MIDI Header' });
+        ret.push({ address: 0, text: 'MIDI Header' });
         const trackCount = header[10] * 256 + header[11];
         address = 14;
         for (let i = 0; i < trackCount; i += 1) {
@@ -31,7 +31,7 @@ export default class MidiParser {
           trackLength = trackLength * 256 + trackHeader[6];
           trackLength = trackLength * 256 + trackHeader[7];
           this.tags.set(address, kMidiTrack);
-          ret.push({ address, value: 'MIDI Track' });
+          ret.push({ address, text: 'MIDI Track' });
           address += trackLength + 8;
         }
       } else if (this.tags.get(address) === kMidiTrack) {
@@ -40,7 +40,7 @@ export default class MidiParser {
         throw new Error();
       }
     } catch (e) {
-      ret.push({ address, value: undefined });
+      ret.push({ address, text: undefined });
     }
     return ret;
   }

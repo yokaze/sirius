@@ -209,11 +209,33 @@ class BinaryTableViewModel {
   onAppRequestStructureView() {
     const midiParser = new MidiParser(this.document);
     console.log(midiParser.parseBlock(0, this.document.getFileSize()));
+    this.listener.useStructureView();
   }
 
   _applyCommand(command) {
     this.document.applyCommand(command);
     ipcClient.sendDocumentCommand(command);
+  }
+}
+
+class BinaryStructureNode extends Component {
+  shouldComponentUpdate() {
+    return true;
+  }
+
+  render() {
+    const { value } = this.props;
+    let children = undefined;
+    if (value.children) {
+      children = value.children.map(child => <BinaryStructureNode value={child} />);
+    }
+    return (
+      <span style={{ display: 'inline-block', width: 600 }}>
+        {value.address + ' ' + value.text}
+        <br />
+        {children}
+      </span>
+    );
   }
 }
 
@@ -416,7 +438,8 @@ class BinaryTable extends Component {
   }
 
   complementStateChange(state, diff) {
-    if (diff.addressWidth || diff.totalWidth || diff.tableHeight || diff.columnUnit || diff.rowHeight || diff.dataCellWidth || diff.expressionCellWidth) {
+    if (diff.addressWidth || diff.totalWidth || diff.tableHeight || diff.columnUnit || diff.rowHeight || diff.dataCellWidth || diff.expressionCellWidth ||
+        diff.useStructureView) {
       if ((diff.columnCount === undefined) || (diff.rowCount === undefined)) {
         const nextState = Object.assign(state, diff);
         if (nextState.addressWidth === undefined) {
@@ -433,6 +456,9 @@ class BinaryTable extends Component {
           columnCount = Math.floor(Math.max(nextState.columnUnit, (nextState.totalWidth - nextState.addressWidth - cellWidth - 1) / cellWidth));
         }
         columnCount = Math.max(1, Math.floor(columnCount / nextState.columnUnit) * nextState.columnUnit);
+        if (nextState.useStructureView) {
+          columnCount = Math.min(columnCount, 16);
+        }
         return Object.assign(diff, { rowCount, columnCount });
       }
     }
@@ -492,6 +518,11 @@ class BinaryTable extends Component {
 
   onExpressionCellResized(size) {
     const diff = { expressionCellWidth: size.width };
+    this.setState(state => this.complementStateChange(state, diff));
+  }
+
+  useStructureView() {
+    const diff = { useStructureView: true };
     this.setState(state => this.complementStateChange(state, diff));
   }
 
@@ -605,10 +636,21 @@ class BinaryTable extends Component {
         tableCells.push(<br key={'br' + rowAddress} />);
       }
       items.push(<div key="table" style={{ display: 'inline-block' }}>{tableCells}</div>);
+      const { useStructureView } = this.state;
+      if (useStructureView) {
+        const parser = new MidiParser(viewModel.document);
+        const subValue = parser.parseBlock(0, viewModel.getFileSize());
+        const value = {
+          address: 0,
+          children: subValue,
+          text: 'Root',
+        };
+        items.push(<BinaryStructureNode value={value} />);
+      }
       items.push(<br key="br-footer" />);
       items.push(<span key="binary-table-footer-row" className="binary-table-footer-row">
         <span key="address" className="binary-table-address">&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;</span>
-        <div key={'write-mode'} className="binary-table-address">{(this.props.viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>
+        <div key="write-mode" className="binary-table-address">{(viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>
       </span>);
     }
     return (
