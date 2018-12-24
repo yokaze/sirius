@@ -1,4 +1,5 @@
 import assert from 'assert';
+import shallowEqualArrays from 'shallow-equal/arrays';
 
 const kMidiTrack = 'kMidiTrack';
 
@@ -15,7 +16,7 @@ export default class MidiParser {
         const header = this.document.getBuffer(0, 14);
         {
           const template = [0x4D, 0x54, 0x68, 0x64, 0x00, 0x00, 0x00, 0x06];
-          assert(this._testArray(header.subarray(0, 8), template));
+          assert(shallowEqualArrays(header.subarray(0, 8), template));
         }
         ret.push({ address: 0, text: 'MIDI Header' });
         const trackCount = header[10] * 256 + header[11];
@@ -24,7 +25,7 @@ export default class MidiParser {
           const trackHeader = this.document.getBuffer(address, 8);
           {
             const template = [0x4D, 0x54, 0x72, 0x6B];
-            assert(this._testArray(trackHeader.subarray(0, 4), template));
+            assert(shallowEqualArrays(trackHeader.subarray(0, 4), template));
           }
           let trackLength = trackHeader[4];
           trackLength = trackLength * 256 + trackHeader[5];
@@ -46,17 +47,5 @@ export default class MidiParser {
   }
 
   reset() {
-  }
-
-  _testArray(x, y) {
-    if (x.length !== y.length) {
-      return false;
-    }
-    for (let i = 0; i < x.length; i += 1) {
-      if (x[i] !== y[i]) {
-        return false;
-      }
-    }
-    return true;
   }
 }
