@@ -265,6 +265,7 @@ class BinaryTable extends Component {
       floatRow: 0,
     };
     this.renderCache = {
+      address: undefined,
       values: new Map(),
       focusIndex: new Map(),
       selectedRange: new Map(),
@@ -538,14 +539,16 @@ class BinaryTable extends Component {
   updateRenderCache() {
     const { viewModel } = this.props;
     const { columnCount, row, rowCount } = this.state;
-    const { values, selectedRange } = this.renderCache;
+    const { address, values, selectedRange } = this.renderCache;
     const focusIndex = viewModel.getSelectedRange()[0];
     const selection = viewModel.getSelectedRange();
+    let nextAddress = new Float64Array(rowCount);
     const nextValues = new Map();
     const nextFocusIndex = new Map();
     const nextSelectedRange = new Map();
     for (let i = 0; i < rowCount; i += 1) {
       const rowAddress = (row + i) * columnCount;
+      nextAddress[i] = rowAddress;
       {
         const rowValues = values.get(rowAddress);
         let nextRowValues = viewModel.getBuffer(rowAddress, columnCount);
@@ -583,6 +586,14 @@ class BinaryTable extends Component {
         nextSelectedRange.set(rowAddress, nextRowSelectedRange);
       }
     }
+    if (
+      (address !== undefined)
+      && (nextAddress !== undefined)
+      && shallowEqualArrays(address, nextAddress)
+    ) {
+      nextAddress = this.renderCache.address;
+    }
+    this.renderCache.address = nextAddress;
     this.renderCache.values = nextValues;
     this.renderCache.focusIndex = nextFocusIndex;
     this.renderCache.selectedRange = nextSelectedRange;
@@ -609,28 +620,22 @@ class BinaryTable extends Component {
     const { row, rowCount, columnCount } = this.state;
     const items = [];
     if (rowCount !== undefined) {
-      items.push(<span key="binary-table-header-row" className="binary-table-header-row">
-        <Measure onResize={(contentRect) => { this.onAddressResized(contentRect); }}>
-          {({ measureRef }) =>
-            (<span ref={measureRef} style={{ display: 'inline-block' }} key="addressBox">
-              <BinaryTableAddressCell key="address" value={'\xA0Address'} />
-            </span>)
-          }
-        </Measure>
-        <BinaryTableHeaderRow key="binary-table-header-row" columnCount={columnCount} />
-      </span>);
+      items.push(
+        <span key="binary-table-header-row" className="binary-table-header-row">
+          <Measure onResize={(contentRect) => { this.onAddressResized(contentRect); }}>
+            {({ measureRef }) => (
+              <span ref={measureRef} style={{ display: 'inline-block' }} key="addressBox">
+                <BinaryTableAddressCell key="address" value={'\xA0Address'} />
+              </span>
+            )}
+          </Measure>
+          <BinaryTableHeaderRow key="binary-table-header-row" columnCount={columnCount} />
+        </span>,
+      );
       items.push(<br key="br-head" />);
       const { viewModel } = this.props;
-      const selectedRange = viewModel.getSelectedRange();
-      const focusedAddress = selectedRange[0];
-      {
-        const addresses = new Float64Array(rowCount);
-        for (let j = 0; j < rowCount; j += 1) {
-          addresses[j] = (j + row) * columnCount;
-        }
-        items.push(<BinaryTableAddressArea key="BinaryTableAddressArea" addresses={addresses} />);
-      }
       this.updateRenderCache();
+      items.push(<BinaryTableAddressArea key="BinaryTableAddressArea" addresses={this.renderCache.address} />);
       const tableCells = [];
       for (let j = 0; j < rowCount; j += 1) {
         const rowAddress = (j + row) * columnCount;
