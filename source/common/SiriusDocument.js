@@ -93,7 +93,7 @@ export default class SiriusDocument {
     for (let i = 0; i < blockCount; i += 1) {
       const blockSize = Math.min(maxBlockSize, fileSize - i * maxBlockSize);
       this.fileData.push({
-        file: true, address: i * blockSize, size: blockSize, data: undefined, storage: undefined,
+        file: true, address: i * maxBlockSize, size: blockSize, data: undefined, storage: undefined,
       });
     }
   }
