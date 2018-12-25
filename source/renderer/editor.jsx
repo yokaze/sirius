@@ -218,21 +218,32 @@ class BinaryTableViewModel {
 }
 
 class BinaryStructureNode extends Component {
+  constructor(props) {
+    super(props);
+    this.onMouseDown = this.onMouseDown.bind(this);
+  }
+
   shouldComponentUpdate() {
     return true;
   }
 
+  onMouseDown(e) {
+    e.stopPropagation();
+    const { listener, value } = this.props;
+    listener.onStructureNodeMouseDown(value.address);
+  }
+
   render() {
-    const { value } = this.props;
+    const { listener, value } = this.props;
     let children = undefined;
     if (value.children) {
-      children = value.children.map(child => <BinaryStructureNode value={child} />);
+      children = value.children.map(child => <BinaryStructureNode listener={listener} value={child} />);
     }
     return (
-      <span style={{ display: 'inline-block', width: 600 }}>
+      <span style={{ display: 'inline-block', fontFamily:'Roboto Mono', width: 600 }} onMouseDown={this.onMouseDown}>
         {value.address + ' ' + value.text}
         <br />
-        {children}
+        <span style={{ display: 'inline-block', marginLeft: '16px'}}>{children}</span>
       </span>
     );
   }
@@ -503,6 +514,12 @@ class BinaryTable extends Component {
     this.setState(state => this.complementStateChange(state, diff));
   }
 
+  onStructureNodeMouseDown(address) {
+    const { columnCount } = this.state;
+    const diff = { row: Math.floor(address / columnCount) };
+    this.setState(() => diff);
+  }
+
   complementStateChange(state, diff) {
     if (diff.addressWidth || diff.totalWidth || diff.tableHeight || diff.columnUnit || diff.rowHeight || diff.dataCellWidth || diff.expressionCellWidth ||
         diff.useStructureView) {
@@ -675,7 +692,7 @@ class BinaryTable extends Component {
           children: subValue,
           text: 'Root',
         };
-        items.push(<BinaryStructureNode value={value} />);
+        items.push(<BinaryStructureNode listener={this} value={value} />);
       }
       items.push(<br key="br-footer" />);
       items.push(<span key="binary-table-footer-row" className="binary-table-footer-row">
