@@ -258,7 +258,8 @@ class BinaryTable extends Component {
 
   constructor(props) {
     super(props);
-    this.props.viewModel.setListener(this);
+    const { viewModel } = this.props;
+    viewModel.setListener(this);
     this.state = {
       row: 0,
       startAddress: 0,
@@ -554,6 +555,35 @@ class BinaryTable extends Component {
     this.setState(state => this.complementStateChange(state, diff));
   }
 
+  generateTableLayout() {
+    const { columnCount, row, rowCount } = this.state;
+    const partition = [];
+    const ret = [];
+    let address = 0;
+    let partitionIndex = 0;
+    for (let i = 0; i <= (row + rowCount); i += 1) {
+      let rowAddress = 0;
+      if (partitionIndex >= partition.length) {
+        rowAddress = address;
+        address += columnCount;
+      } else {
+        const partitionAddress = partition[partitionIndex];
+        if (address < partitionAddress) {
+          rowAddress = address;
+          address += columnCount;
+        } else {
+          rowAddress = partitionAddress;
+          partitionIndex += 1;
+          address = partitionAddress + columnCount;
+        }
+      }
+      if (i >= row) {
+        ret.push(rowAddress);
+      }
+    }
+    return ret;
+  }
+
   updateRenderCache() {
     const { viewModel } = this.props;
     const { columnCount, row, rowCount } = this.state;
@@ -564,12 +594,14 @@ class BinaryTable extends Component {
     const nextValues = new Map();
     const nextFocusIndex = new Map();
     const nextSelectedRange = new Map();
+    const tableLayout = this.generateTableLayout();
     for (let i = 0; i < rowCount; i += 1) {
-      const rowAddress = (row + i) * columnCount;
+      const rowAddress = tableLayout[i];
+      const rowLength = tableLayout[i + 1] - tableLayout[i];
       nextAddress[i] = rowAddress;
       {
         const rowValues = values.get(rowAddress);
-        let nextRowValues = viewModel.getBuffer(rowAddress, columnCount);
+        let nextRowValues = viewModel.getBuffer(rowAddress, rowLength);
         if (
           (rowValues !== undefined)
           && (nextRowValues !== undefined)
@@ -611,6 +643,7 @@ class BinaryTable extends Component {
     ) {
       nextAddress = this.renderCache.address;
     }
+    this.renderCache.layout = tableLayout;
     this.renderCache.address = nextAddress;
     this.renderCache.values = nextValues;
     this.renderCache.focusIndex = nextFocusIndex;
@@ -659,7 +692,7 @@ class BinaryTable extends Component {
       items.push(<BinaryTableAddressArea key="BinaryTableAddressArea" addresses={this.renderCache.address} />);
       const tableCells = [];
       for (let j = 0; j < rowCount; j += 1) {
-        const rowAddress = (j + row) * columnCount;
+        const rowAddress = this.renderCache.layout[j];
         const rowValue = this.renderCache.values.get(rowAddress);
         const rowFocusIndex = this.renderCache.focusIndex.get(rowAddress);
         const rowSelectedRange = this.renderCache.selectedRange.get(rowAddress);
