@@ -235,15 +235,15 @@ class BinaryStructureNode extends Component {
 
   render() {
     const { listener, value } = this.props;
-    let children = undefined;
+    let children;
     if (value.children) {
       children = value.children.map(child => <BinaryStructureNode listener={listener} value={child} />);
     }
     return (
-      <span style={{ display: 'inline-block', fontFamily:'Roboto Mono', width: 600 }} onMouseDown={this.onMouseDown}>
-        {value.address + ' ' + value.text}
+      <span style={{ cursor: 'default', display: 'inline-block', fontFamily:'Roboto Mono', width: 600 }} onMouseDown={this.onMouseDown}>
+        {`${value.text} (${value.address.toString(16).toUpperCase()})`}
         <br />
-        <span style={{ display: 'inline-block', marginLeft: '16px'}}>{children}</span>
+        <span style={{ display: 'inline-block', marginLeft: '16px' }}>{children}</span>
       </span>
     );
   }
