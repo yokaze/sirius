@@ -43,9 +43,9 @@ function handleDrop(e) {
 class PreferencesView extends Component {
   constructor(props) {
     super(props);
-    this.fontFamilyInputChanged = this.fontFamilyInputChanged.bind(this);
-    this.fontSizeInputChanged = this.fontSizeInputChanged.bind(this);
-    this.columnUnitGroupChanged = this.columnUnitGroupChanged.bind(this);
+    this.onFontFamilyInputChange = this.onFontFamilyInputChange.bind(this);
+    this.onFontSizeInputChange = this.onFontSizeInputChange.bind(this);
+    this.onColumnUnitGroupChange = this.onColumnUnitGroupChange.bind(this);
     this.state = {
       fontFamily: '',
       fontSize: '',
@@ -53,7 +53,7 @@ class PreferencesView extends Component {
     };
   }
 
-  fontFamilyInputChanged(e) {
+  onFontFamilyInputChange(e) {
     const { value } = e.target;
     this.setState((state) => {
       const diff = { fontFamily: value };
@@ -62,7 +62,7 @@ class PreferencesView extends Component {
     });
   }
 
-  fontSizeInputChanged(e) {
+  onFontSizeInputChange(e) {
     const { value } = e.target;
     this.setState((state) => {
       const diff = { fontSize: value };
@@ -71,7 +71,7 @@ class PreferencesView extends Component {
     });
   }
 
-  columnUnitGroupChanged(e) {
+  onColumnUnitGroupChange(e) {
     const value = parseInt(e.target.value, 10);
     this.setState((state) => {
       const diff = { columnUnit: value };
@@ -81,24 +81,36 @@ class PreferencesView extends Component {
   }
 
   render() {
-    const { columnUnit } = this.state;
+    const { columnUnit, fontFamily, fontSize } = this.state;
     return (
-      <div style={{ display: 'inline-block', width: '100%', height: '100%' }} onDragOver={handleDragOver} onDrop={handleDrop}>
+      <div
+        style={{ display: 'inline-block', width: '100%', height: '100%' }}
+        onDragOver={handleDragOver}
+        onDrop={handleDrop}
+      >
         <div style={{ margin: 16 }}>
           <FormControl>
             <FormLabel component="legend">Font Family</FormLabel>
-            <Input placeholder={defaultFontFamily} onChange={this.fontFamilyInputChanged} />
+            <Input
+              placeholder={defaultFontFamily}
+              onChange={this.onFontFamilyInputChange}
+              value={fontFamily}
+            />
           </FormControl>
           <FormControl>
             <FormLabel component="legend">Font Size</FormLabel>
-            <Input placeholder={`${defaultFontSize}`} onChange={this.fontSizeInputChanged} />
+            <Input
+              placeholder={`${defaultFontSize}`}
+              onChange={this.onFontSizeInputChange}
+              value={fontSize}
+            />
           </FormControl>
           <FormControl>
             <FormLabel component="legend">Column Unit</FormLabel>
             <RadioGroup
               row
               value={`${columnUnit}`}
-              onChange={this.columnUnitGroupChanged}
+              onChange={this.onColumnUnitGroupChange}
             >
               <FormControlLabel value="1" control={<Radio />} label="1" />
               <FormControlLabel value="2" control={<Radio />} label="2" />
