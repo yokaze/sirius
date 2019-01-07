@@ -288,6 +288,79 @@ class BinaryTable extends Component {
     this.onWheel = this.onWheel.bind(this);
   }
 
+  // Data Cell Events -----------------------------------------------------------------------------
+  onDataCellMouseDown(address, e) {
+    const { shiftKey } = e;
+    const { viewModel } = this.props;
+
+    this.setState(() => {
+      if (shiftKey === false) {
+        viewModel.setSelectionStartAddress(address);
+      }
+      viewModel.setSelectionEndAddress(address);
+      return { };
+    });
+  }
+
+  onDataCellMouseEnter(address, e) {
+    const { buttons } = e;
+    if (buttons !== 1) {
+      return;
+    }
+
+    const { viewModel } = this.props;
+    this.setState(() => {
+      viewModel.setSelectionEndAddress(address);
+      return { };
+    });
+  }
+
+  onDataCellResized(size) {
+    const diff = { dataCellWidth: size.width, rowHeight: size.height };
+    this.setState(state => this.complementStateChange(state, diff));
+  }
+
+  // Expression Cell Events -----------------------------------------------------------------------
+  onExpressionCellMouseDown(address, e) {
+    const { shiftKey } = e;
+    const { viewModel } = this.props;
+
+    this.setState(() => {
+      if (shiftKey === false) {
+        viewModel.setSelectionStartAddress(address);
+      }
+      viewModel.setSelectionEndAddress(address);
+      return { };
+    });
+  }
+
+  onExpressionCellMouseEnter(address, e) {
+    const { buttons } = e;
+    const { viewModel } = this.props;
+
+    this.setState(() => {
+      if (buttons === 1) {
+        viewModel.setSelectionEndAddress(address);
+      }
+      return { };
+    });
+  }
+
+  onExpressionCellResized(size) {
+    const diff = { expressionCellWidth: size.width };
+    this.setState(state => this.complementStateChange(state, diff));
+  }
+
+  // ----------------------------------------------------------------------------------------------
+  onDragOver(e) {
+    e.preventDefault();
+  }
+
+  onDrop(e) {
+    e.preventDefault();
+    ipcClient.sendFileDropRequest(e.dataTransfer.files[0].path);
+  }
+
   onKeyDown(e) {
     const { keyCode, shiftKey } = e;
     const handler = (state) => {
@@ -405,46 +478,6 @@ class BinaryTable extends Component {
     this.setState(handler);
   }
 
-  onDataCellMouseDown(address, e) {
-    const { shiftKey } = e;
-
-    const handler = () => {
-      if (shiftKey === false) {
-        this.props.viewModel.setSelectionStartAddress(address);
-      }
-      this.props.viewModel.setSelectionEndAddress(address);
-      return { };
-    };
-    this.setState(handler);
-  }
-
-  onDataCellMouseEnter(address, e) {
-    const buttons = e.buttons;
-    if (buttons !== 1) {
-      return;
-    }
-
-    const handler = () => {
-      this.props.viewModel.setSelectionEndAddress(address);
-      return { };
-    };
-    this.setState(handler);
-  }
-
-  onDataCellResized(size) {
-    const diff = { dataCellWidth: size.width, rowHeight: size.height };
-    this.setState(state => this.complementStateChange(state, diff));
-  }
-
-  onDragOver(e) {
-    e.preventDefault();
-  }
-
-  onDrop(e) {
-    e.preventDefault();
-    ipcClient.sendFileDropRequest(e.dataTransfer.files[0].path);
-  }
-
   onWheel(e) {
     const deltaRow = e.deltaY / 24;
     this.setState((state, props) => {
@@ -479,38 +512,6 @@ class BinaryTable extends Component {
       fontSize: preference.fontSize,
       columnUnit: preference.columnUnit,
     };
-    this.setState(state => this.complementStateChange(state, diff));
-  }
-
-  onExpressionCellMouseDown(address, e) {
-    const { shiftKey } = e;
-    const { viewModel } = this.props;
-
-    const handler = () => {
-      if (shiftKey === false) {
-        viewModel.setSelectionStartAddress(address);
-      }
-      viewModel.setSelectionEndAddress(address);
-      return { };
-    };
-    this.setState(handler);
-  }
-
-  onExpressionCellMouseEnter(address, e) {
-    const { buttons } = e;
-    const { viewModel } = this.props;
-
-    const handler = () => {
-      if (buttons === 1) {
-        viewModel.setSelectionEndAddress(address);
-      }
-      return { };
-    };
-    this.setState(handler);
-  }
-
-  onExpressionCellResized(size) {
-    const diff = { expressionCellWidth: size.width };
     this.setState(state => this.complementStateChange(state, diff));
   }
 
@@ -616,24 +617,28 @@ class BinaryTable extends Component {
     this.renderCache.selectedRange = nextSelectedRange;
   }
 
-  render() {
-    {
-      const { fontFamily, fontSize } = this.state;
-      if (this.cache.fontFamily !== fontFamily) {
-        this.cache.fontFamily = fontFamily;
-        BinaryTableHeaderRow.setFontFamily(fontFamily);
-        BinaryTableAddressCell.setFontFamily(fontFamily);
-        BinaryTableDataRow.setFontFamily(fontFamily);
-        BinaryTableExpressionRow.setFontFamily(fontFamily);
-      }
-      if (this.cache.fontSize !== fontSize) {
-        this.cache.fontSize = fontSize;
-        BinaryTableHeaderRow.setFontSize(fontSize);
-        BinaryTableAddressCell.setFontSize(fontSize);
-        BinaryTableDataRow.setFontSize(fontSize);
-        BinaryTableExpressionRow.setFontSize(fontSize);
-      }
+  renderStyle() {
+    const { fontFamily, fontSize } = this.state;
+    if (this.cache.fontFamily !== fontFamily) {
+      this.cache.fontFamily = fontFamily;
+      BinaryTableHeaderRow.setFontFamily(fontFamily);
+      BinaryTableAddressCell.setFontFamily(fontFamily);
+      BinaryTableDataRow.setFontFamily(fontFamily);
+      BinaryTableExpressionRow.setFontFamily(fontFamily);
     }
+    if (this.cache.fontSize !== fontSize) {
+      this.cache.fontSize = fontSize;
+      BinaryTableHeaderRow.setFontSize(fontSize);
+      BinaryTableAddressCell.setFontSize(fontSize);
+      BinaryTableDataRow.setFontSize(fontSize);
+      BinaryTableExpressionRow.setFontSize(fontSize);
+    }
+  }
+
+  render() {
+    this.updateRenderCache();
+    this.renderStyle();
+
     const { row, rowCount, columnCount } = this.state;
     const items = [];
     if (rowCount !== undefined) {
@@ -651,7 +656,6 @@ class BinaryTable extends Component {
       );
       items.push(<br key="br-head" />);
       const { viewModel } = this.props;
-      this.updateRenderCache();
       items.push(<BinaryTableAddressArea key="BinaryTableAddressArea" addresses={this.renderCache.address} />);
       const tableCells = [];
       for (let j = 0; j < rowCount; j += 1) {
