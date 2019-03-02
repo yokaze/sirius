@@ -88,7 +88,7 @@ class PreferencesView extends Component {
         onDragOver={handleDragOver}
         onDrop={handleDrop}
       >
-        <div style={{ margin: 16 }}>
+        <span style={{ display: 'inline-block', margin: 8 }}>
           <FormControl>
             <FormLabel component="legend">Font Family</FormLabel>
             <Input
@@ -97,6 +97,8 @@ class PreferencesView extends Component {
               value={fontFamily}
             />
           </FormControl>
+        </span>
+        <span style={{ display: 'inline-block', margin: 8 }}>
           <FormControl>
             <FormLabel component="legend">Font Size</FormLabel>
             <Input
@@ -105,6 +107,8 @@ class PreferencesView extends Component {
               value={fontSize}
             />
           </FormControl>
+        </span>
+        <span style={{ display: 'inline-block', margin: 8 }}>
           <FormControl>
             <FormLabel component="legend">Column Unit</FormLabel>
             <RadioGroup
@@ -119,7 +123,7 @@ class PreferencesView extends Component {
               <FormControlLabel value="16" control={<Radio />} label="16" />
             </RadioGroup>
           </FormControl>
-        </div>
+        </span>
       </div>
     );
   }
