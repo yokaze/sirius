@@ -8,6 +8,8 @@ import SiriusDocument from '../common/SiriusDocument';
 import SiriusFileHandle from './SiriusFileHandle';
 import SiriusIpcCommand from '../ipc/SiriusIpcCommand';
 
+const isDebug = (process.env.NODE_ENV !== 'production');
+
 export default class SiriusModel {
   constructor() {
     //  Window ID -> Data UUID
@@ -127,7 +129,9 @@ export default class SiriusModel {
     const browserWindow = new BrowserWindow({ width: 1600, height: 1024 });
     browserWindow.setTitle('Sirius');
     browserWindow.loadURL(this.getIndexUrl());
-    browserWindow.openDevTools();
+    if (isDebug) {
+      browserWindow.openDevTools();
+    }
     return browserWindow.id;
   }
 
@@ -149,12 +153,14 @@ export default class SiriusModel {
 
   openPreferences() {
     if (this.preferencesWindow === undefined) {
-      this.preferencesWindow = new BrowserWindow({ width: 400, height: 256, resizable: true });
+      this.preferencesWindow = new BrowserWindow({ width: 400, height: 256, resizable: isDebug });
       this.preferencesWindow.loadURL(this.getUrlForFileName('../renderer/preferences.html'));
-      this.preferencesWindow.openDevTools();
       this.preferencesWindow.on('closed', () => {
         this.preferencesWindow = undefined;
       });
+      if (isDebug) {
+        this.preferencesWindow.openDevTools();
+      }
     } else {
       this.preferencesWindow.focus();
     }
