@@ -19,7 +19,7 @@ function AboutView() {
     >
       <div style={{ margin: 16 }}>
         <h1>Sirius</h1>
-        <p>(C) 2018 Rue Yokaze.</p>
+        <p>(C) 2019 Rue Yokaze.</p>
         <p>Distributed under the MIT License.</p>
       </div>
     </div>
