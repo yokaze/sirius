@@ -8,7 +8,7 @@ const { maxBlockSize, minBlockSize } = SiriusConstants;
 
 export default class SiriusDocument {
   constructor() {
-    this.fileData = [];
+    this.blocks = [];
     this.undoBuffer = [];
     this.redoBuffer = [];
     this.clipboard = new SiriusClipboard();
@@ -16,7 +16,7 @@ export default class SiriusDocument {
 
   isBlankDocument() {
     let ret = true;
-    ret = ret && (this.fileData.length === 0);
+    ret = ret && (this.blocks.length === 0);
     ret = ret && (this.undoBuffer.length === 0);
     ret = ret && (this.redoBuffer.length === 0);
     return ret;
@@ -69,7 +69,7 @@ export default class SiriusDocument {
   }
 
   getFileSize() {
-    return this.fileData.reduce((size, block) => size + block.size, 0);
+    return this.blocks.reduce((size, block) => size + block.size, 0);
   }
 
   getClipboard() {
@@ -87,12 +87,12 @@ export default class SiriusDocument {
 
   setFileHandle(fileHandle) {
     this.fileHandle = fileHandle;
-    this.fileData = [];
+    this.blocks = [];
     const fileSize = fileHandle.getSize();
     const blockCount = Math.ceil(fileSize / maxBlockSize);
     for (let i = 0; i < blockCount; i += 1) {
       const blockSize = Math.min(maxBlockSize, fileSize - i * maxBlockSize);
-      this.fileData.push({
+      this.blocks.push({
         file: true, address: i * maxBlockSize, size: blockSize, data: undefined, storage: undefined,
       });
     }
@@ -100,10 +100,10 @@ export default class SiriusDocument {
 
   _blockIterator(startAddress, endAddress) {
     const items = [];
-    const blockCount = this.fileData.length;
+    const blockCount = this.blocks.length;
     let blockAddress = 0;
     for (let i = 0; i < blockCount; i += 1) {
-      const block = this.fileData[i];
+      const block = this.blocks[i];
       const blockSize = block.size;
       if ((blockAddress + blockSize) <= startAddress) {
         blockAddress += blockSize;
@@ -119,9 +119,9 @@ export default class SiriusDocument {
   }
 
   _swapBlocks(blocks, nextBlocks) {
-    const index = this.fileData.findIndex(b => (b === blocks[0]));
+    const index = this.blocks.findIndex(b => (b === blocks[0]));
     assert(index >= 0);
-    this.fileData.splice(index, blocks.length, ...nextBlocks);
+    this.blocks.splice(index, blocks.length, ...nextBlocks);
   }
 
   _runCommand(command) {
@@ -155,7 +155,7 @@ export default class SiriusDocument {
 
   _runInsertCommand(command) {
     if (command.address <= this.getFileSize()) {
-      this.fileData.splice(command.address, 0, ...command.data);
+      this.blocks.splice(command.address, 0, ...command.data);
       const undoCommand = new SiriusDocumentCommand.Remove(command.address, command.data.length);
       return undoCommand;
     }
