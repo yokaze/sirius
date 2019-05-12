@@ -126,7 +126,11 @@ export default class SiriusModel {
   }
 
   openEditor() {
-    const browserWindow = new BrowserWindow({ width: 1600, height: 1024 });
+    const browserWindow = new BrowserWindow({
+      width: 1600,
+      height: 1024,
+      webPreferences: { nodeIntegration: true },
+    });
     browserWindow.setTitle('Sirius');
     browserWindow.loadURL(this.getIndexUrl());
     if (isDebug) {
@@ -147,13 +151,23 @@ export default class SiriusModel {
   }
 
   openAbout() {
-    const browserWindow = new BrowserWindow({ width: 400, height: 256, resizable: false });
+    const browserWindow = new BrowserWindow({
+      width: 400,
+      height: 256,
+      resizable: false,
+      webPreferences: { nodeIntegration: true },
+    });
     browserWindow.loadURL(this.getUrlForFileName('../renderer/about.html'));
   }
 
   openPreferences() {
     if (this.preferencesWindow === undefined) {
-      this.preferencesWindow = new BrowserWindow({ width: 400, height: 256, resizable: isDebug });
+      this.preferencesWindow = new BrowserWindow({
+        width: 400,
+        height: 256,
+        resizable: isDebug,
+        webPreferences: { nodeIntegration: true },
+      });
       this.preferencesWindow.loadURL(this.getUrlForFileName('../renderer/preferences.html'));
       this.preferencesWindow.on('closed', () => {
         this.preferencesWindow = undefined;
