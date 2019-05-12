@@ -8,10 +8,8 @@ const { maxBlockSize, minBlockSize } = SiriusConstants;
 
 export default class SiriusDocument {
   constructor() {
-    this.blocks = [];
-    this.undoBuffer = [];
-    this.redoBuffer = [];
     this.clipboard = new SiriusClipboard();
+    this._initialize();
   }
 
   isBlankDocument() {
@@ -50,22 +48,22 @@ export default class SiriusDocument {
   getBuffer(address, length) {
     const fileSize = this.getFileSize();
     length = Math.max(0, Math.min(length, fileSize - address));
-    const buffer = new Uint8Array(length);
 
+    const ret = new Uint8Array(length);
     const blocks = this._blockIterator(address, address + length);
     for (let i = 0; i < blocks.length; i += 1) {
       const { address: blockAddress, block } = blocks[i];
+      if (block.file && (block.data === undefined)) {
+        block.data = this.fileHandle.getBuffer(block.address, block.size);
+      }
+
       const blockSize = block.size;
       const writeOffset = Math.max(0, blockAddress - address);
       const readOffset = address + writeOffset - blockAddress;
       const writeLength = Math.min(length - writeOffset, blockSize - readOffset);
-
-      if (block.data === undefined) {
-        block.data = this.fileHandle.getBuffer(block.address, block.size);
-      }
-      buffer.set(block.data.subarray(readOffset, readOffset + writeLength), writeOffset);
+      ret.set(block.data.subarray(readOffset, readOffset + writeLength), writeOffset);
     }
-    return buffer;
+    return ret;
   }
 
   getFileSize() {
@@ -87,19 +85,30 @@ export default class SiriusDocument {
 
   setFileHandle(fileHandle) {
     this.fileHandle = fileHandle;
+    this._initializeBlocksForFile();
+  }
+
+  _initialize() {
     this.blocks = [];
-    const fileSize = fileHandle.getSize();
+    this.undoBuffer = [];
+    this.redoBuffer = [];
+  }
+
+  _initializeBlocksForFile() {
+    this._initialize();
+    const fileSize = this.fileHandle.getSize();
     const blockCount = Math.ceil(fileSize / maxBlockSize);
     for (let i = 0; i < blockCount; i += 1) {
       const blockSize = Math.min(maxBlockSize, fileSize - i * maxBlockSize);
       this.blocks.push({
-        file: true, address: i * maxBlockSize, size: blockSize, data: undefined, storage: undefined,
+        file: true, address: i * maxBlockSize, size: blockSize, data: undefined,
       });
     }
   }
 
   _blockIterator(startAddress, endAddress) {
-    const items = [];
+    //  returns [{ address: number, block: object }, ...]
+    const ret = [];
     const blockCount = this.blocks.length;
     let blockAddress = 0;
     for (let i = 0; i < blockCount; i += 1) {
@@ -112,10 +121,10 @@ export default class SiriusDocument {
       if (endAddress <= blockAddress) {
         break;
       }
-      items.push({ address: blockAddress, block });
+      ret.push({ address: blockAddress, block });
       blockAddress += blockSize;
     }
-    return items;
+    return ret;
   }
 
   _swapBlocks(blocks, nextBlocks) {
@@ -234,7 +243,6 @@ export default class SiriusDocument {
           address: block.address + blockRemoveEnd,
           size: blockSize - blockRemoveEnd,
           data: undefined,
-          storage: undefined,
         };
         nextBlocks.push(rightBlock);
       }
