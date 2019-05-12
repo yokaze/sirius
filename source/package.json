@@ -18,9 +18,7 @@
         "babel-preset-es2015": "^6.24.1",
         "babel-preset-react": "^6.24.1",
         "babel-register": "^6.26.0",
-        "electron": "^5.0.1",
         "electron-devtools-installer": "^2.2.4",
-        "electron-packager": "^13.1.1",
         "jss": "^9.8.7",
         "jss-preset-default": "^4.5.0",
         "prop-types": "^15.7.2",
@@ -33,6 +31,8 @@
         "uuid": "^3.3.2"
     },
     "devDependencies": {
+        "electron": "^5.0.1",
+        "electron-packager": "^13.1.1",
         "eslint": "^5.16.0",
         "eslint-config-airbnb": "^17.1.0",
         "eslint-plugin-import": "^2.17.2",
