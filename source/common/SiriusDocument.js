@@ -278,10 +278,10 @@ export default class SiriusDocument {
           block.size = blockRemoveStart;
           nextBlocks.push(block);
           const rightBlock = {
-            file: true,
+            file: block.file,
             address: block.address + blockRemoveEnd,
             size: blockSize - blockRemoveEnd,
-            data: undefined,
+            data: block.data.subarray(blockRemoveEnd),
           };
           nextBlocks.push(rightBlock);
         }
