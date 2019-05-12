@@ -65,11 +65,11 @@ export default class SiriusModel {
   }
 
   open() {
-    const fileNames = dialog.showOpenDialog(null, {
+    const filePaths = dialog.showOpenDialog(null, {
       properties: ['openFile'],
     });
-    if (fileNames !== undefined) {
-      this._openFile(fileNames[0]);
+    if (filePaths !== undefined) {
+      this._openFile(filePaths[0]);
     }
   }
 
