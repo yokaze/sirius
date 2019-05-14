@@ -22,6 +22,7 @@ export default class SiriusModel {
     this.clipboard = new SiriusClipboard();
     this.clipboard.setListener(this);
 
+    this.activeDocumentWindowId = undefined;
     this.preferencesWindow = undefined;
 
     ipcMain.on('editor-initialized', (e) => {
@@ -146,6 +147,7 @@ export default class SiriusModel {
     });
     browserWindow.setTitle('Sirius');
     browserWindow.loadURL(this.getIndexUrl());
+    browserWindow.on('focus', () => { this.activeDocumentWindowId = browserWindow.id; });
     if (isDebug) {
       browserWindow.openDevTools();
     }
@@ -254,7 +256,7 @@ export default class SiriusModel {
     let initialized = false;
     {
       //  If a blank document window is focused, open document in it.
-      const currentWindow = BrowserWindow.getFocusedWindow();
+      const currentWindow = BrowserWindow.fromId(this.activeDocumentWindowId);
       if (currentWindow) {
         const currentHandle = this.handles.get(currentWindow.id);
         const doc = this.documents.get(currentHandle);
