@@ -1,4 +1,5 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron';
+import fs from 'fs';
 import path from 'path';
 import url from 'url';
 import uuid from 'uuid/v4';
@@ -77,6 +78,18 @@ export default class SiriusModel {
   }
 
   saveAs() {
+    const currentWindow = BrowserWindow.getFocusedWindow();
+    const currentHandle = this.handles.get(currentWindow.id);
+    const doc = this.documents.get(currentHandle);
+    const filePath = dialog.showSaveDialog(null);
+    if (filePath !== undefined) {
+      const fileHandle = fs.openSync(filePath, 'w');
+      const blockCount = Math.floor((doc.getFileSize() + 4095) / 4096);
+      for (let i = 0; i < blockCount; i += 1) {
+        const block = doc.getBuffer(i * 4096, 4096);
+        fs.writeSync(fileHandle, block);
+      }
+    }
   }
 
   undo() {
