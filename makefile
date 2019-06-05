@@ -4,6 +4,9 @@ default:
 run:
 	cd source; npx electron .
 
+test:
+	cd source; npx mocha --require babel-register
+
 lint:
 	cd source; npx eslint . --ext .js --ext .jsx
 
