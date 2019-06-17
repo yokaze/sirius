@@ -15,7 +15,7 @@ export default class SiriusBinary {
     this._list.clear();
     if (fileHandle) {
       this._fileHandle = fileHandle;
-      this._setupInitialNode({ file: true, address: 0 }, fileHandle.getSize());
+      this._setupInitialNode({ file: true, address: 0 }, fileHandle.length());
     }
   }
 
@@ -145,7 +145,7 @@ export default class SiriusBinary {
 
   _fillFileBlock(node) {
     if (node.content.file && (node.content.block === undefined)) {
-      node.content.block = this._fileHandle.getBuffer(node.content.address, node.distance);
+      node.content.block = this._fileHandle.read(node.content.address, node.distance);
     }
   }
 

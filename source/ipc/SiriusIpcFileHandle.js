@@ -12,12 +12,12 @@ export default class SiriusIpcFileHandle {
     this.client.destroy();
   }
 
-  getBuffer(address, length) {
+  read(address, length) {
     const buffer = this.client.receiveFileBufferSync(this.fileHandle, address, length);
     return new Uint8Array(buffer);
   }
 
-  getSize() {
+  length() {
     return this.fileSize;
   }
 }

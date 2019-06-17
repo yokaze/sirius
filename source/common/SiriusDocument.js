@@ -71,25 +71,11 @@ export default class SiriusDocument {
   setFileHandle(fileHandle) {
     this.fileHandle = fileHandle;
     this._binary.setFileHandle(fileHandle);
-    this._initializeBlocksForFile();
   }
 
   _initialize() {
-    this.blocks = [];
     this.undoBuffer = [];
     this.redoBuffer = [];
-  }
-
-  _initializeBlocksForFile() {
-    this._initialize();
-    const fileSize = this.fileHandle.getSize();
-    const blockCount = Math.ceil(fileSize / maxBlockSize);
-    for (let i = 0; i < blockCount; i += 1) {
-      const blockSize = Math.min(maxBlockSize, fileSize - i * maxBlockSize);
-      this.blocks.push({
-        file: true, address: i * maxBlockSize, size: blockSize, data: undefined,
-      });
-    }
   }
 
   _blockIterator(startAddress, endAddress) {
