@@ -42,13 +42,13 @@ export default class SiriusModel {
 
     ipcMain.on(SiriusIpcCommand.onEditorRequestFileBufferSync, (e, fileHandle, address, length) => {
       const doc = this.documents.get(fileHandle);
-      e.returnValue = [...doc.getBuffer(address, length)];
+      e.returnValue = [...doc.read(address, length)];
     });
 
     ipcMain.on(SiriusIpcCommand.onEditorRequestFileSizeSync, (e) => {
       const windowId = e.sender.getOwnerBrowserWindow().id;
       const handle = this.handles.get(windowId);
-      e.returnValue = this.documents.get(handle).getFileSize();
+      e.returnValue = this.documents.get(handle).length();
     });
 
     ipcMain.on(SiriusIpcCommand.onPreferenceCommand, (e, command) => {

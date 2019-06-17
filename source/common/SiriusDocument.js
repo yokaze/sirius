@@ -1,5 +1,6 @@
 import assert from 'assert';
 
+import SiriusBinary from './SiriusBinary';
 import SiriusClipboard from './SiriusClipboard';
 import SiriusDocumentCommand from './SiriusDocumentCommand';
 import SiriusConstants from './SiriusConstants';
@@ -9,12 +10,13 @@ const { maxBlockSize, minBlockSize } = SiriusConstants;
 export default class SiriusDocument {
   constructor() {
     this.clipboard = new SiriusClipboard();
+    this._binary = new SiriusBinary();
     this._initialize();
   }
 
   isBlankDocument() {
     let ret = true;
-    ret = ret && (this.blocks.length === 0);
+    ret = ret && (this._binary.length() === 0);
     ret = ret && (this.undoBuffer.length === 0);
     ret = ret && (this.redoBuffer.length === 0);
     return ret;
@@ -45,29 +47,12 @@ export default class SiriusDocument {
     }
   }
 
-  getBuffer(address, length) {
-    const fileSize = this.getFileSize();
-    length = Math.max(0, Math.min(length, fileSize - address));
-
-    const ret = new Uint8Array(length);
-    const blocks = this._blockIterator(address, address + length);
-    for (let i = 0; i < blocks.length; i += 1) {
-      const { address: blockAddress, block } = blocks[i];
-      if (block.file && (block.data === undefined)) {
-        block.data = this.fileHandle.getBuffer(block.address, block.size);
-      }
-
-      const blockSize = block.size;
-      const writeOffset = Math.max(0, blockAddress - address);
-      const readOffset = address + writeOffset - blockAddress;
-      const writeLength = Math.min(length - writeOffset, blockSize - readOffset);
-      ret.set(block.data.subarray(readOffset, readOffset + writeLength), writeOffset);
-    }
-    return ret;
+  read(address, length) {
+    return this._binary.read(address, length);
   }
 
-  getFileSize() {
-    return this.blocks.reduce((size, block) => size + block.size, 0);
+  length() {
+    return this._binary.length();
   }
 
   getClipboard() {
@@ -85,6 +70,7 @@ export default class SiriusDocument {
 
   setFileHandle(fileHandle) {
     this.fileHandle = fileHandle;
+    this._binary.setFileHandle(fileHandle);
     this._initializeBlocksForFile();
   }
 
@@ -161,43 +147,23 @@ export default class SiriusDocument {
   }
 
   _extendFileLength(nextFileSize) {
-    const fillData = new Uint8Array(nextFileSize - this.getFileSize());
-    const fillCommand = new SiriusDocumentCommand.Insert(this.getFileSize(), fillData);
+    const fillData = new Uint8Array(nextFileSize - this.length());
+    const fillCommand = new SiriusDocumentCommand.Insert(this.length(), fillData);
     return this._runCommand(fillCommand);
   }
 
   _runInsertCommand(command) {
     const { address } = command;
-    if (address <= this.getFileSize()) {
+    if (address <= this.length()) {
       return this._runInsertCommandWithinBound(command);
     }
     return this._runInsertCommandExceedsBound(command);
   }
 
   _runInsertCommandWithinBound(command) {
-    const { address } = command;
+    const { address, data } = command;
     const { length } = command.data;
-    const newBlock = {
-      file: false, data: command.data, size: length,
-    };
-    if (address === this.getFileSize()) {
-      this.blocks.push(newBlock);
-    } else {
-      const b = this._blockIterator(address, address + 1)[0];
-      if (b.address === address) {
-        this._swapBlocks([b.block], [newBlock, b.block]);
-      } else {
-        const leftSize = address - b.address;
-        const rightSize = b.block.size - leftSize;
-        const leftBlock = {
-          file: false, data: b.block.data.subarray(0, leftSize), size: leftSize,
-        };
-        const rightBlock = {
-          file: false, data: b.block.data.subarray(leftSize), size: rightSize,
-        };
-        this._swapBlocks([b.block], [leftBlock, newBlock, rightBlock]);
-      }
-    }
+    this._binary.insert(address, data);
     return new SiriusDocumentCommand.Remove(address, length);
   }
 
@@ -211,7 +177,7 @@ export default class SiriusDocument {
   _runOverwriteCommand(command) {
     const { address } = command;
     const { length } = command.data;
-    if ((address + length) <= this.getFileSize()) {
+    if ((address + length) <= this.length()) {
       return this._runOverwriteCommandWithinBound(command);
     }
     return this._runOverwriteCommandExceedsBound(command);
@@ -220,7 +186,7 @@ export default class SiriusDocument {
   _runOverwriteCommandWithinBound(command) {
     const { address } = command;
     const { length } = command.data;
-    const backup = this.getBuffer(address, length);
+    const backup = this.read(address, length);
     {
       const blocks = this._blockIterator(address, address + length);
       const nextBlocks = [];
@@ -253,41 +219,9 @@ export default class SiriusDocument {
 
   _runRemoveCommand(command) {
     const { address, length } = command;
-    assert((address + length) <= this.getFileSize());
-    const backup = this.getBuffer(address, length);
-    {
-      const blocks = this._blockIterator(address, address + length);
-      const nextBlocks = [];
-      for (let i = 0; i < blocks.length; i += 1) {
-        const { address: blockAddress, block } = blocks[i];
-        const blockSize = block.size;
-        const blockRemoveStart = Math.max(0, address - blockAddress);
-        const blockRemoveEnd = Math.min(blockSize, address + length - blockAddress);
-        if ((blockRemoveStart === 0) && (blockRemoveEnd === blockSize)) {
-          continue;
-        } else if (blockRemoveStart === 0) {
-          block.address += blockRemoveEnd;
-          if (block.data) {
-            block.data = block.data.subarray(blockRemoveEnd);
-          }
-          nextBlocks.push(block);
-        } else if (blockRemoveEnd === blockSize) {
-          block.size = blockRemoveStart;
-          nextBlocks.push(block);
-        } else {
-          block.size = blockRemoveStart;
-          nextBlocks.push(block);
-          const rightBlock = {
-            file: block.file,
-            address: block.address + blockRemoveEnd,
-            size: blockSize - blockRemoveEnd,
-            data: block.data.subarray(blockRemoveEnd),
-          };
-          nextBlocks.push(rightBlock);
-        }
-      }
-      this._swapBlocks(blocks.map(b => b.block), nextBlocks);
-    }
+    assert((address + length) <= this.length());
+    const backup = this._binary.read(address, length);
+    this._binary.remove(address, length);
     return new SiriusDocumentCommand.Insert(address, backup);
   }
 
@@ -299,7 +233,7 @@ export default class SiriusDocument {
   }
 
   _runCopyCommand(command) {
-    this.clipboard.setData(this.getBuffer(command.address, command.length));
+    this.clipboard.setData(this.read(command.address, command.length));
     return undefined;
   }
 

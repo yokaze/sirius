@@ -54,7 +54,7 @@ class BinaryTableViewModel {
   }
 
   getBuffer(address, length) {
-    return this.document.getBuffer(address, length);
+    return this.document.read(address, length);
   }
 
   setValueAt(address, value) {
@@ -70,7 +70,7 @@ class BinaryTableViewModel {
   }
 
   removeValueAt(address, length) {
-    const executable = ((address + length) <= this.document.getFileSize());
+    const executable = ((address + length) <= this.document.length());
     if (executable) {
       const command = new SiriusDocumentCommand.Remove(address, length);
       this._applyCommand(command);
@@ -97,8 +97,8 @@ class BinaryTableViewModel {
     }
   }
 
-  getFileSize() {
-    return this.document.getFileSize();
+  length() {
+    return this.document.length();
   }
 
   getSelectedRange() {
@@ -201,13 +201,13 @@ class BinaryTableViewModel {
 
   onAppRequestSelectAll() {
     this.selectionStartAddress = 0;
-    this.selectionEndAddress = this.getFileSize();
+    this.selectionEndAddress = this.length();
     this.listener.onViewModelReloaded();
   }
 
   onAppRequestStructureView() {
     const midiParser = new MidiParser(this.document);
-    console.log(midiParser.parseBlock(0, this.document.getFileSize()));
+    console.log(midiParser.parseBlock(0, this.document.length()));
     this.listener.useStructureView();
   }
 
@@ -235,7 +235,7 @@ class BinaryStructureNode extends Component {
 
   render() {
     const { listener, value } = this.props;
-    let children;
+    let children = undefined;
     if (value.children) {
       children = value.children.map(child => <BinaryStructureNode listener={listener} value={child} />);
     }
@@ -482,7 +482,7 @@ class BinaryTable extends Component {
   onWheel(e) {
     const deltaRow = e.deltaY / 24;
     this.setState((state, props) => {
-      const nextFloatRow = BinaryTable.limitRowNumber(this.cache.floatRow + deltaRow, state.columnCount, props.viewModel.getFileSize());
+      const nextFloatRow = BinaryTable.limitRowNumber(this.cache.floatRow + deltaRow, state.columnCount, props.viewModel.length());
       this.cache.floatRow = nextFloatRow;
       const nextRow = Math.floor(nextFloatRow);
       if (nextRow !== state.row) {
@@ -723,7 +723,7 @@ class BinaryTable extends Component {
       const { useStructureView } = this.state;
       if (useStructureView) {
         const parser = new MidiParser(viewModel.document);
-        const subValue = parser.parseBlock(0, viewModel.getFileSize());
+        const subValue = parser.parseBlock(0, viewModel.length());
         const value = {
           address: 0,
           children: subValue,
