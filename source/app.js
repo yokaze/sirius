@@ -42,7 +42,7 @@ const menuTemplate = [
   {
     label: 'View',
     submenu: [
-      { label: 'Structure View', click: () => { model.displayStructureView(); } },
+      //  { label: 'Structure View', click: () => { model.displayStructureView(); } },
       { label: 'Open in New Window', click: () => { model.duplicateActiveEditor(); } },
     ],
   },
