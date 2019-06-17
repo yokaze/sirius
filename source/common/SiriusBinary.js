@@ -63,7 +63,24 @@ export default class SiriusBinary {
   }
 
   overwrite(address, block) {
-
+    assert(address >= 0);
+    assert((address + block.length) <= this.length());
+    const li = this._list;
+    let { node, distance } = li.nodeForDistance(address);
+    while (distance < (address + block.length)) {
+      if (node.content.file && (node.distance > maxBlockSize)) {
+        const right = li.makeNode({
+          file: true,
+          address: node.content.address + maxBlockSize,
+        }, node.distance - maxBlockSize);
+        li.resize(node, maxBlockSize);
+        li.insert(node, right);
+      }
+      this._fillFileBlock(node);
+      blockCopy(block, address, node.content.block, distance);
+      distance += node.distance;
+      node = li.next(node);
+    }
   }
 
   remove(address, length) {

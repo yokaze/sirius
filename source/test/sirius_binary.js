@@ -107,4 +107,11 @@ describe('SiriusBinary', () => {
     expect(binary.length()).to.equal(4);
     expect(binary.read(0, 4)).to.deep.equal(new Uint8Array([1, 2, 7, 8]));
   });
+  it('overwrite', () => {
+    const binary = new SiriusBinary();
+    binary.insert(0, new Uint8Array([1, 2, 3, 4]));
+    binary.overwrite(1, new Uint8Array([5, 6]));
+    expect(binary.length()).to.equal(4);
+    expect(binary.read(0, 4)).to.deep.equal(new Uint8Array([1, 5, 6, 4]));
+  });
 });

@@ -78,33 +78,6 @@ export default class SiriusDocument {
     this.redoBuffer = [];
   }
 
-  _blockIterator(startAddress, endAddress) {
-    //  returns [{ address: number, block: object }, ...]
-    const ret = [];
-    const blockCount = this.blocks.length;
-    let blockAddress = 0;
-    for (let i = 0; i < blockCount; i += 1) {
-      const block = this.blocks[i];
-      const blockSize = block.size;
-      if ((blockAddress + blockSize) <= startAddress) {
-        blockAddress += blockSize;
-        continue;
-      }
-      if (endAddress <= blockAddress) {
-        break;
-      }
-      ret.push({ address: blockAddress, block });
-      blockAddress += blockSize;
-    }
-    return ret;
-  }
-
-  _swapBlocks(blocks, nextBlocks) {
-    const index = this.blocks.findIndex(b => (b === blocks[0]));
-    assert(index >= 0);
-    this.blocks.splice(index, blocks.length, ...nextBlocks);
-  }
-
   _runCommand(command) {
     if (command.type === SiriusDocumentCommand.Insert.getType()) {
       return this._runInsertCommand(command);
@@ -173,25 +146,7 @@ export default class SiriusDocument {
     const { address } = command;
     const { length } = command.data;
     const backup = this.read(address, length);
-    {
-      const blocks = this._blockIterator(address, address + length);
-      const nextBlocks = [];
-      for (let i = 0; i < blocks.length; i += 1) {
-        const { address: blockAddress, block } = blocks[i];
-        const blockSize = block.size;
-        const blockOverwriteStart = Math.max(0, address - blockAddress);
-        const blockOverwriteEnd = Math.min(blockSize, address + length - blockAddress);
-        if (block.data === undefined) {
-          block.data = this.fileHandle.getBuffer(block.address, block.size);
-        }
-        block.file = false;
-        block.data.set(
-          command.data.subarray(0, blockOverwriteEnd - blockOverwriteStart), blockOverwriteStart,
-        );
-        nextBlocks.push(block);
-      }
-      this._swapBlocks(blocks.map(b => b.block), nextBlocks);
-    }
+    this._binary.overwrite(address, command.data);
     return new SiriusDocumentCommand.Overwrite(address, backup);
   }
 

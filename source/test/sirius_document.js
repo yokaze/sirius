@@ -27,8 +27,30 @@ describe('SiriusDocument', () => {
   });
   it('insert beyond', () => {
     const doc = new SiriusDocument();
-    const com1 = new SiriusDocumentCommand.Insert(100, new Uint8Array([1, 2, 3, 4]));
+    const com = new SiriusDocumentCommand.Insert(100, new Uint8Array([1, 2, 3, 4]));
+    doc.applyCommand(com);
+    expect(doc.length()).to.equal(104);
+    expect(doc.read(100, 4)).to.deep.equal(new Uint8Array([1, 2, 3, 4]));
+    doc.undo();
+    expect(doc.isBlankDocument()).to.equal(false);
+    expect(doc.length()).to.equal(0);
+  });
+  it('overwrite', () => {
+    const doc = new SiriusDocument();
+    const com1 = new SiriusDocumentCommand.Insert(0, new Uint8Array([1, 2, 3, 4]));
     doc.applyCommand(com1);
+    const com2 = new SiriusDocumentCommand.Overwrite(1, new Uint8Array([5, 6]));
+    doc.applyCommand(com2);
+    expect(doc.length()).to.equal(4);
+    expect(doc.read(0, 4)).to.deep.equal(new Uint8Array([1, 5, 6, 4]));
+    doc.undo();
+    expect(doc.length()).to.equal(4);
+    expect(doc.read(0, 4)).to.deep.equal(new Uint8Array([1, 2, 3, 4]));
+  });
+  it('overwrite beyond', () => {
+    const doc = new SiriusDocument();
+    const com = new SiriusDocumentCommand.Overwrite(100, new Uint8Array([1, 2, 3, 4]));
+    doc.applyCommand(com);
     expect(doc.length()).to.equal(104);
     expect(doc.read(100, 4)).to.deep.equal(new Uint8Array([1, 2, 3, 4]));
     doc.undo();
