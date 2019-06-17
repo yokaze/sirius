@@ -57,4 +57,38 @@ describe('SiriusDocument', () => {
     expect(doc.isBlankDocument()).to.equal(false);
     expect(doc.length()).to.equal(0);
   });
+  it('cut', () => {
+    const doc = new SiriusDocument();
+    const com1 = new SiriusDocumentCommand.Insert(0, new Uint8Array([1, 2, 3, 4]));
+    doc.applyCommand(com1);
+    const com2 = new SiriusDocumentCommand.Cut(1, 2);
+    doc.applyCommand(com2);
+    expect(doc.length()).to.equal(2);
+    expect(doc.read(0, 2)).to.deep.equal(new Uint8Array([1, 4]));
+    expect(doc.getClipboard().getValue()).to.deep.equal(new Uint8Array([2, 3]));
+  });
+  it('copy', () => {
+    const doc = new SiriusDocument();
+    const com1 = new SiriusDocumentCommand.Insert(0, new Uint8Array([1, 2, 3, 4]));
+    doc.applyCommand(com1);
+    const com2 = new SiriusDocumentCommand.Copy(1, 2);
+    doc.applyCommand(com2);
+    expect(doc.length()).to.equal(4);
+    expect(doc.read(0, 4)).to.deep.equal(new Uint8Array([1, 2, 3, 4]));
+    expect(doc.getClipboard().getValue()).to.deep.equal(new Uint8Array([2, 3]));
+  });
+  it('paste', () => {
+    const doc = new SiriusDocument();
+    const com1 = new SiriusDocumentCommand.Insert(0, new Uint8Array([1, 2, 3, 4]));
+    doc.applyCommand(com1);
+    const com2 = new SiriusDocumentCommand.Copy(1, 2);
+    doc.applyCommand(com2);
+    const com3 = new SiriusDocumentCommand.Paste(1);
+    doc.applyCommand(com3);
+    expect(doc.length()).to.equal(6);
+    expect(doc.read(0, 6)).to.deep.equal(new Uint8Array([1, 2, 3, 2, 3, 4]));
+    doc.undo();
+    expect(doc.length()).to.equal(4);
+    expect(doc.read(0, 4)).to.deep.equal(new Uint8Array([1, 2, 3, 4]));
+  });
 });

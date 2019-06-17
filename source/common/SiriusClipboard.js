@@ -2,27 +2,27 @@ import assert from 'assert';
 
 export default class SiriusClipboard {
   constructor() {
-    this.data = undefined;
-    this.listener = undefined;
+    this._value = undefined;
+    this._listener = undefined;
   }
 
-  getData() {
-    return this.data;
+  getValue() {
+    return this._value;
   }
 
-  setData(data) {
-    assert(data instanceof Uint8Array);
-    this.data = data;
-    if (this.listener) {
-      this.listener.onClipboardDataChanged(this);
+  setValue(value) {
+    assert(value instanceof Uint8Array);
+    this._value = value;
+    if (this._listener) {
+      this._listener.onClipboardDataChanged(this);
     }
   }
 
   isEmpty() {
-    return this.data === undefined;
+    return (this._value === undefined);
   }
 
   setListener(listener) {
-    this.listener = listener;
+    this._listener = listener;
   }
 }

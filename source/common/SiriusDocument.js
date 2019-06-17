@@ -3,9 +3,6 @@ import assert from 'assert';
 import SiriusBinary from './SiriusBinary';
 import SiriusClipboard from './SiriusClipboard';
 import SiriusDocumentCommand from './SiriusDocumentCommand';
-import SiriusConstants from './SiriusConstants';
-
-const { maxBlockSize, minBlockSize } = SiriusConstants;
 
 export default class SiriusDocument {
   constructor() {
@@ -174,7 +171,7 @@ export default class SiriusDocument {
   }
 
   _runCopyCommand(command) {
-    this.clipboard.setData(this.read(command.address, command.length));
+    this.clipboard.setValue(this.read(command.address, command.length));
     return undefined;
   }
 
@@ -182,7 +179,7 @@ export default class SiriusDocument {
     if (this.clipboard.isEmpty()) {
       return undefined;
     }
-    const data = this.clipboard.getData();
+    const data = this.clipboard.getValue();
     const insertCommand = new SiriusDocumentCommand.Insert(command.address, data);
     return this._runCommand(insertCommand);
   }

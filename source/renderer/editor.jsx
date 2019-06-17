@@ -140,7 +140,7 @@ class BinaryTableViewModel {
   }
 
   onAppUpdateClipboard(sender, data) {
-    this.document.getClipboard().setData(data);
+    this.document.getClipboard().setValue(data);
   }
 
   onAppUpdateFileHandle(sender, fileHandle) {

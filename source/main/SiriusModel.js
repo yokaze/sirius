@@ -214,7 +214,7 @@ export default class SiriusModel {
   }
 
   onClipboardDataChanged() {
-    const data = this.clipboard.getData();
+    const data = this.clipboard.getValue();
     this.handles.forEach((handle, windowId) => {
       const window = BrowserWindow.fromId(windowId);
       window.webContents.send(SiriusIpcCommand.onAppUpdateClipboard, data);
