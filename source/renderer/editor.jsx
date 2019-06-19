@@ -4,6 +4,7 @@ import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
 import shallowEqualArrays from 'shallow-equal/arrays';
+import { sprintf } from 'sprintf-js';
 
 import BinaryTableAddressArea from './components/BinaryTableAddressArea';
 import BinaryTableAddressCell from './components/BinaryTableAddressCell';
@@ -732,10 +733,15 @@ class BinaryTable extends Component {
         items.push(<BinaryStructureNode listener={this} value={value} />);
       }
       items.push(<br key="br-footer" />);
-      items.push(<span key="binary-table-footer-row" className="binary-table-footer-row">
-        <span key="address" className="binary-table-address">&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;&ensp;</span>
-        <div key="write-mode" className="binary-table-address">{(viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>
-      </span>);
+      items.push(
+        <span key="binary-table-footer-row" className="binary-table-footer-row">
+          <span style={{ display: 'inline-block' }} key="addressBox-footer">
+            <BinaryTableAddressCell key="address-footer" value={'\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0'} />
+          </span>
+          <div key="write-mode" style={{ display: 'inline-block' }}>{(viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>
+          <div key="file-size" style={{ display: 'inline-block' }}>{`\xA0\xA0File\xA0Size:\xA0${viewModel.length()}\xA0(0x${sprintf('%X', viewModel.length())})`}</div>
+        </span>,
+      );
     }
     return (
       <Measure onResize={(contentRect) => { this.onResized(contentRect); }}>
