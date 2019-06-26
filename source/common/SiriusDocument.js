@@ -70,6 +70,10 @@ export default class SiriusDocument {
     this._binary.setFileHandle(fileHandle);
   }
 
+  getInternalBinary() {
+    return this._binary;
+  }
+
   _initialize() {
     this.undoBuffer = [];
     this.redoBuffer = [];

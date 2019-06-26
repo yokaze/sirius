@@ -7,6 +7,7 @@ import uuid from 'uuid/v4';
 import SiriusClipboard from '../common/SiriusClipboard';
 import SiriusDocument from '../common/SiriusDocument';
 import SiriusFileHandle from './SiriusFileHandle';
+import SiriusFileWriter from './SiriusFileWriter';
 import SiriusIpcCommand from '../ipc/SiriusIpcCommand';
 
 const isDebug = (process.env.NODE_ENV !== 'production');
@@ -81,15 +82,11 @@ export default class SiriusModel {
   saveAs() {
     const currentWindow = BrowserWindow.getFocusedWindow();
     const currentHandle = this.handles.get(currentWindow.id);
-    const doc = this.documents.get(currentHandle);
     const filePath = dialog.showSaveDialog(null);
     if (filePath !== undefined) {
-      const fileHandle = fs.openSync(filePath, 'w');
-      const blockCount = Math.floor((doc.getFileSize() + 4095) / 4096);
-      for (let i = 0; i < blockCount; i += 1) {
-        const block = doc.getBuffer(i * 4096, 4096);
-        fs.writeSync(fileHandle, block);
-      }
+      const binary = this.documents.get(currentHandle).getInternalBinary();
+      const writer = new SiriusFileWriter(filePath, binary);
+      writer.write();
     }
   }
 
