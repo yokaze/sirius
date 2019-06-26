@@ -2,6 +2,7 @@
 import { expect } from 'chai';
 import SiriusDocument from '../common/SiriusDocument';
 import SiriusDocumentCommand from '../common/SiriusDocumentCommand';
+import SiriusFileHandle from '../main/SiriusFileHandle';
 
 describe('SiriusDocument', () => {
   it('constructor', () => {
@@ -90,5 +91,12 @@ describe('SiriusDocument', () => {
     doc.undo();
     expect(doc.length()).to.equal(4);
     expect(doc.read(0, 4)).to.deep.equal(new Uint8Array([1, 2, 3, 4]));
+  });
+  it('handle', () => {
+    const handle = new SiriusFileHandle('test/sample');
+    const doc = new SiriusDocument();
+    doc.setFileHandle(handle);
+    expect(doc.getFileHandle()).to.equal(handle);
+    expect(doc.read(64, 4)).to.deep.equal(new Uint8Array([64, 65, 66, 67]));
   });
 });

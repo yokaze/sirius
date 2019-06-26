@@ -62,11 +62,10 @@ export default class SiriusDocument {
   }
 
   getFileHandle() {
-    return this.fileHandle;
+    return this._binary.getFileHandle();
   }
 
   setFileHandle(fileHandle) {
-    this.fileHandle = fileHandle;
     this._binary.setFileHandle(fileHandle);
   }
 

@@ -1,6 +1,7 @@
 /* eslint-env mocha */
 import { expect } from 'chai';
 import SiriusBinary from '../common/SiriusBinary';
+import SiriusFileHandle from '../main/SiriusFileHandle';
 
 describe('SiriusBinary', () => {
   it('constructor', () => {
@@ -113,5 +114,12 @@ describe('SiriusBinary', () => {
     binary.overwrite(1, new Uint8Array([5, 6]));
     expect(binary.length()).to.equal(4);
     expect(binary.read(0, 4)).to.deep.equal(new Uint8Array([1, 5, 6, 4]));
+  });
+  it('handle', () => {
+    const handle = new SiriusFileHandle('test/sample');
+    const binary = new SiriusBinary();
+    binary.setFileHandle(handle);
+    expect(binary.getFileHandle()).to.equal(handle);
+    expect(binary.read(64, 4)).to.deep.equal(new Uint8Array([64, 65, 66, 67]));
   });
 });

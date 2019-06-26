@@ -11,6 +11,10 @@ export default class SiriusBinary {
     this._list = new WeightedSkipList();
   }
 
+  getFileHandle() {
+    return this._fileHandle;
+  }
+
   setFileHandle(fileHandle) {
     this._list.clear();
     if (fileHandle) {
