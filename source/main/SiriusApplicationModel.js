@@ -3,6 +3,7 @@ import uuid from 'uuid/v4';
 import SiriusClipboard from '../common/SiriusClipboard';
 import SiriusDocument from '../common/SiriusDocument';
 import SiriusFileHandle from './SiriusFileHandle';
+import SiriusFileWriter from './SiriusFileWriter';
 
 export default class SiriusApplicationModel {
   constructor() {
@@ -30,6 +31,13 @@ export default class SiriusApplicationModel {
     const handle = new SiriusFileHandle(path);
     const doc = this.getDocument(key);
     doc.setFileHandle(handle);
+    this._documents.get(key).path = path;
+  }
+
+  saveFileAs(key, path) {
+    const binary = this.getDocument(key).getInternalBinary();
+    const writer = new SiriusFileWriter(path, binary);
+    writer.write();
     this._documents.get(key).path = path;
   }
 

@@ -67,6 +67,14 @@ export default class SiriusModel {
   }
 
   save() {
+    const currentWindow = BrowserWindow.getFocusedWindow();
+    const currentHandle = this.handles.get(currentWindow.id);
+    const filePath = this._appModel.getDocumentPath(currentHandle);
+    if (filePath) {
+      this._appModel.saveFileAs(currentHandle, filePath);
+    } else {
+      this.saveAs();
+    }
   }
 
   saveAs() {
@@ -74,9 +82,8 @@ export default class SiriusModel {
     const currentHandle = this.handles.get(currentWindow.id);
     const filePath = dialog.showSaveDialog(null);
     if (filePath !== undefined) {
-      const binary = this._appModel.getDocument(currentHandle).getInternalBinary();
-      const writer = new SiriusFileWriter(filePath, binary);
-      writer.write();
+      this._appModel.saveFileAs(currentHandle, filePath);
+      currentWindow.setTitle(filePath);
     }
   }
 
