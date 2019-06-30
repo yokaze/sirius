@@ -1,13 +1,8 @@
 import { BrowserWindow, dialog, ipcMain } from 'electron';
-import fs from 'fs';
 import path from 'path';
 import url from 'url';
-import uuid from 'uuid/v4';
 
 import SiriusApplicationModel from './SiriusApplicationModel';
-import SiriusClipboard from '../common/SiriusClipboard';
-import SiriusDocument from '../common/SiriusDocument';
-import SiriusFileHandle from './SiriusFileHandle';
 import SiriusFileWriter from './SiriusFileWriter';
 import SiriusIpcCommand from '../ipc/SiriusIpcCommand';
 
@@ -237,37 +232,39 @@ export default class SiriusModel {
   }
 
   _openFile(filePath) {
-    let fileHandle;
-    try {
-      fileHandle = new SiriusFileHandle(filePath);
-    } catch (e) {
-      dialog.showErrorBox('Sirius', e.message);
-      return;
-    }
+    let recycle = false;
+    let key;
     let windowId;
-    let initialized = false;
     {
       //  If a blank document window is focused, open document in it.
       const currentWindow = BrowserWindow.fromId(this.activeDocumentWindowId);
       if (currentWindow) {
-        const currentHandle = this.handles.get(currentWindow.id);
-        const doc = this._appModel.getDocument(currentHandle);
+        const currentKey = this.handles.get(currentWindow.id);
+        const doc = this._appModel.getDocument(currentKey);
         if (doc.isBlankDocument()) {
+          recycle = true;
+          key = currentKey;
           windowId = currentWindow.id;
-          initialized = true;
         }
       }
     }
-    if (windowId === undefined) {
+    key = this._appModel.createDocument();
+    try {
+      this._appModel.loadFile(key, filePath);
+    } catch (e) {
+      dialog.showErrorBox('Sirius', e.message);
+      if (!recycle) {
+        this._appModel.removeDocument(key);
+        return;
+      }
+    }
+    if (!recycle) {
       windowId = this.openEditor();
     }
-    const key = this._appModel.createDocument();
-    const doc = this._appModel.getDocument(key);
-    doc.setFileHandle(fileHandle);
     BrowserWindow.fromId(windowId).setTitle(filePath);
     this.handles.set(windowId, key);
 
-    if (initialized) {
+    if (recycle) {
       this.updateWindowBinary(windowId);
     }
   }

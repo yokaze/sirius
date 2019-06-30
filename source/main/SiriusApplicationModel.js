@@ -2,6 +2,7 @@ import uuid from 'uuid/v4';
 
 import SiriusClipboard from '../common/SiriusClipboard';
 import SiriusDocument from '../common/SiriusDocument';
+import SiriusFileHandle from './SiriusFileHandle';
 
 export default class SiriusApplicationModel {
   constructor() {
@@ -21,7 +22,22 @@ export default class SiriusApplicationModel {
     return key;
   }
 
+  removeDocument(key) {
+
+  }
+
+  loadFile(key, path) {
+    const handle = new SiriusFileHandle(path);
+    const doc = this.getDocument(key);
+    doc.setFileHandle(handle);
+    this._documents.get(key).path = path;
+  }
+
   getDocument(key) {
     return this._documents.get(key).document;
+  }
+
+  getDocumentPath(key) {
+    return this._documents.get(key).path;
   }
 }
