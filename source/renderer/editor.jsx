@@ -406,7 +406,7 @@ class BinaryTable extends Component {
         case 37: // Left
         {
           if (shiftKey === false) {
-            const address = Math.min(selectedRange[0], selectedRange[1] - 1);
+            const address = Math.max(0, Math.min(selectedRange[0], selectedRange[1] - 1));
             viewModel.setSelectionStartAddress(address);
             viewModel.setSelectionEndAddress(address);
           } else {
@@ -418,7 +418,7 @@ class BinaryTable extends Component {
         case 38: // Up
         {
           if (shiftKey === false) {
-            const address = Math.min(selectedRange[0], selectedRange[1] - columnCount);
+            const address = Math.max(0, Math.min(selectedRange[0], selectedRange[1] - columnCount));
             viewModel.setSelectionStartAddress(address);
             viewModel.setSelectionEndAddress(address);
           } else {
