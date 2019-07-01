@@ -16,15 +16,3 @@ div {
 span {
     user-select: none;
 }
-
-.binary-table-footer-row {
-    background-color: powderblue;
-    border-top: 1px;
-    border-top-color: lightsteelblue;
-    border-top-style: solid;
-    bottom: 0px;
-    display: inline-block;
-    height: 24px;
-    position: fixed;
-    width: 100%;
-}

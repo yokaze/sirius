@@ -10,6 +10,7 @@ import BinaryTableAddressArea from './components/BinaryTableAddressArea';
 import BinaryTableAddressCell from './components/BinaryTableAddressCell';
 import BinaryTableDataRow from './components/BinaryTableDataRow';
 import BinaryTableExpressionRow from './components/BinaryTableExpressionRow';
+import BinaryTableFooterArea from './components/BinaryTableFooterArea';
 import BinaryTableHeaderArea from './components/BinaryTableHeaderArea';
 import BinaryTableHeaderRow from './components/BinaryTableHeaderRow';
 import MidiParser from '../parser/MidiParser';
@@ -18,13 +19,9 @@ import SiriusDocument from '../common/SiriusDocument';
 import SiriusDocumentCommand from '../common/SiriusDocumentCommand';
 import SiriusIpcClient from '../ipc/SiriusIpcClient';
 import SiriusIpcFileHandle from '../ipc/SiriusIpcFileHandle';
+import WriteMode from './WriteMode';
 
 const ipcClient = new SiriusIpcClient();
-
-const WriteMode = {
-  Overwrite: 0,
-  Insert: 1,
-};
 
 const whiteStyle = {
   display: 'inline-block',
@@ -723,15 +720,7 @@ class BinaryTable extends Component {
         items.push(<BinaryStructureNode listener={this} value={value} />);
       }
       items.push(<br key="br-footer" />);
-      items.push(
-        <span key="binary-table-footer-row" className="binary-table-footer-row">
-          <span style={{ display: 'inline-block' }} key="addressBox-footer">
-            <BinaryTableAddressCell key="address-footer" value={'\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0'} />
-          </span>
-          <div key="write-mode" style={{ display: 'inline-block' }}>{(viewModel.getWriteMode() === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>
-          <div key="file-size" style={{ display: 'inline-block' }}>{`\xA0\xA0File\xA0Size:\xA0${viewModel.length()}\xA0(0x${sprintf('%X', viewModel.length())})`}</div>
-        </span>,
-      );
+      items.push(<BinaryTableFooterArea key="binary-table-footer-area" writeMode={viewModel.getWriteMode()} fileSize={viewModel.length()} />);
     }
     return (
       <Measure onResize={(contentRect) => { this.onResized(contentRect); }}>
