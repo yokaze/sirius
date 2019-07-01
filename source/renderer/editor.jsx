@@ -1,10 +1,10 @@
 /* eslint-env browser */
 import { ipcRenderer } from 'electron';
+import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import ReactDOM from 'react-dom';
 import Measure from 'react-measure';
 import shallowEqualArrays from 'shallow-equal/arrays';
-import { sprintf } from 'sprintf-js';
 
 import BinaryTableAddressArea from './components/BinaryTableAddressArea';
 import BinaryTableAddressCell from './components/BinaryTableAddressCell';
@@ -205,8 +205,6 @@ class BinaryTableViewModel {
   }
 
   onAppRequestStructureView() {
-    const midiParser = new MidiParser(this.document);
-    console.log(midiParser.parseBlock(0, this.document.length()));
     this.listener.useStructureView();
   }
 
@@ -234,12 +232,20 @@ class BinaryStructureNode extends Component {
 
   render() {
     const { listener, value } = this.props;
-    let children = undefined;
+    let children;
     if (value.children) {
       children = value.children.map(child => <BinaryStructureNode listener={listener} value={child} />);
     }
     return (
-      <span style={{ cursor: 'default', display: 'inline-block', fontFamily:'Roboto Mono', width: 600 }} onMouseDown={this.onMouseDown}>
+      <span
+        style={{
+          cursor: 'default',
+          display: 'inline-block',
+          fontFamily: 'Roboto Mono',
+          width: 600,
+        }}
+        onMouseDown={this.onMouseDown}
+      >
         {`${value.text} (${value.address.toString(16).toUpperCase()})`}
         <br />
         <span style={{ display: 'inline-block', marginLeft: '16px' }}>{children}</span>
@@ -261,8 +267,6 @@ class BinaryTable extends Component {
     viewModel.setListener(this);
     this.state = {
       row: 0,
-      startAddress: 0,
-      focusAddress: 64,
       columnCount: 16,
       columnUnit: 4,
       addressWidth: 0,
@@ -462,11 +466,11 @@ class BinaryTable extends Component {
         if (viewModel.getSelectionStartAddress() < viewModel.getSelectionEndAddress()) {
           displayAddress = selectedRange[1] - 1;
         } else {
-          displayAddress = selectedRange[0];
+          [displayAddress] = selectedRange;
         }
       }
       const displayRow = Math.floor(displayAddress / state.columnCount);
-      let row = state.row;
+      let { row } = state;
       if (displayRow < row) {
         row = displayRow;
       } else if (displayRow >= (row + state.rowCount)) {
@@ -522,8 +526,14 @@ class BinaryTable extends Component {
   }
 
   complementStateChange(state, diff) {
-    if (diff.addressWidth || diff.totalWidth || diff.tableHeight || diff.columnUnit || diff.rowHeight || diff.dataCellWidth || diff.expressionCellWidth ||
-        diff.useStructureView) {
+    if (diff.addressWidth
+      || diff.totalWidth
+      || diff.tableHeight
+      || diff.columnUnit
+      || diff.rowHeight
+      || diff.dataCellWidth
+      || diff.expressionCellWidth
+      || diff.useStructureView) {
       if ((diff.columnCount === undefined) || (diff.rowCount === undefined)) {
         const nextState = Object.assign(state, diff);
         if (nextState.addressWidth === undefined) {
@@ -585,7 +595,7 @@ class BinaryTable extends Component {
 
   updateRenderCache() {
     const { viewModel } = this.props;
-    const { columnCount, row, rowCount } = this.state;
+    const { columnCount, rowCount } = this.state;
     const { address, values, selectedRange } = this.renderCache;
     const focusIndex = viewModel.getSelectedRange()[0];
     const selection = viewModel.getSelectedRange();
@@ -671,7 +681,7 @@ class BinaryTable extends Component {
     this.updateRenderCache();
     this.renderStyle();
 
-    const { row, rowCount, columnCount } = this.state;
+    const { rowCount, columnCount } = this.state;
     const items = [];
     if (rowCount !== undefined) {
       items.push(<BinaryTableHeaderArea key="binary-table-header-area" listener={this} columnCount={columnCount} />);
@@ -743,6 +753,10 @@ class BinaryTable extends Component {
     );
   }
 }
+
+BinaryTable.propTypes = {
+  viewModel: PropTypes.shape({}).isRequired,
+};
 
 const tableViewModel = new BinaryTableViewModel();
 tableViewModel.setIpcClient(ipcClient);
