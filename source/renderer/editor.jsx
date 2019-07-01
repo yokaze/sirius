@@ -10,6 +10,7 @@ import BinaryTableAddressArea from './components/BinaryTableAddressArea';
 import BinaryTableAddressCell from './components/BinaryTableAddressCell';
 import BinaryTableDataRow from './components/BinaryTableDataRow';
 import BinaryTableExpressionRow from './components/BinaryTableExpressionRow';
+import BinaryTableHeaderArea from './components/BinaryTableHeaderArea';
 import BinaryTableHeaderRow from './components/BinaryTableHeaderRow';
 import MidiParser from '../parser/MidiParser';
 import SiriusConstants from '../common/SiriusConstants';
@@ -499,8 +500,8 @@ class BinaryTable extends Component {
     this.setState(state => this.complementStateChange(state, diff));
   }
 
-  onAddressResized(contentRect) {
-    const addressWidth = contentRect.entry.width;
+  onAddressCellResized(size) {
+    const addressWidth = size.width;
     this.setState(state => this.complementStateChange(state, { addressWidth }));
   }
 
@@ -676,18 +677,7 @@ class BinaryTable extends Component {
     const { row, rowCount, columnCount } = this.state;
     const items = [];
     if (rowCount !== undefined) {
-      items.push(
-        <span key="binary-table-header-row" className="binary-table-header-row">
-          <Measure onResize={(contentRect) => { this.onAddressResized(contentRect); }}>
-            {({ measureRef }) => (
-              <span ref={measureRef} style={{ display: 'inline-block' }} key="addressBox">
-                <BinaryTableAddressCell key="address" value={'\xA0Address'} />
-              </span>
-            )}
-          </Measure>
-          <BinaryTableHeaderRow key="binary-table-header-row" columnCount={columnCount} />
-        </span>,
-      );
+      items.push(<BinaryTableHeaderArea key="binary-table-header-area" listener={this} columnCount={columnCount} />);
       items.push(<br key="br-head" />);
       const { viewModel } = this.props;
       items.push(<BinaryTableAddressArea key="BinaryTableAddressArea" addresses={this.renderCache.address} />);
