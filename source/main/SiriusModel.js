@@ -3,7 +3,6 @@ import path from 'path';
 import url from 'url';
 
 import SiriusApplicationModel from './SiriusApplicationModel';
-import SiriusFileWriter from './SiriusFileWriter';
 import SiriusIpcCommand from '../ipc/SiriusIpcCommand';
 
 const isDebug = (process.env.NODE_ENV !== 'production');

@@ -17,15 +17,6 @@ span {
     user-select: none;
 }
 
-.binary-table-header-row {
-    background-color: powderblue;
-    border-bottom: 1px;
-    border-bottom-color: lightsteelblue;
-    border-bottom-style: solid;
-    display: inline-block;
-    width: 100%;
-}
-
 .binary-table-footer-row {
     background-color: powderblue;
     border-top: 1px;
