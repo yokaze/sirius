@@ -30,11 +30,11 @@ export default class BinaryTableFooterArea extends Component {
     const { writeMode, fileSize } = this.props;
     return (
       <span key="binary-table-footer-row" className={classes.container}>
-        <span style={{ display: 'inline-block' }} key="addressBox-footer">
-          <BinaryTableAddressCell key="address-footer" value={'\xA0\xA0\xA0\xA0\xA0\xA0\xA0\xA0'} />
-        </span>
+        &nbsp;
+        <div key="file-size" style={{ display: 'inline-block' }}>{`File\xA0Size:\xA0${fileSize}\xA0(0x${sprintf('%X', fileSize)})`}</div>
+        &nbsp;|&nbsp;
         <div key="write-mode" style={{ display: 'inline-block' }}>{(writeMode === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>
-        <div key="file-size" style={{ display: 'inline-block' }}>{`\xA0\xA0File\xA0Size:\xA0${fileSize}\xA0(0x${sprintf('%X', fileSize)})`}</div>
+        &nbsp;|
       </span>
     );
   }
