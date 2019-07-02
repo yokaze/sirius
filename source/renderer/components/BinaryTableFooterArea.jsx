@@ -40,6 +40,15 @@ export default class BinaryTableFooterArea extends Component {
   }
 }
 
+BinaryTableFooterArea.setFontFamily = (fontFamily) => {
+  const entry = `${fontFamily}, monospace`;
+  sheet.getRule('container').prop('font-family', entry);
+};
+
+BinaryTableFooterArea.setFontSize = (fontSize) => {
+  sheet.getRule('container').prop('font-size', fontSize);
+};
+
 BinaryTableFooterArea.propTypes = {
   writeMode: PropTypes.number.isRequired,
   fileSize: PropTypes.number.isRequired,

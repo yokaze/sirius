@@ -667,6 +667,7 @@ class BinaryTable extends Component {
       BinaryTableAddressCell.setFontFamily(fontFamily);
       BinaryTableDataRow.setFontFamily(fontFamily);
       BinaryTableExpressionRow.setFontFamily(fontFamily);
+      BinaryTableFooterArea.setFontFamily(fontFamily);
     }
     if (this.cache.fontSize !== fontSize) {
       this.cache.fontSize = fontSize;
@@ -674,6 +675,7 @@ class BinaryTable extends Component {
       BinaryTableAddressCell.setFontSize(fontSize);
       BinaryTableDataRow.setFontSize(fontSize);
       BinaryTableExpressionRow.setFontSize(fontSize);
+      BinaryTableFooterArea.setFontSize(fontSize);
     }
   }
 
