@@ -34,6 +34,16 @@ export default class SiriusApplicationModel {
     this._documents.get(key).path = path;
   }
 
+  saveFile(key, queryName) {
+    let path = this.getDocumentPath(key);
+    if (path === undefined) {
+      path = queryName();
+    }
+    if (path) {
+      this.saveFileAs(key, path);
+    }
+  }
+
   saveFileAs(key, path) {
     const binary = this.getDocument(key).getInternalBinary();
     const writer = new SiriusFileWriter(path, binary);

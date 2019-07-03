@@ -68,12 +68,7 @@ export default class SiriusModel {
   save() {
     const currentWindow = BrowserWindow.getFocusedWindow();
     const currentHandle = this.handles.get(currentWindow.id);
-    const filePath = this._appModel.getDocumentPath(currentHandle);
-    if (filePath) {
-      this._appModel.saveFileAs(currentHandle, filePath);
-    } else {
-      this.saveAs();
-    }
+    this._appModel.saveFile(currentHandle, () => dialog.showSaveDialog(null));
   }
 
   saveAs() {
