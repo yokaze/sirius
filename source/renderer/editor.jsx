@@ -497,7 +497,13 @@ class BinaryTable extends Component {
 
   onResized(contentRect) {
     const { width, height } = contentRect.entry;
-    const diff = { totalWidth: width, tableHeight: height };
+    const diff = { totalWidth: width, contentHeight: height };
+    this.setState(state => this.complementStateChange(state, diff));
+  }
+
+  onFooterResize(size) {
+    const { height } = size;
+    const diff = { footerHeight: height };
     this.setState(state => this.complementStateChange(state, diff));
   }
 
@@ -528,7 +534,8 @@ class BinaryTable extends Component {
   complementStateChange(state, diff) {
     if (diff.addressWidth
       || diff.totalWidth
-      || diff.tableHeight
+      || diff.contentHeight
+      || diff.footerHeight
       || diff.columnUnit
       || diff.rowHeight
       || diff.dataCellWidth
@@ -542,7 +549,7 @@ class BinaryTable extends Component {
         let rowCount = 1;
         if (nextState.rowHeight !== 0) {
           //  2 for excluding header and footer
-          rowCount = Math.floor((nextState.tableHeight / nextState.rowHeight) - 2);
+          rowCount = Math.floor(((nextState.contentHeight - nextState.footerHeight) / nextState.rowHeight) - 1);
         }
         let columnCount = 1;
         if ((nextState.dataCellWidth !== 0) && (nextState.expressionCellWidth !== 0)) {
@@ -732,7 +739,14 @@ class BinaryTable extends Component {
         items.push(<BinaryStructureNode listener={this} value={value} />);
       }
       items.push(<br key="br-footer" />);
-      items.push(<BinaryTableFooterArea key="binary-table-footer-area" writeMode={viewModel.getWriteMode()} fileSize={viewModel.length()} />);
+      items.push(
+        <BinaryTableFooterArea
+          key="binary-table-footer-area"
+          listener={this}
+          writeMode={viewModel.getWriteMode()}
+          fileSize={viewModel.length()}
+        />,
+      );
     }
     return (
       <Measure onResize={(contentRect) => { this.onResized(contentRect); }}>
