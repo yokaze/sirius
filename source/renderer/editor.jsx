@@ -13,6 +13,7 @@ import BinaryTableExpressionRow from './components/BinaryTableExpressionRow';
 import BinaryTableFooterArea from './components/BinaryTableFooterArea';
 import BinaryTableHeaderArea from './components/BinaryTableHeaderArea';
 import BinaryTableHeaderRow from './components/BinaryTableHeaderRow';
+import FooterMode from './FooterMode';
 import MidiParser from '../parser/MidiParser';
 import SiriusConstants from '../common/SiriusConstants';
 import SiriusDocument from '../common/SiriusDocument';
@@ -743,6 +744,7 @@ class BinaryTable extends Component {
         <BinaryTableFooterArea
           key="binary-table-footer-area"
           listener={this}
+          footerMode={FooterMode.Default}
           writeMode={viewModel.getWriteMode()}
           fileSize={viewModel.length()}
         />,

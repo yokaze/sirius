@@ -5,8 +5,10 @@ import PropTypes from 'prop-types';
 import React, { Component } from 'react';
 import Measure from 'react-measure';
 import { sprintf } from 'sprintf-js';
+import Input from '@material-ui/core/Input';
 
 import BinaryTableAddressCell from './BinaryTableAddressCell';
+import FooterMode from '../FooterMode';
 import WriteMode from '../WriteMode';
 
 const jss = create(preset());
@@ -38,16 +40,38 @@ export default class BinaryTableFooterArea extends Component {
   }
 
   render() {
-    const { writeMode, fileSize } = this.props;
+    const { footerMode, writeMode, fileSize } = this.props;
+    const items = [];
+    if ((footerMode === FooterMode.Find) || (footerMode === FooterMode.Replace)) {
+      items.push(
+        <span style={{ display: 'inline-block' }}>
+          <BinaryTableAddressCell value={'\xA0\xA0\xA0\xA0Find'} />
+        </span>,
+        <Input />,
+        <br />,
+      );
+    }
+    if (footerMode === FooterMode.Replace) {
+      items.push(
+        <span style={{ display: 'inline-block' }}>
+          <BinaryTableAddressCell value={'\xA0Replace'} />
+        </span>,
+        <Input />,
+        <br />,
+      );
+    }
+    items.push(
+      '\xA0',
+      <div key="file-size" style={{ display: 'inline-block' }}>{`File\xA0Size:\xA0${fileSize}\xA0(0x${sprintf('%X', fileSize)})`}</div>,
+      '\xA0|\xA0',
+      <div key="write-mode" style={{ display: 'inline-block' }}>{(writeMode === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>,
+      '\xA0|',
+    );
     return (
       <Measure onResize={this.onResize}>
         {({ measureRef }) => (
           <span key="binary-table-footer-row" ref={measureRef} className={classes.container}>
-            &nbsp;
-            <div key="file-size" style={{ display: 'inline-block' }}>{`File\xA0Size:\xA0${fileSize}\xA0(0x${sprintf('%X', fileSize)})`}</div>
-            &nbsp;|&nbsp;
-            <div key="write-mode" style={{ display: 'inline-block' }}>{(writeMode === WriteMode.Insert) ? 'Insert' : 'Overwrite'}</div>
-            &nbsp;|
+            {items}
           </span>
         )}
       </Measure>
@@ -68,6 +92,7 @@ BinaryTableFooterArea.propTypes = {
   listener: PropTypes.shape({
     onFooterResize: PropTypes.function,
   }).isRequired,
+  footerMode: PropTypes.number.isRequired,
   writeMode: PropTypes.number.isRequired,
   fileSize: PropTypes.number.isRequired,
 };
