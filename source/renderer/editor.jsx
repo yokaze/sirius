@@ -17,6 +17,7 @@ import FooterMode from './FooterMode';
 import MidiParser from '../parser/MidiParser';
 import SiriusConstants from '../common/SiriusConstants';
 import SiriusEditorViewModel from './SiriusEditorViewModel';
+import WriteMode from './WriteMode';
 
 const whiteStyle = {
   display: 'inline-block',
