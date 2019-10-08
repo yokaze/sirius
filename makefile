@@ -10,6 +10,9 @@ test:
 lint:
 	cd source; npx eslint . --ext .js --ext .jsx
 
+analyze:
+	cd source; cloc . --exclude-dir=node_modules --exclude-ext=json
+
 setup:
 	cd source; npm install
 
